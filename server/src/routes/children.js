@@ -74,8 +74,8 @@ r.post("/:id/password", async (req, res) => {
   notify(req.session.user_id, {
     childId: kid.id,
     type: "password_changed",
-    title: "Password changed",
-    body: "Your parents set you a new password.",
+    title: "Password updated",
+    body: "Your parent set a new sign-in password.",
     data: {},
   });
   res.json({ ok: true });

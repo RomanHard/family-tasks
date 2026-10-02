@@ -35,6 +35,15 @@ export default function NotifBell() {
     }
   };
 
+  const timeAgo = (createdAt) => {
+    const mins = Math.max(0, Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000));
+    if (mins < 1) return t("justNow");
+    if (mins < 60) return t("minAgo", { n: mins });
+    const h = Math.floor(mins / 60);
+    if (h < 24) return t("hoursAgo", { n: h });
+    return String(createdAt).slice(0, 16).replace("T", " ");
+  };
+
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
       <button onClick={toggle} title={t("notifs")} style={bellBtn} aria-label={t("notifs")}>
@@ -49,14 +58,20 @@ export default function NotifBell() {
               <button onClick={() => setOpen(false)}>✕</button>
             </div>
             <div style={{ maxHeight: 320, overflowY: "auto", marginTop: 8 }}>
-              {items.length === 0 && <p><small>{t("noNotifs")}</small></p>}
+              {items.length === 0 && (
+                <p>
+                  <b>{t("noNotifs")}</b>
+                  <br />
+                  <small>{t("noNotifsHint")}</small>
+                </p>
+              )}
               {items.map((n) => {
                 const { title, body } = notifText(lang, n);
                 return (
                   <div key={n.id} style={{ ...row, opacity: n.read ? 0.7 : 1 }}>
                     <div><b>{title}</b></div>
                     <div><small>{body}</small></div>
-                    <div><small style={{ color: "#888" }}>{String(n.created_at).slice(0, 16).replace("T", " ")}</small></div>
+                    <div><small style={{ color: "#888" }}>{timeAgo(n.created_at)}</small></div>
                   </div>
                 );
               })}

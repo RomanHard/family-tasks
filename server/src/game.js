@@ -148,11 +148,14 @@ export function creditRewards(childId, coins, exp) {
   const newCoins = active.coins + c;
   const afterLevel = levelForExp(newExp);
   const leveledUp = afterLevel > beforeLevel ? { from: beforeLevel, to: afterLevel } : null;
-  // level-up reward: a free mystic chest per gained level
-  const freeChests = leveledUp ? afterLevel - beforeLevel : 0;
-  db.prepare(
-    "UPDATE child_worlds SET exp = ?, coins = ?, level = ?, free_chests = free_chests + ? WHERE id = ?"
-  ).run(newExp, newCoins, afterLevel, freeChests, active.id);
+  // Level-up reward is a free mystery drop per gained level, auto-opened by
+  // the approve handler (canonical: "your free mystery drop contained X").
+  db.prepare("UPDATE child_worlds SET exp = ?, coins = ?, level = ? WHERE id = ?").run(
+    newExp,
+    newCoins,
+    afterLevel,
+    active.id
+  );
   return {
     world_id: active.world_id,
     coins: newCoins,

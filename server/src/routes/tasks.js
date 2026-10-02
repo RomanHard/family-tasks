@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "../db.js";
 import { requireParent, requireChild } from "../auth.js";
 import { creditRewards, applyDeadlineBonus } from "../game.js";
+import { localized, langOfChild } from "../game.js";
 import { notify, notifyParent } from "../notify.js";
 
 const r = Router();
@@ -100,7 +101,6 @@ r.post("/", requireParent, (req, res) => {
       data: {
         title: String(title).trim(),
         coins: Math.max(0, parseInt(coins) || 0),
-        exp: Math.max(0, parseInt(exp) || 0),
       },
     });
   }
@@ -190,22 +190,73 @@ r.post("/:id/approve", requireParent, (req, res) => {
     if (stillExists) reward = creditRewards(doerId, t.coins, t.exp);
   }
   if (doerId) {
+    const leveledUp = !!reward?.leveledUp;
+    const newLevel = reward?.leveledUp?.to || null;
+    const nick =
+      db.prepare("SELECT nickname FROM children WHERE id = ?").get(doerId)?.nickname || "";
+    const plan =
+      db.prepare("SELECT plan FROM parents WHERE id = ?").get(req.session.user_id)?.plan ||
+      "free";
+    let suffixKey = null;
+    let dropName = null;
+    if (leveledUp && newLevel) {
+      // Level-up reward: auto-open one free mystery drop per gained level.
+      const lang = langOfChild(doerId);
+      for (let lv = reward.leveledUp.from + 1; lv <= newLevel; lv++) {
+        const lvProgs = db
+          .prepare(
+            `SELECT * FROM potion_templates
+             WHERE parent_id = ? AND world_id = ? AND level = ? AND in_chest = 1 AND archived = 0`
+          )
+          .all(req.session.user_id, reward.world_id, lv);
+        if (lvProgs.length === 0) continue;
+        const pick = lvProgs[Math.floor(Math.random() * lvProgs.length)];
+        const lp = localized(pick, lang);
+        db.prepare(
+          `INSERT INTO kid_inventory (child_id, world_id, potion_template_id, name, effect)
+           VALUES (?, ?, ?, ?, ?)`
+        ).run(doerId, reward.world_id, pick.id, lp.name, lp.effect);
+        if (lv === newLevel) dropName = lp.name;
+      }
+      // Canonical level-up notifications to the parents (up to 4, separate).
+      if (plan === "free" && newLevel >= 4) {
+        notify(req.session.user_id, {
+          type: "plus_chapter_ready",
+          data: { name: nick, n: newLevel },
+        });
+        suffixKey = "plus";
+      }
+      if (dropName) {
+        notify(req.session.user_id, {
+          type: "mission_completed",
+          data: { name: nick, n: newLevel, program: dropName },
+        });
+        if (!suffixKey) suffixKey = "program";
+      } else {
+        notify(req.session.user_id, {
+          type: "mission_reward_setup",
+          data: { name: nick, n: newLevel },
+        });
+        if (!suffixKey) suffixKey = "setup";
+      }
+      notify(req.session.user_id, {
+        type: "check_level_rewards",
+        data: { name: nick, n: newLevel },
+      });
+    }
     notify(req.session.user_id, {
       childId: doerId,
       type: "task_approved",
-      title: "Task approved",
-      body: `+${t.coins} coins, +${t.exp} EXP: "${t.title}"`,
-      data: { title: t.title, coins: t.coins, exp: t.exp },
+      data: {
+        title: t.title,
+        coins: t.coins,
+        xp: t.exp,
+        leveledUp,
+        suffixKey,
+        n: newLevel,
+        program: dropName,
+      },
     });
-    if (reward?.leveledUp) {
-      notify(req.session.user_id, {
-        childId: doerId,
-        type: "level_up",
-        title: "Level up!",
-        body: `${reward.world_id}: level ${reward.leveledUp.to}`,
-        data: { world_id: reward.world_id, level: reward.leveledUp.to },
-      });
-    }
   }
   res.json({ ok: true, granted: { coins: t.coins, exp: t.exp }, reward });
 });
@@ -369,8 +420,8 @@ r.post("/:id/finish", requireChild, (req, res) => {
   notifyParent(req.session.user_id, {
     type: "task_review",
     title: "Task ready for review",
-    body: `${nick} — "${t.title}" is ready for review`,
-    data: { nick, title: t.title },
+    body: `${nick} finished "${t.title}"`,
+    data: { name: nick, title: t.title, note: String(note || "").trim() },
   });
   res.json({ ok: true });
 });
@@ -397,6 +448,11 @@ r.post("/suggest/new", requireChild, (req, res) => {
       "INSERT INTO task_suggestions (parent_id, child_id, title, details) VALUES (?, ?, ?, ?)"
     )
     .run(me.parent_id, req.session.user_id, String(title).trim(), String(details || "").trim());
+  const nick = db.prepare("SELECT nickname FROM children WHERE id = ?").get(req.session.user_id)?.nickname || "";
+  notifyParent(req.session.user_id, {
+    type: "task_suggested",
+    data: { name: nick, title: String(title).trim() },
+  });
   res.json({ ok: true, id: lastInsertRowid });
 });
 

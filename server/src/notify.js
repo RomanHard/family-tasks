@@ -5,7 +5,7 @@ import { db } from "./db.js";
  * the client maps known `type`s to localized strings (see NOTIF i18n).
  * `data` carries template variables as JSON.
  */
-export function notify(parentId, { childId = null, type, title, body, data = {} }) {
+export function notify(parentId, { childId = null, type, title = "", body = "", data = {} }) {
   db.prepare(
     `INSERT INTO notifications (parent_id, child_id, type, title, body, data)
      VALUES (?, ?, ?, ?, ?, ?)`

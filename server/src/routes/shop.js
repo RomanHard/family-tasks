@@ -248,9 +248,9 @@ r.post("/:world_id/buy-potion/:potion_id", requireChild, (req, res) => {
     .run(req.session.user_id, world_id, potion.id, lp.name, lp.effect);
   notifyParent(req.session.user_id, {
     type: "potion_bought",
-    title: "Program bought",
-    body: `${nickOf(req.session.user_id)}: ${potion.name} (${potion.price})`,
-    data: { nick: nickOf(req.session.user_id), name: potion.name, price: potion.price },
+    title: "Program unlocked",
+    body: `${nickOf(req.session.user_id)} bought the program "${lp.name}".`,
+    data: { name: nickOf(req.session.user_id), program: lp.name },
   });
   res.json({ ok: true, id: lastInsertRowid });
 });
@@ -293,9 +293,9 @@ r.post("/:world_id/open-chest", requireChild, (req, res) => {
     .run(req.session.user_id, world_id, drop.id, ld.name, ld.effect);
   notifyParent(req.session.user_id, {
     type: "chest_opened",
-    title: "Chest opened",
-    body: `Chest dropped: ${ld.name} (${nickOf(req.session.user_id)})`,
-    data: { nick: nickOf(req.session.user_id), drop: ld.name },
+    title: "Mystery drop opened",
+    body: `${nickOf(req.session.user_id)} unlocked "${ld.name}".`,
+    data: { name: nickOf(req.session.user_id), program: ld.name },
   });
   res.json({ ok: true, id: lastInsertRowid, drop: { name: ld.name, effect: ld.effect }, usedFree });
 });
@@ -319,11 +319,12 @@ r.post("/:world_id/buy-module/:key", requireChild, (req, res) => {
   db.prepare(
     "INSERT INTO purchased_modules (child_id, world_id, module_key) VALUES (?, ?, ?)"
   ).run(req.session.user_id, world_id, key);
+  const lm = localized(mod, langOfChild(req.session.user_id));
   notifyParent(req.session.user_id, {
     type: "module_bought",
-    title: "Module bought",
-    body: `${nickOf(req.session.user_id)}: ${mod.name}`,
-    data: { nick: nickOf(req.session.user_id), name: mod.name },
+    title: "Permanent module unlocked",
+    body: `${nickOf(req.session.user_id)} bought "${lm.name}".`,
+    data: { name: nickOf(req.session.user_id), module: lm.name },
   });
 
   // deadline shield: shift the kid's open tasks with deadlines by +1 day
@@ -357,9 +358,9 @@ r.post("/inventory/:id/use", requireChild, (req, res) => {
   db.prepare("UPDATE kid_inventory SET used = 1 WHERE id = ?").run(item.id);
   notifyParent(req.session.user_id, {
     type: "potion_used",
-    title: "Program started",
-    body: `${nickOf(req.session.user_id)}: ${item.name}`,
-    data: { nick: nickOf(req.session.user_id), name: item.name },
+    title: "Program run",
+    body: `${nickOf(req.session.user_id)} ran the program "${item.name}": ${item.effect}`,
+    data: { name: nickOf(req.session.user_id), program: item.name, effect: item.effect },
   });
   res.json({ ok: true });
 });

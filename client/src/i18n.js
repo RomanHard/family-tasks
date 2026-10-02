@@ -140,26 +140,40 @@ const S = {
   levelUp: { uk: "🎉 Новий рівень! {f} → {t} у світі «{w}»", en: "🎉 Level up! {f} → {t} in “{w}”", es: "🎉 ¡Nuevo nivel! {f} → {t} en «{w}»" },
   watchIntro: { uk: "Дивитись вступ", en: "Watch intro", es: "Ver la intro" },
   // subscription / paywall
-  subscriptionTitle: { uk: "Підписка", en: "Subscription", es: "Suscripción" },
-  currentPlan: { uk: "Поточний план", en: "Current plan", es: "Plan actual" },
-  planFree: { uk: "Безкоштовний", en: "Free", es: "Gratis" },
-  planPlus: { uk: "Family Tasks Plus", en: "Family Tasks Plus", es: "Family Tasks Plus" },
-  previewPlus: { uk: "Попередній перегляд Plus", en: "Preview Plus access", es: "Vista previa de Plus" },
-  switchToFree: { uk: "Повернутись на Free", en: "Switch back to Free", es: "Volver a Gratis" },
-  billingNote: { uk: "Реальні платежі буде підключено до публічного релізу.", en: "Billing will be connected for the public release.", es: "Los pagos reales se conectarán para el lanzamiento público." },
+  subscriptionTitle: { uk: "Family Tasks Plus", en: "Family Tasks Plus", es: "Family Tasks Plus" },
+  currentPlan: { uk: "3 глави безкоштовно. Повна історія має 10.", en: "3 chapters free. The full story has 10.", es: "3 capítulos gratis. La historia completa tiene 10." },
+  planFreeBullet: { uk: "Глави 1–3 включено безкоштовно.", en: "Chapters 1–3 are included free.", es: "Los capítulos 1–3 están incluidos gratis." },
+  planPlusBullet: { uk: "Plus відкриває глави 4–10 у кожному світі.", en: "Plus opens Chapters 4–10 in every world.", es: "Plus abre los capítulos 4–10 en cada mundo." },
+  freeBadge: { uk: "БЕЗКОШТОВНО", en: "FREE", es: "GRATIS" },
+  stayFree: { uk: "Залишитись на безкоштовному", en: "Stay on Free", es: "Quedarse en el plan gratuito" },
+  previewPlusBtn: { uk: "Переглянути Plus", en: "Preview Plus", es: "Vista previa de Plus" },
+  previewNote: { uk: "Це перемикач попереднього перегляду. Справжня оплата з'явиться пізніше.", en: "This is a preview toggle. Real billing comes later.", es: "Este es un interruptor de vista previa. La facturación real llegará más tarde." },
   plusLockedTitle: { uk: "Рівень Plus 🔒", en: "Plus level 🔒", es: "Nivel Plus 🔒" },
   plusLockedBody: { uk: "Рівні 4–10 доступні з Family Tasks Plus. Твій EXP продовжує накопичуватись!", en: "Levels 4–10 need Family Tasks Plus. Your EXP keeps accumulating!", es: "Los niveles 4–10 requieren Family Tasks Plus. ¡Tu EXP sigue acumulándose!" },
   askParents: { uk: "Попросити батьків", en: "Ask parents", es: "Pedir a los padres" },
-  plusRequestSent: { uk: "Запит надіслано батькам ✓", en: "Request sent to parents ✓", es: "Solicitud enviada a los padres ✓" },
+  rewardRequestSent: { uk: "Запит надіслано батькам ✓", en: "Request sent to parents ✓", es: "Solicitud enviada a los padres ✓" },
   // notifications
   notifs: { uk: "Сповіщення", en: "Notifications", es: "Notificaciones" },
-  noNotifs: { uk: "Поки порожньо.", en: "Nothing here yet.", es: "Nada por aquí todavía." },
+  noNotifs: { uk: "Усе спокійно", en: "All quiet", es: "Todo tranquilo" },
+  noNotifsHint: { uk: "Нові завдання, схвалення та оновлення нагород з'являться тут.", en: "New task, approval, and reward updates will appear here.", es: "Las nuevas tareas, aprobaciones y actualizaciones de recompensas aparecerán aquí." },
+  justNow: { uk: "щойно", en: "just now", es: "ahora mismo" },
+  minAgo: { uk: "{n} хв тому", en: "{n}m ago", es: "hace {n} min" },
+  hoursAgo: { uk: "{n} год тому", en: "{n}h ago", es: "hace {n} h" },
+  // child paywall modal
+  pwStoryGoesOn: { uk: "Історія продовжується тут.", en: "The story continues here.", es: "La historia continúa aquí." },
+  pwBody: { uk: "Рівні 1–3 включено безкоштовно. Plus відкриває глави 4–10 у кожному світі разом із програмами рівнів і таємними нагородами.", en: "Levels 1–3 are included free. Plus opens Chapters 4–10 in every world, along with their level programs and mystery rewards.", es: "Los niveles 1–3 están incluidos gratis. Plus abre los capítulos 4–10 en cada mundo, junto con los programas de nivel y las recompensas misteriosas." },
+  pwChapterOf: { uk: "Глава {n}: {title}", en: "Chapter {n}: {title}", es: "Capítulo {n}: {title}" },
+  pwAskParent: { uk: "Попроси батьків розблокувати Plus", en: "Ask a parent to unlock Plus", es: "Pide a un padre que desbloquee Plus" },
+  pwSending: { uk: "Надсилання…", en: "Sending…", es: "Enviando…" },
+  pwSent: { uk: "Батьків повідомлено", en: "Parent notified", es: "Padre notificado" },
+  pwKeepFree: { uk: "Продовжити грати безкоштовно", en: "Keep playing free", es: "Seguir jugando gratis" },
   // family rewards ("Ask for one")
   rewards: { uk: "Сімейні винагороди", en: "Family rewards", es: "Recompensas familiares" },
   askForOne: { uk: "Попросити", en: "Ask for one", es: "Pedir una" },
   rewardPh: { uk: "Яку винагороду хочеш попросити?", en: "What reward do you want to ask for?", es: "¿Qué recompensa quieres pedir?" },
   rewardRequests: { uk: "Запити винагород", en: "Reward requests", es: "Solicitudes de recompensas" },
   noRewards: { uk: "Поки немає запитів.", en: "No requests yet.", es: "Aún no hay solicitudes." },
+  setCoinPrice: { uk: "Встановити ціну", en: "Set coin price", es: "Fijar precio" },
   rwPending: { uk: "чекає", en: "pending", es: "pendiente" },
   rwApproved: { uk: "схвалено", en: "approved", es: "aprobada" },
   rwDeclined: { uk: "відхилено", en: "declined", es: "rechazada" },
@@ -283,6 +297,8 @@ const S = {
   themeOcean: { uk: "Океан", en: "Ocean", es: "Océano" },
   themeNight: { uk: "Нічна", en: "Night", es: "Noche" },
   kidThemeLabel: { uk: "Тема дитини", en: "Child theme", es: "Tema infantil" },
+  kidResetHint: { uk: "Вкажи свій нік — батьки отримають прохання встановити тобі новий пароль.", en: "Enter your nickname — your parents will get a request to set you a new password.", es: "Escribe tu apodo — tus padres recibirán una solicitud para ponerte una nueva contraseña." },
+  kidResetSent: { uk: "Батьків повідомлено. Попроси їх встановити тобі новий пароль.", en: "Your parents have been notified. Ask them to set you a new password.", es: "Tus padres han sido notificados. Pídeles que te pongan una nueva contraseña." },
 };
 
 export const TASK_CATEGORIES = ["home", "study", "sport", "create", "kind", "nature", "other"];
@@ -292,80 +308,169 @@ export function catLabel(id, lang) {
   return tr(lang, `cat_${TASK_CATEGORIES.includes(id) ? id : "other"}`);
 }
 
-// Localized notification templates by type. Stored title/body (English) are
-// used as fallback for unknown types. `data` carries template variables.
+// Canonical verbatim notification templates from the original app.
+// Stored title/body are always rendered from these plus notification `data`.
+// Rows marked UNTRANSLATED in the original stay English: the entry only
+// carries an `en` string and pick() falls back to it in every language.
+// `noteSuffix` appends when data.note is non-empty; `suffixes` picks an
+// always-English suffix via data.suffixKey (UNTRANSLATED by design);
+// `titleBy` selects title/body variants by a data field.
 export const NOTIF_TPL = {
+  // 1 — child opens a mystery drop
+  chest_opened: {
+    title: { uk: "Таємний подарунок відкрито", en: "Mystery drop opened", es: "Regalo misterioso abierto" },
+    body: { uk: "{name} відкрив/відкрила \"{program}\" у безкоштовному таємному подарунку.", en: "{name} unlocked \"{program}\".", es: "{name} desbloqueó \"{program}\"." },
+  },
+  // 2 — child asks parents for a new password
+  child_password_request: {
+    title: { uk: "Запит на скидання пароля", en: "Password reset requested", es: "Solicitud de restablecimiento de contraseña" },
+    body: { uk: "{name} потрібен новий пароль.", en: "{name} needs a new password.", es: "{name} necesita una nueva contraseña." },
+  },
+  // 3 — parent password reset request (email to the same parent)
+  password_reset_request: {
+    title: { uk: "Запит на скидання пароля", en: "Password reset requested", es: "Solicitud de restablecimiento de contraseña" },
+    body: { uk: "Запит на скидання пароля було надіслано для цього батьківського облікового запису.", en: "A password reset was requested for this parent account.", es: "Se solicitó un restablecimiento de contraseña para esta cuenta de padres." },
+  },
+  // 4 — parent set the child a new password
+  password_changed: {
+    title: { uk: "Пароль оновлено", en: "Password updated", es: "Contraseña actualizada" },
+    body: { uk: "Твій батько/мама встановив новий пароль для входу.", en: "Your parent set a new sign-in password.", es: "Tu padre/madre estableció una nueva contraseña de inicio de sesión." },
+  },
+  // 5 — parent assigns a task (coins stay English in all languages)
   task_assigned: {
     title: { uk: "Нове завдання", en: "New task", es: "Nueva tarea" },
-    body: { uk: "«{title}» — {coins} монет, {exp} EXP", en: "“{title}” — {coins} coins, {exp} EXP", es: "«{title}» — {coins} monedas, {exp} EXP" },
+    body: { uk: "{title} · {coins} coins", en: "{title} · {coins} coins", es: "{title} · {coins} coins" },
   },
-  task_review: {
-    title: { uk: "Завдання на перевірці", en: "Task ready for review", es: "Tarea lista para revisar" },
-    body: { uk: "{nick} — «{title}» готове до перевірки", en: "{nick} — “{title}” is ready for review", es: "{nick} — «{title}» lista para revisar" },
+  // 6 — child submits a task for review (+ optional note suffix)
+  task_submitted: {
+    title: { uk: "Завдання готове до перевірки", en: "Task ready to review", es: "Tarea lista para revisar" },
+    body: { uk: "{name} завершив/завершила \"{title}\".", en: "{name} finished \"{title}\".", es: "{name} terminó \"{title}\"." },
+    noteSuffix: { uk: " Нотатка: {note}", en: " Note: {note}", es: " Nota: {note}" },
   },
+  // 7a — level-up -> parents: free plan hits the Plus gate
+  plus_chapter_ready: {
+    title: { uk: "Главі {n} потрібен Plus", en: "Chapter {n} needs Plus", es: "El capítulo {n} necesita Plus" },
+    body: { uk: "Чудовий прогрес! {name} досяг/досягла рівня {n}, але глави 4–10 — це частина Family Tasks Plus.", en: "Great progress! {name} reached Level {n}, but Chapters 4–10 are part of Family Tasks Plus.", es: "¡Gran progreso! {name} alcanzó el nivel {n}, pero los capítulos 4–10 son parte de Family Tasks Plus." },
+  },
+  // 7b — level-up -> parents: free drop auto-opened a program
+  mission_completed: {
+    title: { uk: "Главу {n} пройдено", en: "Chapter {n} complete", es: "Capítulo {n} completado" },
+    body: { uk: "{name} досяг/досягла рівня {n} і розблокував/розблокувала \"{program}\" з безкоштовного таємного подарунка.", en: "{name} reached Level {n} and unlocked \"{program}\"from a free mystery drop.", es: "{name} alcanzó el nivel {n} y desbloqueó \"{program}\" de un regalo misterioso gratuito." },
+  },
+  // 7c — level-up -> parents: the new level has no chest programs
+  mission_reward_setup: {
+    title: { uk: "Нагороді рівня {n} бракує", en: "Level {n} reward missing", es: "Falta la recompensa del nivel {n}" },
+    body: { uk: "{name} досяг/досягла рівня {n}, але його таємний подарунок поки не має програм. Додайте щонайменше одну програму в налаштуваннях гри, щоб нагорода за підвищення рівня існувала.", en: "{name} reached Level {n}, but its mystery drop has no programs yet. Add at least one program in Game setup so the level-up reward exists.", es: "{name} alcanzó el nivel {n}, pero su regalo misterioso aún no tiene programas. Añade al menos un programa en la configuración del juego para que exista la recompensa de subida de nivel." },
+  },
+  // 7d — level-up -> parents: review this level's rewards
+  check_level_rewards: {
+    title: { uk: "Перевірте нагороди рівня {n}", en: "Check Level {n} rewards", es: "Revisa las recompensas del nivel {n}" },
+    body: { uk: "Перегляньте назви нагород, ефекти, ціни та вибір таємного подарунка для цього рівня в налаштуваннях гри.", en: "Review the reward names, effects, prices, and mystery-drop choices for this level in Game setup.", es: "Revisa los nombres de las recompensas, los efectos, los precios y las opciones del regalo misterioso para este nivel en la configuración del juego." },
+  },
+  // 8 — badge (no trigger yet; template kept for parity)
+  badge: {
+    title: { uk: "Бейдж розблоковано", en: "Badge unlocked", es: "Insignia desbloqueada" },
+    body: { uk: "Ти заробив/заробила бейдж {badge}.", en: "You earned the {badge} badge.", es: "Ganaste la insignia {badge}." },
+  },
+  // 9 — parent approves a task (title + suffix depend on level-up)
   task_approved: {
-    title: { uk: "Завдання схвалено ✅", en: "Task approved ✅", es: "Tarea aprobada ✅" },
-    body: { uk: "+{coins} монет, +{exp} EXP: «{title}»", en: "+{coins} coins, +{exp} EXP: “{title}”", es: "+{coins} monedas, +{exp} EXP: «{title}»" },
+    titleBy: "leveledUp",
+    title: {
+      yes: { uk: "Новий рівень!", en: "Level up!", es: "¡Nuevo nivel!" },
+      no: { uk: "Завдання схвалено", en: "Task approved", es: "Tarea aprobada" },
+    },
+    body: { uk: "{coins} монет та {xp} досвіду додано за \"{title}\".", en: "{coins} coins and {xp} EXP were added for \"{title}\".", es: "Se añadieron {coins} monedas y {xp} EXP por \"{title}\"." },
+    suffixes: {
+      plus: { en: " Level {n} is ready, but Chapters 4–10 need Family Tasks Plus. Your EXP is safely saved." },
+      program: { en: " Level {n} reached — your free mystery drop contained \"{program}\" and is now in your inventory." },
+      setup: { en: " Level {n} reached. Ask a parent to activate an unlocked mystery-drop power in Game setup." },
+    },
   },
+  // 10 — parent sends the task back
   task_rejected: {
-    title: { uk: "Завдання повернуто", en: "Task sent back", es: "Tarea devuelta" },
-    body: { uk: "«{title}» — глянь ще раз", en: "“{title}” — take another look", es: "«{title}» — revísala de nuevo" },
+    title: { uk: "Спробуй ще", en: "Try again", es: "Inténtalo de nuevo" },
+    body: { uk: "\"{title}\" потребує ще однієї спроби.", en: "\"{title}\" needs another try.", es: "\"{title}\" necesita otro intento." },
   },
-  level_up: {
-    title: { uk: "Новий рівень! 🎉", en: "Level up! 🎉", es: "¡Nuevo nivel! 🎉" },
-    body: { uk: "{world}: рівень {level}", en: "{world}: level {level}", es: "{world}: nivel {level}" },
+  // 11 — child suggests a task -> parents
+  task_suggested: {
+    title: { uk: "Ідея завдання", en: "Task idea", es: "Idea de tarea" },
+    body: { uk: "{name} запропонував/запропонувала \"{title}\".", en: "{name} suggested \"{title}\".", es: "{name} sugirió \"{title}\"." },
   },
-  chest_opened: {
-    title: { uk: "Скриня відкрита 🎁", en: "Chest opened 🎁", es: "Cofre abierto 🎁" },
-    body: { uk: "Зі скрині випало: {drop} ({nick})", en: "Chest dropped: {drop} ({nick})", es: "El cofre contenía: {drop} ({nick})" },
-  },
-  potion_bought: {
-    title: { uk: "Куплено програму", en: "Program bought", es: "Programa comprado" },
-    body: { uk: "{nick}: {name} ({price})", en: "{nick}: {name} ({price})", es: "{nick}: {name} ({price})" },
-  },
-  potion_used: {
-    title: { uk: "Програму запущено", en: "Program started", es: "Programa iniciado" },
-    body: { uk: "{nick}: {name}", en: "{nick}: {name}", es: "{nick}: {name}" },
-  },
-  module_bought: {
-    title: { uk: "Куплено модуль", en: "Module bought", es: "Módulo comprado" },
-    body: { uk: "{nick}: {name}", en: "{nick}: {name}", es: "{nick}: {name}" },
-  },
+  // 12 — task suggestion accepted / declined -> child
   suggestion_accepted: {
-    title: { uk: "Ідею прийнято ✅", en: "Suggestion accepted ✅", es: "Sugerencia aceptada ✅" },
-    body: { uk: "«{title}» стало завданням", en: "“{title}” became a task", es: "«{title}» se convirtió en tarea" },
+    title: { uk: "Ідею завдання прийнято", en: "Task idea accepted", es: "Idea de tarea aceptada" },
+    body: { uk: "Один з батьків прийняв твою ідею і тепер може перетворити її на завдання.", en: "A parent accepted your idea and can now turn it into a task.", es: "Un padre aceptó tu idea y ahora puede convertirla en una tarea." },
   },
   suggestion_declined: {
-    title: { uk: "Ідею відхилено", en: "Suggestion declined", es: "Sugerencia rechazada" },
-    body: { uk: "«{title}»", en: "“{title}”", es: "«{title}»" },
+    title: { uk: "Ідею завдання відхилено", en: "Task idea declined", es: "Idea de tarea rechazada" },
+    body: { uk: "Твою ідею \"{title}\" відхилено.", en: "Your idea \"{title}\" was declined.", es: "Tu idea \"{title}\" fue rechazada." },
   },
-  plus_requested: {
-    title: { uk: "Запит на Plus", en: "Plus requested", es: "Solicitud de Plus" },
-    body: { uk: "{nickname} просить Family Tasks Plus (рівні 4–10)", en: "{nickname} asks for Family Tasks Plus (levels 4–10)", es: "{nickname} pide Family Tasks Plus (niveles 4–10)" },
-  },
-  plan_changed: {
-    title: { uk: "План змінено", en: "Plan changed", es: "Plan cambiado" },
-    body: { uk: "Тепер: {plan}", en: "Now: {plan}", es: "Ahora: {plan}" },
-  },
-  password_changed: {
-    title: { uk: "Пароль змінено", en: "Password changed", es: "Contraseña cambiada" },
-    body: { uk: "Батьки встановили тобі новий пароль", en: "Your parents set you a new password", es: "Tus padres te pusieron una nueva contraseña" },
-  },
-  password_reset_request: {
-    title: { uk: "Запит на скидання пароля", en: "Password reset requested", es: "Solicitud de restablecimiento" },
-    body: { uk: "{email} просить скинути пароль", en: "{email} requests a password reset", es: "{email} solicita restablecer la contraseña" },
-  },
+  // 13 — child suggests a family reward -> parents
   reward_requested: {
-    title: { uk: "Запит винагороди", en: "Reward requested", es: "Recompensa solicitada" },
-    body: { uk: "{nick}: {text}", en: "{nick}: {text}", es: "{nick}: {text}" },
+    title: { uk: "Нова ідея нагороди", en: "New reward idea", es: "Nueva idea de recompensa" },
+    body: { uk: "{name} дуже хотів би/хотіла б \"{title}\".", en: "{name} would love \"{title}\".", es: "A {name} le encantaría \"{title}\"." },
   },
-  reward_approved: {
-    title: { uk: "Винагороду схвалено ✅", en: "Reward approved ✅", es: "Recompensa aprobada ✅" },
-    body: { uk: "«{text}»", en: "“{text}”", es: "«{text}»" },
-  },
+  // 14 — reward suggestion declined -> child
   reward_declined: {
-    title: { uk: "Винагороду відхилено", en: "Reward declined", es: "Recompensa rechazada" },
-    body: { uk: "«{text}»", en: "“{text}”", es: "«{text}»" },
+    title: { uk: "Ідею нагороди відхилено", en: "Reward idea declined", es: "Idea de recompensa rechazada" },
+    body: { uk: "Твою ідею \"{title}\" відхилено.", en: "Your idea \"{title}\" was declined.", es: "Tu idea \"{title}\" fue rechazada." },
+  },
+  // 15 — reward suggestion accepted -> child
+  reward_approved: {
+    title: { uk: "Ідею нагороди прийнято", en: "Reward idea accepted", es: "Idea de recompensa aceptada" },
+    body: { uk: "\"{title}\" додано за {coins} монет.", en: "\"{title}\" was added for {coins} coins.", es: "\"{title}\" se añadió por {coins} monedas." },
+  },
+  // 16 — reward request decision -> child (approved / declined)
+  reward_decision: {
+    titleBy: "decision",
+    title: {
+      approved: { uk: "Нагороду схвалено", en: "Reward approved", es: "Recompensa aprobada" },
+      declined: { uk: "Нагороду відхилено", en: "Reward declined", es: "Recompensa rechazada" },
+    },
+    body: {
+      approved: { uk: "{coins} монет обміняно на \"{title}\".", en: "{coins} coins were redeemed for \"{title}\".", es: "Se canjearon {coins} monedas por \"{title}\"." },
+      declined: { uk: "Твій запит на \"{title}\" відхилено.", en: "Your request for \"{title}\" was declined.", es: "Tu solicitud de \"{title}\" fue rechazada." },
+    },
+  },
+  // 17 — child requests an approved reward -> parents (no flow yet; template kept)
+  reward_request: {
+    title: { uk: "Запит на нагороду", en: "Reward request", es: "Solicitud de recompensa" },
+    body: { uk: "{name} хоче \"{title}\" за {coins} монет.", en: "{name} wants \"{title}\" for {coins} coins.", es: "{name} quiere \"{title}\" por {coins} monedas." },
+  },
+  // 18 — chest bought and stored -> parents (UNTRANSLATED; no flow yet; template kept)
+  chest_bought: {
+    title: { en: "Mystery drop collected" },
+    body: { en: "{name} bought a Level {n} mystery drop and saved it in inventory." },
+  },
+  // 19 — permanent module bought (title UNTRANSLATED)
+  module_bought: {
+    title: { en: "Permanent module unlocked" },
+    body: { uk: "{name} купив/купила \"{module}\".", en: "{name} bought \"{module}\".", es: "{name} compró \"{module}\"." },
+  },
+  // 20 — one-time program bought
+  potion_bought: {
+    title: { uk: "Програму розблоковано", en: "Program unlocked", es: "Programa desbloqueado" },
+    body: { uk: "{name} купив/купила програму \"{program}\".", en: "{name} bought the program \"{program}\".", es: "{name} compró el programa \"{program}\"." },
+  },
+  // 21 — child runs a program from inventory
+  potion_used: {
+    title: { uk: "Програму запущено", en: "Program run", es: "Programa ejecutado" },
+    body: { uk: "{name} запустив/запустила програму \"{program}\": {effect}", en: "{name} ran the program \"{program}\": {effect}", es: "{name} ejecutó el programa \"{program}\": {effect}" },
+  },
+  // 22 — child asks for Plus
+  plus_requested: {
+    title: { uk: "Запитано доступ до Plus", en: "Plus access requested", es: "Acceso Plus solicitado" },
+    body: { uk: "{name} дійшов/дійшла до кінця безкоштовної пригоди і хоче продовжити з главами 4–10.", en: "{name} reached the end of the free adventure and wants to continue with Chapters 4–10.", es: "{name} llegó al final de la aventura gratuita y quiere continuar con los capítulos 4–10." },
+  },
+  // 23a — parent switches to the Plus preview
+  plan_changed_plus: {
+    title: { uk: "Усі глави розблоковано", en: "All chapters unlocked", es: "Todos los capítulos desbloqueados" },
+    body: { uk: "Увімкнено попередній перегляд Family Tasks Plus. Глави 4–10 тепер відкриються, коли ви до них дійдете.", en: "Family Tasks Plus preview is on. Chapters 4–10 are now open when you reach them.", es: "La vista previa de Family Tasks Plus está activada. Los capítulos 4–10 ahora se abrirán cuando los alcances." },
+  },
+  // 23b — parent switches back to Free
+  plan_changed_free: {
+    title: { uk: "Активний безкоштовний план", en: "Free plan active", es: "Plan gratuito activo" },
+    body: { uk: "Глави 1–3 залишаються відкритими. Для глав 4–10 потрібен Family Tasks Plus.", en: "Chapters 1–3 stay open. Chapters 4–10 need Family Tasks Plus.", es: "Los capítulos 1–3 permanecen abiertos. Los capítulos 4–10 necesitan Family Tasks Plus." },
   },
 };
 
@@ -373,21 +478,25 @@ export function notifText(lang, n) {
   const tpl = NOTIF_TPL[n.type];
   let data = {};
   try { data = JSON.parse(n.data || "{}"); } catch { /* keep empty */ }
-  if (data.world_id) data.world = worldName(data.world_id, lang);
-  if (data.plan) data.plan = data.plan === "plus" ? "Plus" : "Free";
-  const fill = (s) => {
-    let out = s;
-    for (const [k, v] of Object.entries(data)) out = out.replaceAll(`{${k}}`, String(v ?? ""));
-    return out;
-  };
-  if (tpl) {
-    return {
-      title: fill(tpl.title[lang] || tpl.title.uk),
-      body: fill(tpl.body[lang] || tpl.body.uk),
-    };
+  if (!tpl) return { title: n.title, body: n.body };
+  const pick = (t) => (t && (t[lang] || t.en)) || "";
+  const fill = (s) => String(s ?? "").replace(/\{(\w+)\}/g, (_, k) => String(data[k] ?? ""));
+  let vk = null;
+  if (tpl.titleBy) {
+    const v = data[tpl.titleBy];
+    vk = v === true ? "yes" : v === false ? "no" : v;
   }
-  return { title: n.title, body: n.body };
+  const titleSrc = vk && tpl.title[vk] ? tpl.title[vk] : tpl.title;
+  const bodySrc = vk && tpl.body && tpl.body[vk] ? tpl.body[vk] : tpl.body;
+  let title = fill(pick(titleSrc));
+  let body = fill(pick(bodySrc));
+  if (tpl.noteSuffix && data.note) body += fill(pick(tpl.noteSuffix));
+  if (tpl.suffixes && data.suffixKey && tpl.suffixes[data.suffixKey]) {
+    body += fill(tpl.suffixes[data.suffixKey].en); // UNTRANSLATED by design
+  }
+  return { title, body };
 }
+
 
 export const LANGS = [
   { id: "uk", label: "Українська" },

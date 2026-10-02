@@ -185,6 +185,7 @@ addColumn("module_templates", "bonus_es", "TEXT NOT NULL DEFAULT ''");
 // themes (phase 10)
 addColumn("parents", "theme", "TEXT NOT NULL DEFAULT 'bright'");
 addColumn("children", "theme", "TEXT NOT NULL DEFAULT 'sky'");
+addColumn("redemptions", "coins", "INTEGER NOT NULL DEFAULT 0");
 
 export function getDb() {
   return db;

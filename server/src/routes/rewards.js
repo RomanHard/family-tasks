@@ -19,9 +19,9 @@ r.post("/request", requireChild, (req, res) => {
     .run(me.parent_id, req.session.user_id, String(text).trim().slice(0, 300));
   notifyParent(req.session.user_id, {
     type: "reward_requested",
-    title: "Reward requested",
-    body: `${me.nickname}: ${String(text).trim().slice(0, 300)}`,
-    data: { nick: me.nickname, text: String(text).trim().slice(0, 300) },
+    title: "New reward idea",
+    body: `${me.nickname} would love "${String(text).trim().slice(0, 300)}".`,
+    data: { name: me.nickname, title: String(text).trim().slice(0, 300) },
   });
   res.json({ ok: true, id: lastInsertRowid });
 });
@@ -63,13 +63,17 @@ function decide(req, res, status) {
     .prepare("SELECT * FROM redemptions WHERE id = ? AND parent_id = ? AND status = 'pending'")
     .get(req.params.id, req.session.user_id);
   if (!rwd) return res.status(404).json({ error: "request not found" });
-  db.prepare("UPDATE redemptions SET status = ? WHERE id = ?").run(status, rwd.id);
+  const coins = status === "approved" ? Math.max(0, parseInt(req.body?.coins) || 0) : 0;
+  db.prepare("UPDATE redemptions SET status = ?, coins = ? WHERE id = ?").run(status, coins, rwd.id);
   notify(req.session.user_id, {
     childId: rwd.child_id,
     type: status === "approved" ? "reward_approved" : "reward_declined",
-    title: status === "approved" ? "Reward approved" : "Reward declined",
-    body: `"${rwd.text}"`,
-    data: { text: rwd.text },
+    title: status === "approved" ? "Reward idea accepted" : "Reward idea declined",
+    body:
+      status === "approved"
+        ? `"${rwd.text}" was added for ${coins} coins.`
+        : `Your idea "${rwd.text}" was declined.`,
+    data: { title: rwd.text, coins },
   });
   res.json({ ok: true });
 }

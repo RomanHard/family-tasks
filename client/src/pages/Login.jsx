@@ -17,6 +17,9 @@ export default function Login() {
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetMsg, setResetMsg] = useState("");
+  const [showKidReset, setShowKidReset] = useState(false);
+  const [kidResetNick, setKidResetNick] = useState("");
+  const [kidResetMsg, setKidResetMsg] = useState("");
 
   const sendReset = async (e) => {
     e.preventDefault();
@@ -27,6 +30,17 @@ export default function Login() {
     }
     setResetMsg(t("resetSent"));
     setResetEmail("");
+  };
+
+  const sendKidReset = async (e) => {
+    e.preventDefault();
+    try {
+      await api("/api/auth/child-password-request", { method: "POST", body: { nickname: kidResetNick } });
+    } catch {
+      /* same message either way — no nickname enumeration */
+    }
+    setKidResetMsg(t("kidResetSent"));
+    setKidResetNick("");
   };
 
   const submit = async (e) => {
@@ -127,6 +141,35 @@ export default function Login() {
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={styles.button} type="submit">{t("send")}</button>
                 <button type="button" onClick={() => { setShowReset(false); setResetMsg(""); }}>
+                  {t("cancel")}
+                </button>
+              </div>
+            </form>
+          )}
+        </>
+      )}
+      {mode === "child" && (
+        <>
+          {!showKidReset ? (
+            <p>
+              <button type="button" onClick={() => setShowKidReset(true)} style={styles.link}>
+                {t("forgotPw")}
+              </button>
+            </p>
+          ) : (
+            <form onSubmit={sendKidReset} style={styles.form}>
+              <input
+                style={styles.input}
+                placeholder={t("nickname")}
+                value={kidResetNick}
+                onChange={(e) => setKidResetNick(e.target.value)}
+                required
+              />
+              <p><small>{t("kidResetHint")}</small></p>
+              {kidResetMsg && <p style={{ color: "green" }}><small>{kidResetMsg}</small></p>}
+              <div style={{ display: "flex", gap: 8 }}>
+                <button style={styles.button} type="submit">{t("send")}</button>
+                <button type="button" onClick={() => { setShowKidReset(false); setKidResetMsg(""); }}>
                   {t("cancel")}
                 </button>
               </div>

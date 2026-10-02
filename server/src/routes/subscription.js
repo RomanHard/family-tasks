@@ -18,10 +18,8 @@ r.patch("/plan", requireParent, (req, res) => {
   if (!PLANS.includes(plan)) return res.status(400).json({ error: "unknown plan" });
   db.prepare("UPDATE parents SET plan = ? WHERE id = ?").run(plan, req.session.user_id);
   notify(req.session.user_id, {
-    type: "plan_changed",
-    title: "Subscription plan changed",
-    body: `Plan is now ${plan === "plus" ? "Family Tasks Plus" : "Free"}.`,
-    data: { plan },
+    type: plan === "plus" ? "plan_changed_plus" : "plan_changed_free",
+    data: {},
   });
   res.json({ ok: true, plan });
 });
@@ -41,9 +39,9 @@ r.post("/request", requireChild, (req, res) => {
   if (!existing) {
     notify(me.parent_id, {
       type: "plus_requested",
-      title: "Family Tasks Plus requested",
-      body: `${me.nickname} asks for Family Tasks Plus (levels 4-10).`,
-      data: { nickname: me.nickname },
+      title: "Plus access requested",
+      body: `${me.nickname} reached the end of the free adventure and wants to continue with Chapters 4–10.`,
+      data: { name: me.nickname },
     });
   }
   res.json({ ok: true });

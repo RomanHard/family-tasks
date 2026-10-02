@@ -257,13 +257,29 @@ function SubscriptionPanel() {
     <section style={panelBox}>
       <h2 style={{ marginTop: 0 }}>{t("subscriptionTitle")}</h2>
       <p>
-        {t("currentPlan")}: <b>{plan === "plus" ? t("planPlus") : t("planFree")}</b>
+        <span style={planBadge}>{plan === "plus" ? "PLUS PREVIEW" : t("freeBadge")}</span>
       </p>
-      <button onClick={toggle}>{plan === "plus" ? t("switchToFree") : t("previewPlus")}</button>
-      <p><small>{t("billingNote")}</small></p>
+      <p>{t("currentPlan")}</p>
+      <ul>
+        <li>{t("planFreeBullet")}</li>
+        <li>{t("planPlusBullet")}</li>
+      </ul>
+      <button onClick={toggle}>{plan === "plus" ? t("stayFree") : t("previewPlusBtn")}</button>
+      <p><small>{t("previewNote")}</small></p>
     </section>
   );
 }
+
+const planBadge = {
+  display: "inline-block",
+  fontSize: 11,
+  fontWeight: "bold",
+  letterSpacing: 1,
+  padding: "4px 10px",
+  borderRadius: 999,
+  border: "1px solid #cbd7e6",
+  background: "#eaf0f8",
+};
 
 const panelBox = { border: "1px solid #ddd", borderRadius: 12, padding: 16, background: "#fafafa" };
 const tourBtn = { padding: "6px 10px", borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: "pointer" };
@@ -288,7 +304,13 @@ function RewardsPanel() {
 
   const decide = async (id, action) => {
     try {
-      await api(`/api/rewards/${id}/${action}`, { method: "POST" });
+      let body;
+      if (action === "approve") {
+        const raw = window.prompt(t("setCoinPrice"), "20");
+        if (raw === null) return; // cancelled — keep pending
+        body = { coins: Math.max(0, parseInt(raw) || 0) };
+      }
+      await api(`/api/rewards/${id}/${action}`, { method: "POST", body });
       await load();
     } catch {
       /* offline */
@@ -306,7 +328,7 @@ function RewardsPanel() {
         <div key={r.id} style={rewardRow}>
           <div><b>{r.child_nickname}</b>: {r.text}</div>
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={() => decide(r.id, "approve")}>{t("approve")}</button>
+            <button onClick={() => decide(r.id, "approve")}>{t("setCoinPrice")}</button>
             <button onClick={() => decide(r.id, "decline")}>{t("decline")}</button>
           </div>
         </div>
@@ -317,7 +339,8 @@ function RewardsPanel() {
           <ul>
             {history.map((r) => (
               <li key={r.id}>
-                <b>{r.child_nickname}</b>: {r.text} — <small>{st(r.status)}</small>
+                <b>{r.child_nickname}</b>: {r.text}
+                {r.status === "approved" && r.coins > 0 && <> — {r.coins} {t("coins")}</>} — <small>{st(r.status)}</small>
               </li>
             ))}
           </ul>

@@ -194,7 +194,7 @@ function RewardAsk() {
         />
         <button type="submit">{t("askForOne")}</button>
       </form>
-      {sent && <p style={{ color: "green" }}><small>{t("plusRequestSent")}</small></p>}
+      {sent && <p style={{ color: "green" }}><small>{t("rewardRequestSent")}</small></p>}
       {mine.length > 0 && (
         <ul>
           {mine.map((r) => (

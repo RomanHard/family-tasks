@@ -10,6 +10,7 @@ export default function JourneyMap({ world, onBack }) {
   const [data, setData] = useState(null);
   const [modal, setModal] = useState(null); // {kind:'level', point} | {kind:'secret'} | {kind:'paywall'}
   const [requested, setRequested] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const STATUS = { completed: t("stCompleted"), current: t("stCurrent"), locked: t("stLocked") };
 
@@ -20,12 +21,14 @@ export default function JourneyMap({ world, onBack }) {
   if (!data) return <p>{t("loadingMap")}</p>;
 
   const askPlus = async () => {
+    setSending(true);
     try {
       await api("/api/subscription/request", { method: "POST" });
       setRequested(true);
     } catch {
       /* already requested or offline — stay quiet */
     }
+    setSending(false);
   };
 
   return (
@@ -38,12 +41,17 @@ export default function JourneyMap({ world, onBack }) {
           {data.maxed ? ` • ${t("maxed")}` : ` • ${t("expToNext", { n: data.exp_to_next, l: data.level + 1 })}`}
         </small>
       </p>
+      {data.plan === "free" && (
+        <p><small>Free journey complete · EXP keeps saving for Plus</small></p>
+      )}
 
       <div style={path}>
         {data.points.map((p) => (
           <div key={p.level} style={pointCol}>
             <button
-              onClick={() => (p.paywalled ? setModal({ kind: "paywall" }) : setModal({ kind: "level", point: p }))}
+              onClick={() => (p.paywalled
+                ? setModal({ kind: "paywall", level: p.level, chapter: p.chapter })
+                : setModal({ kind: "level", point: p }))}
               style={{
                 ...dot,
                 ...(p.paywalled
@@ -65,6 +73,7 @@ export default function JourneyMap({ world, onBack }) {
                   ? t("lmRowPlus")
                   : t("lmRowLegend")}
             </small>
+            <span style={mapTag}>{p.paywalled ? "PLUS" : "FREE"}</span>
           </div>
         ))}
         <div style={pointCol}>
@@ -133,13 +142,27 @@ export default function JourneyMap({ world, onBack }) {
       )}
 
       {modal?.kind === "paywall" && (
-        <Modal onClose={() => setModal(null)}>
-          <h3>{t("plusLockedTitle")}</h3>
-          <p>{t("plusLockedBody")}</p>
+        <Modal onClose={() => setModal(null)} closeLabel={t("pwKeepFree")}>
+          <p style={{ marginTop: 0 }}><span style={plusTag}>FAMILY TASKS PLUS</span></p>
+          <h3 style={{ marginTop: 8 }}>{t("pwStoryGoesOn")}</h3>
+          <p>{t("pwBody")}</p>
+          {modal.chapter && (
+            <div style={pwPreview}>
+              <p style={{ marginTop: 0 }}>
+                <b>{t("pwChapterOf", { n: modal.level, title: modal.chapter.title })}</b>
+              </p>
+              <p style={{ lineHeight: 1.5 }}>{modal.chapter.scene}</p>
+              <p style={{ marginBottom: 0 }}>
+                <b>{t("lmMissionWord")}:</b> {modal.chapter.mission}
+              </p>
+            </div>
+          )}
           {requested ? (
-            <p><b>{t("plusRequestSent")}</b></p>
+            <p><b>{t("pwSent")}</b></p>
           ) : (
-            <button onClick={askPlus} style={btnPrimary}>{t("askParents")}</button>
+            <button onClick={askPlus} style={btnPrimary} disabled={sending}>
+              {sending ? t("pwSending") : t("pwAskParent")}
+            </button>
           )}
         </Modal>
       )}
@@ -172,6 +195,34 @@ function Modal({ children, onClose, closeLabel }) {
 }
 
 const path = { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 16 };
+const plusTag = {
+  display: "inline-block",
+  fontSize: 11,
+  fontWeight: "bold",
+  letterSpacing: 1,
+  padding: "4px 10px",
+  borderRadius: 999,
+  background: "#6a1b9a",
+  color: "#fff",
+};
+const mapTag = {
+  fontSize: 9,
+  fontWeight: "bold",
+  letterSpacing: 1,
+  marginTop: 2,
+  padding: "1px 7px",
+  borderRadius: 999,
+  border: "1px solid #cbd7e6",
+  background: "#eef2f8",
+  color: "#607089",
+};
+const pwPreview = {
+  border: "1px dashed #c9a0dc",
+  borderRadius: 10,
+  padding: 12,
+  background: "#faf5ff",
+  margin: "12px 0",
+};
 const pointCol = { display: "flex", flexDirection: "column", alignItems: "center", width: 76 };
 const rowLabel = { textAlign: "center", marginTop: 4, color: "#607089", lineHeight: 1.3 };
 const insideChrome = { margin: "0 0 4px", fontSize: 13, color: "#607089" };

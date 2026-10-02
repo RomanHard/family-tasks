@@ -96,8 +96,8 @@ r.post("/password-reset-request", (req, res) => {
       notify(p.id, {
         type: "password_reset_request",
         title: "Password reset requested",
-        body: `${email} requests a password reset.`,
-        data: { email },
+        body: "A password reset was requested for this parent account.",
+        data: {},
       });
     }
   }
@@ -129,6 +129,24 @@ r.patch("/language", (req, res) => {
   const language = cleanLang(req.body?.language);
   db.prepare("UPDATE parents SET language = ? WHERE id = ?").run(language, s.user_id);
   res.json({ ok: true, language });
+});
+
+// Child forgot their password: ask the parents (no account reveal either way)
+r.post("/child-password-request", (req, res) => {
+  const nickname = String(req.body?.nickname || "").trim();
+  if (!nickname) return res.status(400).json({ error: "nickname required" });
+  const kid = db
+    .prepare("SELECT id, parent_id, nickname FROM children WHERE nickname = ?")
+    .get(nickname);
+  if (kid) {
+    notify(kid.parent_id, {
+      type: "child_password_request",
+      title: "Password reset requested",
+      body: `${kid.nickname} needs a new password.`,
+      data: { name: kid.nickname },
+    });
+  }
+  res.json({ ok: true });
 });
 
 // Parent changes their own color theme: bright | warm | ocean | night
