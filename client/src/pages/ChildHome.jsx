@@ -103,7 +103,11 @@ export default function ChildHome() {
   };
 
   return (
-    <main style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
+    <main
+      data-theme={user?.theme || "sky"}
+      data-world={active?.id || undefined}
+      style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}
+    >
       {tour && (
         <Tour
           steps={kidSteps}

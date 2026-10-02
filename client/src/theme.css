@@ -1,0 +1,206 @@
+/* Family Tasks themes — canonical values from the original theme.css.
+   [data-world] blocks come AFTER [data-theme] blocks: inside a world the
+   world palette wins over the child profile theme. Default stays light. */
+
+:root,
+[data-theme="bright"] {
+  --bg: #f3f7fc;
+  --surface: #ffffff;
+  --surface-2: #eaf0f8;
+  --text: #172238;
+  --dim: #607089;
+  --border: #cbd7e6;
+  --accent: #2457e6;
+  --accent-2: #f5b82e;
+  --success: #25a877;
+  --danger: #d9574a;
+  --radius: 18px;
+  --shadow: 0 18px 44px rgba(23, 34, 56, 0.10);
+  color-scheme: light;
+}
+
+[data-theme="warm"] {
+  --bg: #fff8ee;
+  --surface: #fffdf9;
+  --surface-2: #f8ead7;
+  --text: #35271f;
+  --dim: #786356;
+  --border: #ead3bc;
+  --accent: #c65332;
+  --accent-2: #f2bd4f;
+  color-scheme: light;
+}
+
+[data-theme="ocean"] {
+  --bg: #eef8fb;
+  --surface: #ffffff;
+  --surface-2: #dff0f5;
+  --text: #15313b;
+  --dim: #56717b;
+  --border: #bfdae2;
+  --accent: #147a9b;
+  --accent-2: #f5bd48;
+  color-scheme: light;
+}
+
+[data-theme="night"] {
+  --bg: #0e1626;
+  --surface: #172238;
+  --surface-2: #202e46;
+  --text: #f4f7fc;
+  --dim: #aab7ca;
+  --border: #344663;
+  --accent: #7da2ff;
+  --accent-2: #ffd166;
+  --success: #57c69d;
+  --danger: #ff887d;
+  --shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+  color-scheme: dark;
+}
+
+/* ---- kid profile themes (visible outside a world, e.g. world select) ---- */
+[data-theme="sky"] {
+  --bg: #eef8fb;
+  --surface: #ffffff;
+  --surface-2: #dff0f5;
+  --text: #15313b;
+  --dim: #56717b;
+  --border: #bfdae2;
+  --accent: #147a9b;
+  --accent-2: #f5bd48;
+  color-scheme: light;
+}
+
+[data-theme="mint"] {
+  --bg: #effaf4;
+  --surface: #ffffff;
+  --surface-2: #dff3e8;
+  --text: #17362a;
+  --dim: #597467;
+  --border: #c1dfcf;
+  --accent: #23845d;
+  --accent-2: #f2bd4f;
+  color-scheme: light;
+}
+
+[data-theme="coral"] {
+  --bg: #fff3f1;
+  --surface: #ffffff;
+  --surface-2: #fbe3df;
+  --text: #3a2523;
+  --dim: #7b625f;
+  --border: #eccbc5;
+  --accent: #d95f50;
+  --accent-2: #f4bd45;
+  color-scheme: light;
+}
+
+[data-theme="sunshine"] {
+  --bg: #fffbea;
+  --surface: #ffffff;
+  --surface-2: #f8efc8;
+  --text: #352e19;
+  --dim: #756b48;
+  --border: #e7d99b;
+  --accent: #c97916;
+  --accent-2: #f0b824;
+  color-scheme: light;
+}
+
+/* ---- kid world palettes: AFTER [data-theme], so the world wins ---- */
+[data-world="pirates"] {
+  --bg: #f2e8cf;
+  --surface: #fffaf0;
+  --surface-2: #ead9b5;
+  --text: #2d271d;
+  --dim: #6f6048;
+  --border: #cbb37e;
+  --accent: #0f5b55;
+  --accent-2: #dfa82e;
+  --success: #28765d;
+  --danger: #b74f3d;
+  --shadow: 0 14px 32px rgba(76, 52, 23, 0.13);
+  color-scheme: light;
+}
+
+[data-world="space"] {
+  --bg: #e9eff4;
+  --surface: #f9fbfc;
+  --surface-2: #dfe8ee;
+  --text: #152331;
+  --dim: #566a79;
+  --border: #b8c8d2;
+  --accent: #176d91;
+  --accent-2: #68d2dc;
+  --success: #177f70;
+  --danger: #b84d51;
+  --shadow: 0 14px 30px rgba(23, 47, 66, 0.13);
+  color-scheme: light;
+}
+
+[data-world="dollhouse"] {
+  --bg: #fff0f1;
+  --surface: #fffafb;
+  --surface-2: #f8dfe3;
+  --text: #482b35;
+  --dim: #80606a;
+  --border: #e7c0c8;
+  --accent: #ad4c67;
+  --accent-2: #f0b64d;
+  --success: #3b866c;
+  --danger: #c14f55;
+  --shadow: 0 14px 32px rgba(121, 58, 76, 0.12);
+  color-scheme: light;
+}
+
+/* ---- base application of the variables ---- */
+html {
+  background: var(--bg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+}
+
+main[data-theme],
+main[data-world] {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* world page background patterns */
+main[data-world="pirates"] {
+  background-image: radial-gradient(rgba(76, 52, 23, 0.07) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+}
+
+main[data-world="space"] {
+  background-image:
+    linear-gradient(rgba(23, 47, 66, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 47, 66, 0.05) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+main[data-world="dollhouse"] {
+  background-image: radial-gradient(rgba(121, 58, 76, 0.08) 3px, transparent 3px);
+  background-size: 30px 30px;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+main[data-theme="night"] input,
+main[data-theme="night"] select,
+main[data-theme="night"] textarea {
+  background: var(--surface-2);
+  border-color: var(--border);
+}

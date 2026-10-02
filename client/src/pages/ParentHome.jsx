@@ -9,6 +9,8 @@ import NotifBell from "../components/NotifBell.jsx";
 import Tour from "../components/Tour.jsx";
 
 const PARENT_TOUR_KEY = "ft_parent_tour_done";
+const PARENT_THEMES = ["bright", "warm", "ocean", "night"];
+const KID_THEMES = ["sky", "mint", "coral", "sunshine"];
 
 export default function ParentHome() {
   const { user, logout, refresh } = useAuth();
@@ -83,6 +85,16 @@ export default function ParentHome() {
     await load();
   };
 
+  const setKidTheme = async (id, theme) => {
+    await api(`/api/children/${id}/theme`, { method: "PATCH", body: { theme } });
+    await load();
+  };
+
+  const setMyTheme = async (theme) => {
+    await api("/api/auth/theme", { method: "PATCH", body: { theme } });
+    await refresh();
+  };
+
   const changeKidPassword = async (kid) => {
     const pw = window.prompt(t("newPwPrompt", { nick: kid.nickname }));
     if (pw === null) return;
@@ -96,7 +108,7 @@ export default function ParentHome() {
   };
 
   return (
-    <main style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
+    <main data-theme={user?.theme || "bright"} style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
       {ptour && (
         <Tour
           steps={ptourSteps}
@@ -137,6 +149,18 @@ export default function ParentHome() {
       <p>{user?.email}</p>
       <p>
         <label>
+          {t("themeLabel")}:{" "}
+          <select value={user?.theme || "bright"} onChange={(e) => setMyTheme(e.target.value)}>
+            {PARENT_THEMES.map((th) => (
+              <option key={th} value={th}>{t(`theme${th[0].toUpperCase()}${th.slice(1)}`)}</option>
+            ))}
+          </select>
+        </label>
+        <br />
+        <small>{t("themeHint")}</small>
+      </p>
+      <p>
+        <label>
           {t("language")}:{" "}
           <select value={lang} onChange={(e) => setMyLang(e.target.value)}>
             {LANGS.map((l) => (
@@ -159,6 +183,15 @@ export default function ParentHome() {
             >
               {LANGS.map((l) => (
                 <option key={l.id} value={l.id}>{l.label}</option>
+              ))}
+            </select>{" "}
+            <select
+              value={k.theme || "sky"}
+              onChange={(e) => setKidTheme(k.id, e.target.value)}
+              title={t("kidThemeLabel")}
+            >
+              {KID_THEMES.map((th) => (
+                <option key={th} value={th}>{th[0].toUpperCase() + th.slice(1)}</option>
               ))}
             </select>{" "}
             <button onClick={() => changeKidPassword(k)} title={t("changePw")}>

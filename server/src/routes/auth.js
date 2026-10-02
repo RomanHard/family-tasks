@@ -37,7 +37,7 @@ r.post("/parent/register", async (req, res) => {
   const token = createSession("parent", lastInsertRowid);
   res
     .cookie("ft_session", token, SESSION_COOKIE_OPTS)
-    .json({ ok: true, user: { type: "parent", id: lastInsertRowid, email: normalized, language: lang } });
+    .json({ ok: true, user: { type: "parent", id: lastInsertRowid, email: normalized, language: lang, theme: "bright" } });
 });
 
 // Parent login: email + password
@@ -59,7 +59,7 @@ r.post("/parent/login", async (req, res) => {
   }
   res
     .cookie("ft_session", token, SESSION_COOKIE_OPTS)
-    .json({ ok: true, user: { type: "parent", id: p.id, email: p.email, language: p.language || "uk" } });
+    .json({ ok: true, user: { type: "parent", id: p.id, email: p.email, language: p.language || "uk", theme: p.theme || "bright" } });
 });
 
 // Child login: nickname + password (no email)
@@ -78,7 +78,7 @@ r.post("/child/login", async (req, res) => {
         .cookie("ft_session", token, SESSION_COOKIE_OPTS)
         .json({
           ok: true,
-          user: { type: "child", id: k.id, nickname: k.nickname, parent_id: k.parent_id, language: k.language || "uk" },
+          user: { type: "child", id: k.id, nickname: k.nickname, parent_id: k.parent_id, language: k.language || "uk", theme: k.theme || "sky" },
         });
     }
   }
@@ -113,13 +113,13 @@ r.get("/me", (req, res) => {
   const s = getSession(req);
   if (!s) return res.json({ user: null });
   if (s.user_type === "parent") {
-    const p = db.prepare("SELECT id, email, language FROM parents WHERE id = ?").get(s.user_id);
-    return res.json({ user: p ? { type: "parent", ...p, language: p.language || "uk" } : null });
+    const p = db.prepare("SELECT id, email, language, theme FROM parents WHERE id = ?").get(s.user_id);
+    return res.json({ user: p ? { type: "parent", ...p, language: p.language || "uk", theme: p.theme || "bright" } : null });
   }
   const c = db
-    .prepare("SELECT id, nickname, parent_id, language FROM children WHERE id = ?")
+    .prepare("SELECT id, nickname, parent_id, language, theme FROM children WHERE id = ?")
     .get(s.user_id);
-  return res.json({ user: c ? { type: "child", ...c, language: c.language || "uk" } : null });
+  return res.json({ user: c ? { type: "child", ...c, language: c.language || "uk", theme: c.theme || "sky" } : null });
 });
 
 // Parent changes their own interface language
@@ -129,6 +129,17 @@ r.patch("/language", (req, res) => {
   const language = cleanLang(req.body?.language);
   db.prepare("UPDATE parents SET language = ? WHERE id = ?").run(language, s.user_id);
   res.json({ ok: true, language });
+});
+
+// Parent changes their own color theme: bright | warm | ocean | night
+r.patch("/theme", (req, res) => {
+  const s = getSession(req);
+  if (!s || s.user_type !== "parent") return res.status(401).json({ error: "unauthorized" });
+  const theme = ["bright", "warm", "ocean", "night"].includes(req.body?.theme)
+    ? req.body.theme
+    : "bright";
+  db.prepare("UPDATE parents SET theme = ? WHERE id = ?").run(theme, s.user_id);
+  res.json({ ok: true, theme });
 });
 
 export default r;

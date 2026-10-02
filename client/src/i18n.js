@@ -275,6 +275,14 @@ const S = {
   scHidden: { uk: "Вміст приховано", en: "Contents hidden", es: "Contenido oculto" },
   scLater: { uk: "Цю винагороду відкриємо пізніше.", en: "We will reveal this reward later.", es: "Revelaremos esta recompensa más adelante." },
   scBack: { uk: "Назад до карти", en: "Back to the map", es: "Volver al mapa" },
+  // themes
+  themeLabel: { uk: "Тема сім'ї", en: "Family theme", es: "Tema familiar" },
+  themeHint: { uk: "Оберіть зручний вигляд батьківського простору.", en: "Choose a comfortable look for the parent space.", es: "Elige un aspecto cómodo para el espacio de padres." },
+  themeBright: { uk: "Світла", en: "Bright", es: "Clara" },
+  themeWarm: { uk: "Тепла", en: "Warm", es: "Cálida" },
+  themeOcean: { uk: "Океан", en: "Ocean", es: "Océano" },
+  themeNight: { uk: "Нічна", en: "Night", es: "Noche" },
+  kidThemeLabel: { uk: "Тема дитини", en: "Child theme", es: "Tema infantil" },
 };
 
 export const TASK_CATEGORIES = ["home", "study", "sport", "create", "kind", "nature", "other"];

@@ -9,7 +9,7 @@ r.use(requireParent);
 // List parent's children
 r.get("/", (req, res) => {
   const kids = db
-    .prepare("SELECT id, nickname, language, created_at FROM children WHERE parent_id = ? ORDER BY id")
+    .prepare("SELECT id, nickname, language, theme, created_at FROM children WHERE parent_id = ? ORDER BY id")
     .all(req.session.user_id);
   res.json({ children: kids });
 });
@@ -42,6 +42,19 @@ r.patch("/:id/language", (req, res) => {
   if (!kid) return res.status(404).json({ error: "child not found" });
   db.prepare("UPDATE children SET language = ? WHERE id = ?").run(language, kid.id);
   res.json({ ok: true, language });
+});
+
+// Set a child's profile theme (parent decides per child): sky | mint | coral | sunshine
+r.patch("/:id/theme", (req, res) => {
+  const theme = ["sky", "mint", "coral", "sunshine"].includes(req.body?.theme)
+    ? req.body.theme
+    : "sky";
+  const kid = db
+    .prepare("SELECT id FROM children WHERE id = ? AND parent_id = ?")
+    .get(req.params.id, req.session.user_id);
+  if (!kid) return res.status(404).json({ error: "child not found" });
+  db.prepare("UPDATE children SET theme = ? WHERE id = ?").run(theme, kid.id);
+  res.json({ ok: true, theme });
 });
 
 // Reset a child's password (old one is never shown)

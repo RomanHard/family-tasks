@@ -182,6 +182,9 @@ addColumn("module_templates", "name_uk", "TEXT NOT NULL DEFAULT ''");
 addColumn("module_templates", "name_es", "TEXT NOT NULL DEFAULT ''");
 addColumn("module_templates", "bonus_uk", "TEXT NOT NULL DEFAULT ''");
 addColumn("module_templates", "bonus_es", "TEXT NOT NULL DEFAULT ''");
+// themes (phase 10)
+addColumn("parents", "theme", "TEXT NOT NULL DEFAULT 'bright'");
+addColumn("children", "theme", "TEXT NOT NULL DEFAULT 'sky'");
 
 export function getDb() {
   return db;
