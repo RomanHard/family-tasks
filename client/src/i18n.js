@@ -140,7 +140,107 @@ const S = {
   plusLockedBody: { uk: "Рівні 4–10 доступні з Family Tasks Plus. Твій EXP продовжує накопичуватись!", en: "Levels 4–10 need Family Tasks Plus. Your EXP keeps accumulating!", es: "Los niveles 4–10 requieren Family Tasks Plus. ¡Tu EXP sigue acumulándose!" },
   askParents: { uk: "Попросити батьків", en: "Ask parents", es: "Pedir a los padres" },
   plusRequestSent: { uk: "Запит надіслано батькам ✓", en: "Request sent to parents ✓", es: "Solicitud enviada a los padres ✓" },
+  // notifications
+  notifs: { uk: "Сповіщення", en: "Notifications", es: "Notificaciones" },
+  noNotifs: { uk: "Поки порожньо.", en: "Nothing here yet.", es: "Nada por aquí todavía." },
 };
+
+// Localized notification templates by type. Stored title/body (English) are
+// used as fallback for unknown types. `data` carries template variables.
+export const NOTIF_TPL = {
+  task_assigned: {
+    title: { uk: "Нове завдання", en: "New task", es: "Nueva tarea" },
+    body: { uk: "«{title}» — {coins} монет, {exp} EXP", en: "“{title}” — {coins} coins, {exp} EXP", es: "«{title}» — {coins} monedas, {exp} EXP" },
+  },
+  task_review: {
+    title: { uk: "Завдання на перевірці", en: "Task ready for review", es: "Tarea lista para revisar" },
+    body: { uk: "{nick} — «{title}» готове до перевірки", en: "{nick} — “{title}” is ready for review", es: "{nick} — «{title}» lista para revisar" },
+  },
+  task_approved: {
+    title: { uk: "Завдання схвалено ✅", en: "Task approved ✅", es: "Tarea aprobada ✅" },
+    body: { uk: "+{coins} монет, +{exp} EXP: «{title}»", en: "+{coins} coins, +{exp} EXP: “{title}”", es: "+{coins} monedas, +{exp} EXP: «{title}»" },
+  },
+  task_rejected: {
+    title: { uk: "Завдання повернуто", en: "Task sent back", es: "Tarea devuelta" },
+    body: { uk: "«{title}» — глянь ще раз", en: "“{title}” — take another look", es: "«{title}» — revísala de nuevo" },
+  },
+  level_up: {
+    title: { uk: "Новий рівень! 🎉", en: "Level up! 🎉", es: "¡Nuevo nivel! 🎉" },
+    body: { uk: "{world}: рівень {level}", en: "{world}: level {level}", es: "{world}: nivel {level}" },
+  },
+  chest_opened: {
+    title: { uk: "Скриня відкрита 🎁", en: "Chest opened 🎁", es: "Cofre abierto 🎁" },
+    body: { uk: "Зі скрині випало: {drop} ({nick})", en: "Chest dropped: {drop} ({nick})", es: "El cofre contenía: {drop} ({nick})" },
+  },
+  potion_bought: {
+    title: { uk: "Куплено програму", en: "Program bought", es: "Programa comprado" },
+    body: { uk: "{nick}: {name} ({price})", en: "{nick}: {name} ({price})", es: "{nick}: {name} ({price})" },
+  },
+  potion_used: {
+    title: { uk: "Програму запущено", en: "Program started", es: "Programa iniciado" },
+    body: { uk: "{nick}: {name}", en: "{nick}: {name}", es: "{nick}: {name}" },
+  },
+  module_bought: {
+    title: { uk: "Куплено модуль", en: "Module bought", es: "Módulo comprado" },
+    body: { uk: "{nick}: {name}", en: "{nick}: {name}", es: "{nick}: {name}" },
+  },
+  suggestion_accepted: {
+    title: { uk: "Ідею прийнято ✅", en: "Suggestion accepted ✅", es: "Sugerencia aceptada ✅" },
+    body: { uk: "«{title}» стало завданням", en: "“{title}” became a task", es: "«{title}» se convirtió en tarea" },
+  },
+  suggestion_declined: {
+    title: { uk: "Ідею відхилено", en: "Suggestion declined", es: "Sugerencia rechazada" },
+    body: { uk: "«{title}»", en: "“{title}”", es: "«{title}»" },
+  },
+  plus_requested: {
+    title: { uk: "Запит на Plus", en: "Plus requested", es: "Solicitud de Plus" },
+    body: { uk: "{nickname} просить Family Tasks Plus (рівні 4–10)", en: "{nickname} asks for Family Tasks Plus (levels 4–10)", es: "{nickname} pide Family Tasks Plus (niveles 4–10)" },
+  },
+  plan_changed: {
+    title: { uk: "План змінено", en: "Plan changed", es: "Plan cambiado" },
+    body: { uk: "Тепер: {plan}", en: "Now: {plan}", es: "Ahora: {plan}" },
+  },
+  password_changed: {
+    title: { uk: "Пароль змінено", en: "Password changed", es: "Contraseña cambiada" },
+    body: { uk: "Батьки встановили тобі новий пароль", en: "Your parents set you a new password", es: "Tus padres te pusieron una nueva contraseña" },
+  },
+  password_reset_request: {
+    title: { uk: "Запит на скидання пароля", en: "Password reset requested", es: "Solicitud de restablecimiento" },
+    body: { uk: "{email} просить скинути пароль", en: "{email} requests a password reset", es: "{email} solicita restablecer la contraseña" },
+  },
+  reward_requested: {
+    title: { uk: "Запит винагороди", en: "Reward requested", es: "Recompensa solicitada" },
+    body: { uk: "{nick}: {text}", en: "{nick}: {text}", es: "{nick}: {text}" },
+  },
+  reward_approved: {
+    title: { uk: "Винагороду схвалено ✅", en: "Reward approved ✅", es: "Recompensa aprobada ✅" },
+    body: { uk: "«{text}»", en: "“{text}”", es: "«{text}»" },
+  },
+  reward_declined: {
+    title: { uk: "Винагороду відхилено", en: "Reward declined", es: "Recompensa rechazada" },
+    body: { uk: "«{text}»", en: "“{text}”", es: "«{text}»" },
+  },
+};
+
+export function notifText(lang, n) {
+  const tpl = NOTIF_TPL[n.type];
+  let data = {};
+  try { data = JSON.parse(n.data || "{}"); } catch { /* keep empty */ }
+  if (data.world_id) data.world = worldName(data.world_id, lang);
+  if (data.plan) data.plan = data.plan === "plus" ? "Plus" : "Free";
+  const fill = (s) => {
+    let out = s;
+    for (const [k, v] of Object.entries(data)) out = out.replaceAll(`{${k}}`, String(v ?? ""));
+    return out;
+  };
+  if (tpl) {
+    return {
+      title: fill(tpl.title[lang] || tpl.title.uk),
+      body: fill(tpl.body[lang] || tpl.body.uk),
+    };
+  }
+  return { title: n.title, body: n.body };
+}
 
 export const LANGS = [
   { id: "uk", label: "Українська" },

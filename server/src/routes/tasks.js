@@ -2,6 +2,7 @@ import { Router } from "express";
 import { db } from "../db.js";
 import { requireParent, requireChild } from "../auth.js";
 import { creditRewards, applyDeadlineBonus } from "../game.js";
+import { notify, notifyParent } from "../notify.js";
 
 const r = Router();
 
@@ -75,6 +76,23 @@ r.post("/", requireParent, (req, res) => {
       finalDeadline
     );
   logEvent(lastInsertRowid, "parent", req.session.user_id, "created");
+  // notify the assignee, or every kid when the task is for all
+  const targets = assignee
+    ? [{ id: assignee.id }]
+    : db.prepare("SELECT id FROM children WHERE parent_id = ?").all(req.session.user_id);
+  for (const k of targets) {
+    notify(req.session.user_id, {
+      childId: k.id,
+      type: "task_assigned",
+      title: "New task",
+      body: `"${String(title).trim()}" — ${Math.max(0, parseInt(coins) || 0)} coins, ${Math.max(0, parseInt(exp) || 0)} EXP`,
+      data: {
+        title: String(title).trim(),
+        coins: Math.max(0, parseInt(coins) || 0),
+        exp: Math.max(0, parseInt(exp) || 0),
+      },
+    });
+  }
   res.json({ ok: true, id: lastInsertRowid });
 });
 
@@ -158,6 +176,24 @@ r.post("/:id/approve", requireParent, (req, res) => {
       .get(doerId, req.session.user_id);
     if (stillExists) reward = creditRewards(doerId, t.coins, t.exp);
   }
+  if (doerId) {
+    notify(req.session.user_id, {
+      childId: doerId,
+      type: "task_approved",
+      title: "Task approved",
+      body: `+${t.coins} coins, +${t.exp} EXP: "${t.title}"`,
+      data: { title: t.title, coins: t.coins, exp: t.exp },
+    });
+    if (reward?.leveledUp) {
+      notify(req.session.user_id, {
+        childId: doerId,
+        type: "level_up",
+        title: "Level up!",
+        body: `${reward.world_id}: level ${reward.leveledUp.to}`,
+        data: { world_id: reward.world_id, level: reward.leveledUp.to },
+      });
+    }
+  }
   res.json({ ok: true, granted: { coins: t.coins, exp: t.exp }, reward });
 });
 
@@ -168,6 +204,16 @@ r.post("/:id/reject", requireParent, (req, res) => {
   const { note } = req.body ?? {};
   db.prepare("UPDATE tasks SET status = 'working' WHERE id = ?").run(t.id);
   logEvent(t.id, "parent", req.session.user_id, "rejected", String(note || ""));
+  const doerId = t.completed_by || t.child_id;
+  if (doerId) {
+    notify(req.session.user_id, {
+      childId: doerId,
+      type: "task_rejected",
+      title: "Task sent back",
+      body: `"${t.title}" — take another look`,
+      data: { title: t.title },
+    });
+  }
   res.json({ ok: true });
 });
 
@@ -240,6 +286,13 @@ r.post("/suggestions/:id/accept", requireParent, (req, res) => {
     );
   db.prepare("UPDATE task_suggestions SET status = 'accepted' WHERE id = ?").run(s.id);
   logEvent(lastInsertRowid, "parent", req.session.user_id, "created", "from kid suggestion");
+  notify(req.session.user_id, {
+    childId: s.child_id,
+    type: "suggestion_accepted",
+    title: "Suggestion accepted",
+    body: `"${s.title}" became a task`,
+    data: { title: s.title },
+  });
   res.json({ ok: true, task_id: lastInsertRowid });
 });
 
@@ -249,6 +302,13 @@ r.post("/suggestions/:id/decline", requireParent, (req, res) => {
     .get(req.params.id, req.session.user_id);
   if (!s) return res.status(404).json({ error: "suggestion not found" });
   db.prepare("UPDATE task_suggestions SET status = 'declined' WHERE id = ?").run(s.id);
+  notify(req.session.user_id, {
+    childId: s.child_id,
+    type: "suggestion_declined",
+    title: "Suggestion declined",
+    body: `"${s.title}"`,
+    data: { title: s.title },
+  });
   res.json({ ok: true });
 });
 
@@ -291,6 +351,14 @@ r.post("/:id/finish", requireChild, (req, res) => {
     t.id
   );
   logEvent(t.id, "child", req.session.user_id, "finished", String(note || "").trim());
+  const nick =
+    db.prepare("SELECT nickname FROM children WHERE id = ?").get(req.session.user_id)?.nickname || "";
+  notifyParent(req.session.user_id, {
+    type: "task_review",
+    title: "Task ready for review",
+    body: `${nick} — "${t.title}" is ready for review`,
+    data: { nick, title: t.title },
+  });
   res.json({ ok: true });
 });
 

@@ -9,11 +9,16 @@ import {
   ownsModule,
   chestPriceFor,
 } from "../game.js";
+import { notifyParent } from "../notify.js";
 
 const r = Router();
 
 function parentOf(childId) {
   return db.prepare("SELECT parent_id FROM children WHERE id = ?").get(childId).parent_id;
+}
+
+function nickOf(childId) {
+  return db.prepare("SELECT nickname FROM children WHERE id = ?").get(childId)?.nickname || "";
 }
 
 // ================= PARENT: Game Setup =================
@@ -199,6 +204,12 @@ r.post("/:world_id/buy-potion/:potion_id", requireChild, (req, res) => {
        VALUES (?, ?, ?, ?, ?)`
     )
     .run(req.session.user_id, world_id, potion.id, potion.name, potion.effect);
+  notifyParent(req.session.user_id, {
+    type: "potion_bought",
+    title: "Program bought",
+    body: `${nickOf(req.session.user_id)}: ${potion.name} (${potion.price})`,
+    data: { nick: nickOf(req.session.user_id), name: potion.name, price: potion.price },
+  });
   res.json({ ok: true, id: lastInsertRowid });
 });
 
@@ -237,6 +248,12 @@ r.post("/:world_id/open-chest", requireChild, (req, res) => {
        VALUES (?, ?, ?, ?, ?)`
     )
     .run(req.session.user_id, world_id, drop.id, drop.name, drop.effect);
+  notifyParent(req.session.user_id, {
+    type: "chest_opened",
+    title: "Chest opened",
+    body: `Chest dropped: ${drop.name} (${nickOf(req.session.user_id)})`,
+    data: { nick: nickOf(req.session.user_id), drop: drop.name },
+  });
   res.json({ ok: true, id: lastInsertRowid, drop: { name: drop.name, effect: drop.effect }, usedFree });
 });
 
@@ -259,6 +276,12 @@ r.post("/:world_id/buy-module/:key", requireChild, (req, res) => {
   db.prepare(
     "INSERT INTO purchased_modules (child_id, world_id, module_key) VALUES (?, ?, ?)"
   ).run(req.session.user_id, world_id, key);
+  notifyParent(req.session.user_id, {
+    type: "module_bought",
+    title: "Module bought",
+    body: `${nickOf(req.session.user_id)}: ${mod.name}`,
+    data: { nick: nickOf(req.session.user_id), name: mod.name },
+  });
 
   // deadline shield: shift the kid's open tasks with deadlines by +1 day
   if (key === "deadline_1day") {
@@ -289,6 +312,12 @@ r.post("/inventory/:id/use", requireChild, (req, res) => {
   if (!item) return res.status(404).json({ error: "item not found" });
   if (item.used) return res.status(400).json({ error: "already used" });
   db.prepare("UPDATE kid_inventory SET used = 1 WHERE id = ?").run(item.id);
+  notifyParent(req.session.user_id, {
+    type: "potion_used",
+    title: "Program started",
+    body: `${nickOf(req.session.user_id)}: ${item.name}`,
+    data: { nick: nickOf(req.session.user_id), name: item.name },
+  });
   res.json({ ok: true });
 });
 

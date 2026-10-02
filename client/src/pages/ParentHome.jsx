@@ -5,6 +5,7 @@ import { useLang } from "../lang.jsx";
 import { LANGS } from "../i18n.js";
 import ParentTasks from "./ParentTasks.jsx";
 import GameSetup from "./GameSetup.jsx";
+import NotifBell from "../components/NotifBell.jsx";
 
 export default function ParentHome() {
   const { user, logout, refresh } = useAuth();
@@ -50,7 +51,10 @@ export default function ParentHome() {
     <main style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>{t("parentTitle")}</h1>
-        <button onClick={logout}>{t("logout")}</button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <NotifBell />
+          <button onClick={logout}>{t("logout")}</button>
+        </div>
       </header>
       <p>{user?.email}</p>
       <p>

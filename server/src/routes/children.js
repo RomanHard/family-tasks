@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db } from "../db.js";
 import { hashPassword, requireParent } from "../auth.js";
+import { notify } from "../notify.js";
 
 const r = Router();
 r.use(requireParent);
@@ -57,6 +58,13 @@ r.post("/:id/password", async (req, res) => {
   db.prepare("UPDATE children SET password_hash = ? WHERE id = ?").run(hash, kid.id);
   // kill child's sessions so the old password stops working everywhere
   db.prepare("DELETE FROM sessions WHERE user_type = 'child' AND user_id = ?").run(kid.id);
+  notify(req.session.user_id, {
+    childId: kid.id,
+    type: "password_changed",
+    title: "Password changed",
+    body: "Your parents set you a new password.",
+    data: {},
+  });
   res.json({ ok: true });
 });
 

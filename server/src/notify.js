@@ -16,3 +16,10 @@ export function notifyParentOfChild(childId, payload) {
   const row = db.prepare("SELECT parent_id FROM children WHERE id = ?").get(childId);
   if (row) notify(row.parent_id, { childId, ...payload });
 }
+
+// Parent-targeted notification about a child's activity (child_id stays NULL;
+// the child's nickname goes into data/body). Keeps parent and child feeds separate.
+export function notifyParent(childId, payload) {
+  const row = db.prepare("SELECT parent_id FROM children WHERE id = ?").get(childId);
+  if (row) notify(row.parent_id, payload);
+}

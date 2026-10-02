@@ -8,6 +8,7 @@ import WorldHome from "./WorldHome.jsx";
 import JourneyMap from "./JourneyMap.jsx";
 import Shop from "./Shop.jsx";
 import ChildTasks from "./ChildTasks.jsx";
+import NotifBell from "../components/NotifBell.jsx";
 
 export default function ChildHome() {
   const { user, logout } = useAuth();
@@ -43,7 +44,10 @@ export default function ChildHome() {
     <main style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>{t("hello")} {user?.nickname}! 🎮</h1>
-        <button onClick={logout}>{t("logout")}</button>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <NotifBell />
+          <button onClick={logout}>{t("logout")}</button>
+        </div>
       </header>
 
       {leveledUp && (

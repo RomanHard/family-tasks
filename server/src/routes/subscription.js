@@ -40,7 +40,6 @@ r.post("/request", requireChild, (req, res) => {
     .get(me.parent_id, req.session.user_id);
   if (!existing) {
     notify(me.parent_id, {
-      childId: req.session.user_id,
       type: "plus_requested",
       title: "Family Tasks Plus requested",
       body: `${me.nickname} asks for Family Tasks Plus (levels 4-10).`,
