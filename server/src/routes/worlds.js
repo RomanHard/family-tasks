@@ -104,7 +104,7 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
     const rows = db
       .prepare(
         `SELECT level, name, effect, price FROM potion_templates
-         WHERE parent_id = ? AND world_id = ? AND in_chest = 1
+         WHERE parent_id = ? AND world_id = ? AND in_chest = 1 AND archived = 0
          ORDER BY level, sort_order, id`
       )
       .all(me.parent_id, world_id);

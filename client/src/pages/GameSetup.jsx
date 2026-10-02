@@ -13,6 +13,7 @@ export default function GameSetup() {
   const [level, setLevel] = useState(1);
   const [tab, setTab] = useState("potions");
   const [potions, setPotions] = useState([]);
+  const [archived, setArchived] = useState([]);
   const [deletedIds, setDeletedIds] = useState([]);
   const [chestPrice, setChestPrice] = useState(20);
   const [modules, setModules] = useState([]);
@@ -23,6 +24,7 @@ export default function GameSetup() {
   const load = async (w = world, lv = level) => {
     const s = await api(`/api/shop/setup?world_id=${w}&level=${lv}`);
     setPotions(s.potions);
+    setArchived(s.archived || []);
     setDeletedIds([]);
     setChestPrice(s.chest_price);
     const m = await api(`/api/shop/modules?world_id=${w}`);
@@ -118,7 +120,7 @@ export default function GameSetup() {
       for (const m of modules) {
         await api(`/api/shop/modules/${m.id}`, {
           method: "PATCH",
-          body: { name: m.name, price: m.price },
+          body: { name: m.name, bonus_text: m.bonus_text, price: m.price },
         });
       }
       setDirty(false);
@@ -133,10 +135,26 @@ export default function GameSetup() {
     load().catch((e) => setError(e.message));
   };
 
+  const restorePotion = async (id) => {
+    setError("");
+    try {
+      await api(`/api/shop/potions/${id}/restore`, { method: "POST" });
+      await load();
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
   const editModule = (id, patch) =>
     markDirty(() => setModules((ms) => ms.map((m) => (m.id === id ? { ...m, ...patch } : m))));
 
   const inChestCount = potions.filter((p) => p.in_chest).length;
+  const chestEffects = potions
+    .filter((p) => p.in_chest)
+    .map((p) => String(p.effect || "").trim().toLowerCase())
+    .filter(Boolean);
+  const dupEffects = new Set(chestEffects).size !== chestEffects.length;
+  const coverageOk = inChestCount >= 5 && !dupEffects;
 
   return (
     <section>
@@ -172,7 +190,14 @@ export default function GameSetup() {
 
       {tab === "potions" && (
         <div>
-          <p><small>{t("inChestCount", { l: level, n: inChestCount })}</small></p>
+          <p style={{ color: coverageOk ? "green" : "#b45309" }}>
+            <small>
+              {coverageOk ? t("coverageOk", { n: inChestCount }) : t("coverageWarn", { n: inChestCount })}
+            </small>
+          </p>
+          {dupEffects && chestEffects.length > 0 && (
+            <p style={{ color: "#b45309" }}><small>{t("dupEffectWarn")}</small></p>
+          )}
           <label>
             {t("chestPrice")}{" "}
             <input
@@ -223,6 +248,19 @@ export default function GameSetup() {
               </div>
             ))}
           <button onClick={addPotion} style={{ marginTop: 8 }}>+ {t("addPotion")}</button>
+          {archived.length > 0 && (
+            <div style={{ marginTop: 16 }}>
+              <h4>🗃 {t("archivedTitle")} ({archived.length})</h4>
+              {archived.map((p) => (
+                <div key={p.id} style={{ ...card, opacity: 0.75 }}>
+                  <div style={{ flex: 1 }}>
+                    <b>{p.name}</b> <small>— {p.effect}</small>
+                  </div>
+                  <button onClick={() => restorePotion(p.id)}>♻ {t("restore")}</button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -236,7 +274,14 @@ export default function GameSetup() {
                 onChange={(e) => editModule(m.id, { name: e.target.value })}
                 style={{ ...input, flex: 2 }}
               />
-              <small style={{ flex: 3 }}>{m.bonus_text}</small>
+              <small style={{ flex: 3 }}>
+                <small style={{ color: "#888" }}>{t("bonusText")}</small>
+                <input
+                  value={m.bonus_text}
+                  onChange={(e) => editModule(m.id, { bonus_text: e.target.value })}
+                  style={{ ...input, width: "100%", boxSizing: "border-box" }}
+                />
+              </small>
               <label>
                 <small>{t("price")}</small>
                 <input

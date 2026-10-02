@@ -155,8 +155,7 @@ const S = {
   rwPending: { uk: "чекає", en: "pending", es: "pendiente" },
   rwApproved: { uk: "схвалено", en: "approved", es: "aprobada" },
   rwDeclined: { uk: "відхилено", en: "declined", es: "rechazada" },
-  // task categories & difficulty
-  category: { uk: "Категорія", en: "Category", es: "Categoría" },
+  // task categories & difficulty  category: { uk: "Категорія", en: "Category", es: "Categoría" },
   difficulty: { uk: "Складність", en: "Difficulty", es: "Dificultad" },
   diff1: { uk: "Легко (10 EXP)", en: "Easy (10 EXP)", es: "Fácil (10 EXP)" },
   diff2: { uk: "Середньо (20 EXP)", en: "Medium (20 EXP)", es: "Media (20 EXP)" },
@@ -168,6 +167,13 @@ const S = {
   cat_kind: { uk: "Доброта", en: "Kindness", es: "Amabilidad" },
   cat_nature: { uk: "Природа", en: "Nature", es: "Naturaleza" },
   cat_other: { uk: "Інше", en: "Other", es: "Otro" },
+  // game setup: coverage, archive
+  coverageOk: { uk: "✅ {n}/5 програм у скрині, ефекти унікальні", en: "✅ {n}/5 chest programs, unique effects", es: "✅ {n}/5 programas en el cofre, efectos únicos" },
+  coverageWarn: { uk: "⚠️ Потрібно щонайменше 5 різних програм у скрині (зараз {n})", en: "⚠️ At least 5 different chest programs required (now {n})", es: "⚠️ Se necesitan al menos 5 programas diferentes en el cofre (ahora {n})" },
+  dupEffectWarn: { uk: "⚠️ Ефекти повторюються — зроби їх унікальними", en: "⚠️ Duplicate effects — make them unique", es: "⚠️ Efectos duplicados — hazlos únicos" },
+  archivedTitle: { uk: "Архів", en: "Archive", es: "Archivo" },
+  restore: { uk: "Відновити", en: "Restore", es: "Restaurar" },
+  bonusText: { uk: "Текст бонусу", en: "Bonus text", es: "Texto del bonus" },
 };
 
 export const TASK_CATEGORIES = ["home", "study", "sport", "create", "kind", "nature", "other"];

@@ -31,14 +31,21 @@ r.get("/setup", requireParent, (req, res) => {
   const potions = db
     .prepare(
       `SELECT * FROM potion_templates
-       WHERE parent_id = ? AND world_id = ? AND level = ?
+       WHERE parent_id = ? AND world_id = ? AND level = ? AND archived = 0
+       ORDER BY sort_order, id`
+    )
+    .all(req.session.user_id, world_id, lv);
+  const archived = db
+    .prepare(
+      `SELECT * FROM potion_templates
+       WHERE parent_id = ? AND world_id = ? AND level = ? AND archived = 1
        ORDER BY sort_order, id`
     )
     .all(req.session.user_id, world_id, lv);
   const chest = db
     .prepare("SELECT price FROM chest_prices WHERE parent_id = ? AND world_id = ? AND level = ?")
     .get(req.session.user_id, world_id, lv);
-  res.json({ potions, chest_price: chest ? chest.price : 20 * lv, level: lv, world_id });
+  res.json({ potions, archived, chest_price: chest ? chest.price : 20 * lv, level: lv, world_id });
 });
 
 r.post("/potions", requireParent, (req, res) => {
@@ -96,7 +103,17 @@ r.delete("/potions/:id", requireParent, (req, res) => {
     .prepare("SELECT id FROM potion_templates WHERE id = ? AND parent_id = ?")
     .get(req.params.id, req.session.user_id);
   if (!p) return res.status(404).json({ error: "potion not found" });
-  db.prepare("DELETE FROM potion_templates WHERE id = ?").run(p.id);
+  // soft-archive, never hard-delete (restorable from Game Setup)
+  db.prepare("UPDATE potion_templates SET archived = 1 WHERE id = ?").run(p.id);
+  res.json({ ok: true });
+});
+
+r.post("/potions/:id/restore", requireParent, (req, res) => {
+  const p = db
+    .prepare("SELECT id FROM potion_templates WHERE id = ? AND parent_id = ?")
+    .get(req.params.id, req.session.user_id);
+  if (!p) return res.status(404).json({ error: "potion not found" });
+  db.prepare("UPDATE potion_templates SET archived = 0 WHERE id = ?").run(p.id);
   res.json({ ok: true });
 });
 
@@ -147,7 +164,7 @@ function kidShopData(childId, worldId) {
   const potions = db
     .prepare(
       `SELECT * FROM potion_templates
-       WHERE parent_id = ? AND world_id = ? AND level = ? AND in_chest = 1
+       WHERE parent_id = ? AND world_id = ? AND level = ? AND in_chest = 1 AND archived = 0
        ORDER BY sort_order, id`
     )
     .all(pid, worldId, level);
@@ -191,7 +208,7 @@ r.post("/:world_id/buy-potion/:potion_id", requireChild, (req, res) => {
   const potion = db
     .prepare(
       `SELECT * FROM potion_templates
-       WHERE id = ? AND parent_id = ? AND world_id = ? AND level = ? AND in_chest = 1`
+       WHERE id = ? AND parent_id = ? AND world_id = ? AND level = ? AND in_chest = 1 AND archived = 0`
     )
     .get(potion_id, pid, world_id, prog.level);
   if (!potion) return res.status(404).json({ error: "potion not found" });
@@ -222,7 +239,7 @@ r.post("/:world_id/open-chest", requireChild, (req, res) => {
   const potions = db
     .prepare(
       `SELECT * FROM potion_templates
-       WHERE parent_id = ? AND world_id = ? AND level = ? AND in_chest = 1
+       WHERE parent_id = ? AND world_id = ? AND level = ? AND in_chest = 1 AND archived = 0
        ORDER BY sort_order, id`
     )
     .all(pid, world_id, prog.level);
