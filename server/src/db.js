@@ -26,6 +26,13 @@ CREATE TABLE IF NOT EXISTS children (
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE(parent_id, nickname)
 );
+CREATE TABLE IF NOT EXISTS sessions (
+  token_hash TEXT PRIMARY KEY,
+  user_type TEXT NOT NULL CHECK (user_type IN ('parent', 'child')),
+  user_id INTEGER NOT NULL,
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `);
 
 export function getDb() {
