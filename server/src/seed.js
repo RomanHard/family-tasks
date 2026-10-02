@@ -1,76 +1,79 @@
 import { db } from "./db.js";
+import { PROGRAMS, MODULES, moduleBonusText } from "./content/programs.js";
 
-// ---- default level-1 potions: 5 approved + 5 backups (per world) ----
-// Parents can edit/reorder/delete/add via Game Setup.
-const POTIONS = [
-  // [name, effect, price, in_chest]
-  ["Батьки 30 хвилин без телефонів", "Батьки 30 хвилин не беруть телефони до рук", 30, 1],
-  ["30 хвилин невидимки", "Дитину 30 хвилин ніхто не чіпає і не дає завдань", 25, 1],
-  ["Дитина обирає вечерю", "Сьогодні вечеря — на вибір дитини", 20, 1],
-  ["+30 хвилин до сну", "Сьогодні можна лягти спати на 30 хвилин пізніше", 20, 1],
-  ["Будиночок з ковдр", "Будуємо будиночок з ковдр (місце обирають батьки)", 35, 1],
-  ["Додаткова казка", "Ще одна казка перед сном", 15, 0],
-  ["Дитина обирає сніданок", "Завтра сніданок — на вибір дитини", 15, 0],
-  ["Гра на вибір дитини", "30 хвилин гри з батьками — гру обирає дитина", 25, 0],
-  ["Кіновечір", "Сімейний кіновечір з попкорном", 30, 0],
-  ["Вихідний від завдання", "Одне завдання можна пропустити без наслідків", 40, 0],
-];
-
-const MODULES = [
-  // [key, name_uk per world, bonus_text, price]
-  ["coins_10", {
-    pirates: "Золотий компас", space: "Сонячні панелі", dollhouse: "Скарбничка",
-  }, "+10% монет за кожне завдання", 150],
-  ["deadline_1day", {
-    pirates: "Попутний вітер", space: "Ремонтний дрон", dollhouse: "Домовичок",
-  }, "+1 день до дедлайну завдань", 120],
-  ["bedtime_30", {
-    pirates: "Ліхтар капітана", space: "Нічний режим", dollhouse: "Затишна лампа",
-  }, "+30 хв до сну у п'ятницю та суботу", 100],
-  ["exp_10", {
-    pirates: "Карта скарбів", space: "Гіпердвигун", dollhouse: "Сімейний альбом",
-  }, "+10% EXP за кожне завдання", 150],
-  ["chest_discount_20", {
-    pirates: "Торг з капітаном", space: "Знижка в доку", dollhouse: "Блошиний ринок",
-  }, "−20% ціни скринь", 120],
-];
-
+// Canonical seed: 50 standard programs per world (5 per level, levels 1–10)
+// with verbatim EN/UK/ES names+effects, canonical prices, in_chest=1,
+// plus the 5 canonical modules per world.
+// Parents can edit/reorder/archive/add via Game Setup (draft+Save).
+// Custom parent programs stay single-language (name_uk/name_es empty → fallback).
 const WORLDS = ["pirates", "space", "dollhouse"];
+
+function hasCanonicalSeed(parentId) {
+  const row = db
+    .prepare("SELECT name_uk FROM potion_templates WHERE parent_id = ? LIMIT 1")
+    .get(parentId);
+  return !!row && !!row.name_uk;
+}
 
 export function seedParent(parentId) {
   const has = db
     .prepare("SELECT id FROM potion_templates WHERE parent_id = ? LIMIT 1")
     .get(parentId);
-  if (has) return; // already seeded
+  if (has && hasCanonicalSeed(parentId)) return; // canonical seed already in place
+
+  // Replace the old level-1-only seed with the canonical one.
+  // (kid_inventory keeps its copies via potion_template_id SET NULL.)
+  db.prepare("DELETE FROM potion_templates WHERE parent_id = ?").run(parentId);
+  db.prepare("DELETE FROM module_templates WHERE parent_id = ?").run(parentId);
 
   const insPotion = db.prepare(
     `INSERT INTO potion_templates
-     (parent_id, world_id, level, name, effect, price, in_chest, sort_order)
-     VALUES (?, ?, 1, ?, ?, ?, ?, ?)`
-  );
-  for (const worldId of WORLDS) {
-    POTIONS.forEach(([name, effect, price, inChest], i) => {
-      insPotion.run(parentId, worldId, name, effect, price, inChest, i);
-    });
-  }
-
-  const insChest = db.prepare(
-    "INSERT INTO chest_prices (parent_id, world_id, level, price) VALUES (?, ?, ?, ?)"
+     (parent_id, world_id, level, name, name_uk, name_es, effect, effect_uk, effect_es,
+      price, in_chest, sort_order)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
   for (const worldId of WORLDS) {
     for (let level = 1; level <= 10; level++) {
-      insChest.run(parentId, worldId, level, 20 * level);
+      PROGRAMS[worldId][level].forEach((p, i) => {
+        insPotion.run(
+          parentId, worldId, level,
+          p.name.en, p.name.uk, p.name.es,
+          p.effect.en, p.effect.uk, p.effect.es,
+          p.price, 1, i
+        );
+      });
+    }
+  }
+
+  const hasChest = db
+    .prepare("SELECT parent_id FROM chest_prices WHERE parent_id = ? LIMIT 1")
+    .get(parentId);
+  if (!hasChest) {
+    const insChest = db.prepare(
+      "INSERT INTO chest_prices (parent_id, world_id, level, price) VALUES (?, ?, ?, ?)"
+    );
+    for (const worldId of WORLDS) {
+      for (let level = 1; level <= 10; level++) {
+        insChest.run(parentId, worldId, level, 20 * level);
+      }
     }
   }
 
   const insModule = db.prepare(
     `INSERT INTO module_templates
-     (parent_id, world_id, module_key, name, bonus_text, price)
-     VALUES (?, ?, ?, ?, ?, ?)`
+     (parent_id, world_id, module_key, name, name_uk, name_es,
+      bonus_text, bonus_uk, bonus_es, price)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   );
   for (const worldId of WORLDS) {
-    for (const [key, names, bonus, price] of MODULES) {
-      insModule.run(parentId, worldId, key, names[worldId], bonus, price);
+    for (const m of MODULES) {
+      const nm = m.names[worldId];
+      insModule.run(
+        parentId, worldId, m.key,
+        nm.en, nm.uk, nm.es,
+        moduleBonusText(m, "en"), moduleBonusText(m, "uk"), moduleBonusText(m, "es"),
+        m.price
+      );
     }
   }
 }

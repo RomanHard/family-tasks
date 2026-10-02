@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
-import { worldName } from "../i18n.js";
+import { worldName, tplName, tplEffect, tplBonus, langKey } from "../i18n.js";
 
 const WORLDS = ["pirates", "space", "dollhouse"];
 
@@ -53,7 +53,11 @@ export default function GameSetup() {
         {
           id: `new-${Date.now()}`,
           name: "",
+          name_uk: "",
+          name_es: "",
           effect: "",
+          effect_uk: "",
+          effect_es: "",
           price: 10,
           in_chest: 1,
           sort_order: ps.length,
@@ -94,8 +98,12 @@ export default function GameSetup() {
             body: {
               world_id: world,
               level,
-              name: p.name,
-              effect: p.effect,
+              name: p.name || p.name_uk || p.name_es,
+              name_uk: p.name_uk,
+              name_es: p.name_es,
+              effect: p.effect || p.effect_uk || p.effect_es,
+              effect_uk: p.effect_uk,
+              effect_es: p.effect_es,
               price: p.price,
               in_chest: p.in_chest,
             },
@@ -105,7 +113,11 @@ export default function GameSetup() {
             method: "PATCH",
             body: {
               name: p.name,
+              name_uk: p.name_uk,
+              name_es: p.name_es,
               effect: p.effect,
+              effect_uk: p.effect_uk,
+              effect_es: p.effect_es,
               price: p.price,
               in_chest: p.in_chest,
               sort_order: p.sort_order,
@@ -120,7 +132,7 @@ export default function GameSetup() {
       for (const m of modules) {
         await api(`/api/shop/modules/${m.id}`, {
           method: "PATCH",
-          body: { name: m.name, bonus_text: m.bonus_text, price: m.price },
+          body: { name: m.name, name_uk: m.name_uk, name_es: m.name_es, bonus_text: m.bonus_text, price: m.price },
         });
       }
       setDirty(false);
@@ -149,9 +161,13 @@ export default function GameSetup() {
     markDirty(() => setModules((ms) => ms.map((m) => (m.id === id ? { ...m, ...patch } : m))));
 
   const inChestCount = potions.filter((p) => p.in_chest).length;
+  // Parents edit the name/effect in their own UI language; the other
+  // translations of standard programs are preserved untouched.
+  const nameKey = langKey("name", lang);
+  const effectKey = langKey("effect", lang);
   const chestEffects = potions
     .filter((p) => p.in_chest)
-    .map((p) => String(p.effect || "").trim().toLowerCase())
+    .map((p) => String(tplEffect(p, lang) || "").trim().toLowerCase())
     .filter(Boolean);
   const dupEffects = new Set(chestEffects).size !== chestEffects.length;
   const coverageOk = inChestCount >= 5 && !dupEffects;
@@ -214,14 +230,14 @@ export default function GameSetup() {
               <div key={p.id} style={card}>
                 <input
                   placeholder={t("name")}
-                  value={p.name}
-                  onChange={(e) => editPotion(p.id, { name: e.target.value })}
+                  value={p[nameKey] ?? ""}
+                  onChange={(e) => editPotion(p.id, { [nameKey]: e.target.value })}
                   style={{ ...input, flex: 2 }}
                 />
                 <input
                   placeholder={t("effect")}
-                  value={p.effect}
-                  onChange={(e) => editPotion(p.id, { effect: e.target.value })}
+                  value={p[effectKey] ?? ""}
+                  onChange={(e) => editPotion(p.id, { [effectKey]: e.target.value })}
                   style={{ ...input, flex: 3 }}
                 />
                 <label>
@@ -254,7 +270,7 @@ export default function GameSetup() {
               {archived.map((p) => (
                 <div key={p.id} style={{ ...card, opacity: 0.75 }}>
                   <div style={{ flex: 1 }}>
-                    <b>{p.name}</b> <small>— {p.effect}</small>
+                    <b>{tplName(p, lang)}</b> <small>— {tplEffect(p, lang)}</small>
                   </div>
                   <button onClick={() => restorePotion(p.id)}>♻ {t("restore")}</button>
                 </div>
@@ -270,8 +286,8 @@ export default function GameSetup() {
           {modules.map((m) => (
             <div key={m.id} style={card}>
               <input
-                value={m.name}
-                onChange={(e) => editModule(m.id, { name: e.target.value })}
+                value={m[nameKey] ?? ""}
+                onChange={(e) => editModule(m.id, { [nameKey]: e.target.value })}
                 style={{ ...input, flex: 2 }}
               />
               <small style={{ flex: 3 }}>
@@ -281,6 +297,7 @@ export default function GameSetup() {
                   onChange={(e) => editModule(m.id, { bonus_text: e.target.value })}
                   style={{ ...input, width: "100%", boxSizing: "border-box" }}
                 />
+                <small style={{ color: "#888" }}>{tplBonus(m, lang)}</small>
               </small>
               <label>
                 <small>{t("price")}</small>

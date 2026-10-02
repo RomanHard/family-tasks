@@ -12,7 +12,10 @@ import {
   getWorldProgress,
   ensureWorldProgress,
   setActiveWorld,
+  localized,
+  langOfChild,
 } from "../game.js";
+import { chapterText, arcText } from "../content/chapters.js";
 
 const r = Router();
 
@@ -98,33 +101,38 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
   const me = db
     .prepare("SELECT parent_id FROM children WHERE id = ?")
     .get(req.session.user_id);
+  const clang = langOfChild(req.session.user_id);
 
   const potionsByLevel = {};
   if (me) {
     const rows = db
       .prepare(
-        `SELECT level, name, effect, price FROM potion_templates
+        `SELECT * FROM potion_templates
          WHERE parent_id = ? AND world_id = ? AND in_chest = 1 AND archived = 0
          ORDER BY level, sort_order, id`
       )
       .all(me.parent_id, world_id);
     for (const x of rows) {
+      const lx = localized(x, clang);
       (potionsByLevel[x.level] = potionsByLevel[x.level] || []).push({
-        name: x.name,
-        effect: x.effect,
+        name: lx.name,
+        effect: lx.effect,
         price: x.price,
       });
     }
   }
   const ownedModules = db
     .prepare(
-      `SELECT mt.name, mt.bonus_text FROM purchased_modules pm
+      `SELECT mt.* FROM purchased_modules pm
        JOIN module_templates mt ON mt.world_id = pm.world_id AND mt.module_key = pm.module_key
          AND mt.parent_id = ?
        WHERE pm.child_id = ? AND pm.world_id = ?`
     )
     .all(me ? me.parent_id : 0, req.session.user_id, world_id)
-    .map((m) => ({ name: m.name, bonus: m.bonus_text }));
+    .map((m) => {
+      const lm = localized(m, clang);
+      return { name: lm.name, bonus: lm.bonus_text };
+    });
 
   // Paywall: on the free plan the visible level is capped at 3 and
   // points 4+ are locked; EXP keeps accumulating underneath.
@@ -144,6 +152,7 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
       status: lv < level ? "completed" : lv === level ? "current" : "locked",
       paywalled,
       potions: potionsByLevel[lv] || [],
+      chapter: chapterText(world_id, lv, clang),
     };
   });
 
@@ -157,6 +166,14 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
     maxed: level >= MAX_LEVEL,
     points,
     modules: ownedModules,
+    arc: arcText(world_id, clang),
+    mission: {
+      // current chapter mission block for the child home screen
+      chapter: chapterText(world_id, level, clang),
+      level,
+      exp_to_next: expToNextLevel(exp),
+      maxed: level >= MAX_LEVEL,
+    },
     secret: {
       id: "???",
       // undisclosed until reached; unlocks at max level

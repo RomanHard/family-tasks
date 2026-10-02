@@ -51,6 +51,12 @@ r.post("/parent/login", async (req, res) => {
     return res.status(401).json({ error: "invalid email or password" });
   }
   const token = createSession("parent", p.id);
+  // migrate old level-1-only seeds to the canonical trilingual seed on login
+  try {
+    seedParent(p.id);
+  } catch {
+    /* seed is best-effort here */
+  }
   res
     .cookie("ft_session", token, SESSION_COOKIE_OPTS)
     .json({ ok: true, user: { type: "parent", id: p.id, email: p.email, language: p.language || "uk" } });

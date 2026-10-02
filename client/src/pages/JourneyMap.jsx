@@ -28,10 +28,6 @@ export default function JourneyMap({ world, onBack }) {
     }
   };
 
-  const planTag = (lv) => (
-    <span style={lv > 3 ? tagPlus : tagFree}>{lv > 3 ? "PLUS" : "FREE"}</span>
-  );
-
   return (
     <div>
       <button onClick={onBack}>← {t("back")}</button>
@@ -45,31 +41,41 @@ export default function JourneyMap({ world, onBack }) {
 
       <div style={path}>
         {data.points.map((p) => (
-          <button
-            key={p.level}
-            onClick={() => (p.paywalled ? setModal({ kind: "paywall" }) : setModal({ kind: "level", point: p }))}
-            style={{
-              ...dot,
-              ...(p.paywalled
-                ? dotPaywalled
-                : p.status === "completed"
-                  ? dotDone
-                  : p.status === "current"
-                    ? dotCurrent
-                    : dotLocked),
-            }}
-            title={`${t("level")} ${p.level} — ${p.paywalled ? "PLUS" : STATUS[p.status]}`}
-          >
-            {p.paywalled ? "🔒" : p.level}
-          </button>
+          <div key={p.level} style={pointCol}>
+            <button
+              onClick={() => (p.paywalled ? setModal({ kind: "paywall" }) : setModal({ kind: "level", point: p }))}
+              style={{
+                ...dot,
+                ...(p.paywalled
+                  ? dotPaywalled
+                  : p.status === "completed"
+                    ? dotDone
+                    : p.status === "current"
+                      ? dotCurrent
+                      : dotLocked),
+              }}
+              title={`${t("level")} ${p.level} — ${p.paywalled ? "PLUS" : STATUS[p.status]}`}
+            >
+              {p.paywalled ? "⌁" : p.level}
+            </button>
+            <small style={rowLabel}>
+              {p.level <= 3
+                ? t("lmRowEarly", { n: p.level })
+                : p.level <= 9
+                  ? t("lmRowPlus")
+                  : t("lmRowLegend")}
+            </small>
+          </div>
         ))}
-        <button
-          onClick={() => setModal({ kind: "secret" })}
-          style={{ ...dot, ...dotSecret }}
-          title="???"
-        >
-          ???
-        </button>
+        <div style={pointCol}>
+          <button
+            onClick={() => setModal({ kind: "secret" })}
+            style={{ ...dot, ...dotSecret }}
+            title="???"
+          >
+            ???
+          </button>
+        </div>
       </div>
 
       {data.modules.length > 0 && (
@@ -85,24 +91,43 @@ export default function JourneyMap({ world, onBack }) {
         </div>
       )}
 
-      {modal?.kind === "level" && (
+      {modal?.kind === "level" && modal.point.chapter && (
         <Modal onClose={() => setModal(null)}>
-          <h3>{t("level")} {modal.point.level} {planTag(modal.point.level)}</h3>
-          <p>{t("threshold")} {modal.point.threshold} EXP</p>
-          <p>{t("status")} {STATUS[modal.point.status]}</p>
+          <p style={insideChrome}>{t("lmInside", { n: modal.point.level })}</p>
+          <h3 style={{ marginTop: 0 }}>
+            {t("lmTitle", { n: modal.point.level, title: modal.point.chapter.title })}
+          </h3>
+          <p>
+            <span style={modal.point.status === "locked" ? pillLocked : pillUnlocked}>
+              {modal.point.status === "locked"
+                ? t("lmLocked", { n: modal.point.threshold })
+                : t("lmUnlocked")}
+            </span>
+          </p>
+          <p>✓ {modal.point.chapter.unlock}</p>
+          <p style={{ lineHeight: 1.5 }}>{modal.point.chapter.scene}</p>
+          <p>
+            <b>{t("lmMissionWord")}:</b> {modal.point.chapter.mission}
+          </p>
+          <hr style={{ margin: "12px 0" }} />
+          <p>
+            <span style={pillChest}>{t("lmPill", { m: modal.point.potions.length })}</span>{" "}
+            {t(`lmChestLine_${world.id}`, { m: modal.point.potions.length })}
+          </p>
+          <h4 style={{ marginBottom: 4 }}>{t(`lmChestName_${world.id}`)}</h4>
+          <p>
+            <small>{t(`lmChestHint_${world.id}`, { n: modal.point.level })}</small>
+          </p>
           {modal.point.potions.length > 0 ? (
-            <>
-              <h4>{t("levelPotions")}</h4>
-              <ul>
-                {modal.point.potions.map((b, i) => (
-                  <li key={i}>
-                    <b>{b.name}</b> — {b.effect} <small>({b.price})</small>
-                  </li>
-                ))}
-              </ul>
-            </>
+            <ul style={{ paddingLeft: 18, margin: "8px 0" }}>
+              {modal.point.potions.map((b, i) => (
+                <li key={i} style={{ marginBottom: 6 }}>
+                  <b>{b.name}</b> — {b.effect} <small>({b.price})</small>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <p><small>{t("noPotions")}</small></p>
+            <p><small>{t("lmEmpty")}</small></p>
           )}
         </Modal>
       )}
@@ -120,28 +145,52 @@ export default function JourneyMap({ world, onBack }) {
       )}
 
       {modal?.kind === "secret" && (
-        <Modal onClose={() => setModal(null)}>
-          <h3>???</h3>
-          <p>{data.secret.unlocked ? t("secretUnlocked") : t("secretLocked")}</p>
+        <Modal onClose={() => setModal(null)} closeLabel={t("scBack")}>
+          <h3 style={{ marginTop: 0 }}>{t("scTitle")}</h3>
+          <p><small style={kicker}>{t("scKicker")}</small></p>
+          <p>{t("scL1")}</p>
+          <p>{t("scL2")}</p>
+          <p>{t("scL3")}</p>
+          <p><small>🔒 {t("scHidden")}</small></p>
+          <p><small>{t("scLater")}</small></p>
         </Modal>
       )}
     </div>
   );
 }
 
-function Modal({ children, onClose }) {
+function Modal({ children, onClose, closeLabel }) {
   const { t } = useLang();
   return (
     <div style={overlay} onClick={onClose}>
       <div style={box} onClick={(e) => e.stopPropagation()}>
         {children}
-        <button onClick={onClose} style={{ marginTop: 12 }}>{t("close")}</button>
+        <button onClick={onClose} style={{ marginTop: 12 }}>{closeLabel || t("close")}</button>
       </div>
     </div>
   );
 }
 
 const path = { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 16 };
+const pointCol = { display: "flex", flexDirection: "column", alignItems: "center", width: 76 };
+const rowLabel = { textAlign: "center", marginTop: 4, color: "#607089", lineHeight: 1.3 };
+const insideChrome = { margin: "0 0 4px", fontSize: 13, color: "#607089" };
+const kicker = { letterSpacing: 1, color: "#9c27b0", fontWeight: "bold" };
+const pillUnlocked = {
+  display: "inline-block", fontSize: 12, fontWeight: "bold",
+  background: "#e8f5e9", color: "#2e7d32", border: "1px solid #2e7d32",
+  borderRadius: 20, padding: "3px 10px",
+};
+const pillLocked = {
+  display: "inline-block", fontSize: 12, fontWeight: "bold",
+  background: "#f5f5f5", color: "#607089", border: "1px solid #ccc",
+  borderRadius: 20, padding: "3px 10px",
+};
+const pillChest = {
+  display: "inline-block", fontSize: 12, fontWeight: "bold",
+  background: "#fff8e1", color: "#7a5c00", border: "1px solid #f5b82e",
+  borderRadius: 20, padding: "3px 10px",
+};
 const dot = {
   width: 52,
   height: 52,
@@ -168,27 +217,4 @@ const overlay = {
   zIndex: 10,
 };
 const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%" };
-const tagPlus = {
-  display: "inline-block",
-  fontSize: 11,
-  fontWeight: "bold",
-  background: "#9c27b0",
-  color: "#fff",
-  borderRadius: 4,
-  padding: "2px 6px",
-  marginLeft: 8,
-  verticalAlign: "middle",
-};
-const tagFree = {
-  display: "inline-block",
-  fontSize: 11,
-  fontWeight: "bold",
-  background: "#e8f5e9",
-  color: "#2e7d32",
-  border: "1px solid #2e7d32",
-  borderRadius: 4,
-  padding: "2px 6px",
-  marginLeft: 8,
-  verticalAlign: "middle",
-};
 const btnPrimary = { padding: "10px 18px", borderRadius: 8, border: "none", background: "#9c27b0", color: "#fff", fontSize: 15 };

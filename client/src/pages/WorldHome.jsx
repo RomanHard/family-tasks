@@ -1,8 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
 import { worldName } from "../i18n.js";
 import IntroVideo from "./IntroVideo.jsx";
+
+const EXP_THRESHOLDS = [0, 40, 100, 180, 280, 400, 550, 730, 940, 1180];
+
+// Current story chapter mission block (canonical texts from the journey API).
+function MissionBlock({ worldId }) {
+  const { t } = useLang();
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    api(`/api/worlds/${worldId}/journey`).then(setData).catch(() => {});
+  }, [worldId]);
+
+  if (!data || !data.mission || !data.mission.chapter) return null;
+  const { mission, arc, plan } = data;
+  const ch = mission.chapter;
+
+  if (mission.maxed) {
+    return (
+      <div style={msBox}>
+        <p style={msKicker}>✓</p>
+        <h3 style={{ margin: "0 0 6px" }}>{t("msDone10t")}</h3>
+        <p style={{ margin: 0 }}>{t("msDone10b")}</p>
+      </div>
+    );
+  }
+
+  if (plan === "free" && mission.level >= 3) {
+    return (
+      <div style={msBox}>
+        <h3 style={{ margin: "0 0 6px" }}>{t("msFreeT")}</h3>
+        <p style={{ margin: 0 }}>{t("msFreeB")}</p>
+      </div>
+    );
+  }
+
+  const base = EXP_THRESHOLDS[mission.level - 1] ?? 0;
+  const total = EXP_THRESHOLDS[mission.level] ?? base + 1;
+  const earned = Math.max(0, data.exp - base);
+  const pct = Math.min(100, Math.round((earned / Math.max(1, total - base)) * 100));
+
+  return (
+    <div style={msBox}>
+      <p style={msKicker}>{t("msKicker", { n: mission.level })}</p>
+      <p style={{ margin: "0 0 8px" }}>{t("msLabel", { mission: ch.mission })}</p>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <small>{t("msProgress", { earned, total: total - base })}</small>
+        <small>{t("msHint", { n: mission.exp_to_next })}</small>
+      </div>
+      <div style={barBg}>
+        <div style={{ ...barFill, width: `${pct}%` }} />
+      </div>
+      <p style={{ margin: "8px 0 0" }}>
+        <small>🎁 {t("msReward", { drop: arc?.drop || "" })}</small>
+      </p>
+    </div>
+  );
+}
 
 // Active world dashboard: character, level/EXP, currency, navigation.
 export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onTour, onChanged }) {
@@ -68,6 +125,7 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onT
         <button onClick={onTour}>🧭 {t("tourReplay")}</button>
         <button onClick={onSwitchWorld}>🔄 {t("switchWorld")}</button>
       </div>
+      <MissionBlock worldId={world.id} />
       {replay && <IntroVideo videos={world.videos} onDone={() => setReplay(false)} />}
     </div>
   );
@@ -85,3 +143,11 @@ const input = { padding: 8, borderRadius: 8, border: "1px solid #ccc", fontSize:
 const btn = { padding: "12px 20px", borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 };
 const barBg = { height: 12, borderRadius: 6, background: "#eee", overflow: "hidden", marginTop: 4 };
 const barFill = { height: "100%", background: "#4caf50", borderRadius: 6 };
+const msBox = {
+  marginTop: 16,
+  border: "1px solid #e0d6bd",
+  borderRadius: 12,
+  padding: 14,
+  background: "#fffdf5",
+};
+const msKicker = { margin: "0 0 6px", fontSize: 12, fontWeight: "bold", color: "#9c27b0", letterSpacing: 0.5 };

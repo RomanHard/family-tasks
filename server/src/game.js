@@ -161,3 +161,32 @@ export function creditRewards(childId, coins, exp) {
     leveledUp,
   };
 }
+
+/**
+ * Localize a potion_templates / module_templates row.
+ * Standard programs carry verbatim name_uk/name_es/effect_uk/effect_es;
+ * custom parent programs stay single-language (fallback to base columns).
+ * Module rows use bonus_uk/bonus_es for the bonus text.
+ */
+export function localized(row, lang) {
+  const out = { ...row };
+  if (lang === "uk" || lang === "es") {
+    const s = "_" + lang;
+    if (row["name" + s]) out.name = row["name" + s];
+    if (row["effect" + s]) out.effect = row["effect" + s];
+    if (row["bonus" + s]) out.bonus_text = row["bonus" + s];
+  }
+  return out;
+}
+
+export function langOfChild(childId) {
+  return (
+    db.prepare("SELECT language FROM children WHERE id = ?").get(childId)?.language || "uk"
+  );
+}
+
+export function langOfParent(parentId) {
+  return (
+    db.prepare("SELECT language FROM parents WHERE id = ?").get(parentId)?.language || "uk"
+  );
+}

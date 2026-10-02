@@ -173,6 +173,15 @@ addColumn("parents", "plan", "TEXT NOT NULL DEFAULT 'free'");
 addColumn("tasks", "category", "TEXT NOT NULL DEFAULT 'other'");
 addColumn("tasks", "difficulty", "INTEGER NOT NULL DEFAULT 1");
 addColumn("potion_templates", "archived", "INTEGER NOT NULL DEFAULT 0");
+// canonical trilingual standard programs (phase 9)
+addColumn("potion_templates", "name_uk", "TEXT NOT NULL DEFAULT ''");
+addColumn("potion_templates", "name_es", "TEXT NOT NULL DEFAULT ''");
+addColumn("potion_templates", "effect_uk", "TEXT NOT NULL DEFAULT ''");
+addColumn("potion_templates", "effect_es", "TEXT NOT NULL DEFAULT ''");
+addColumn("module_templates", "name_uk", "TEXT NOT NULL DEFAULT ''");
+addColumn("module_templates", "name_es", "TEXT NOT NULL DEFAULT ''");
+addColumn("module_templates", "bonus_uk", "TEXT NOT NULL DEFAULT ''");
+addColumn("module_templates", "bonus_es", "TEXT NOT NULL DEFAULT ''");
 
 export function getDb() {
   return db;

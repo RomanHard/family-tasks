@@ -236,6 +236,45 @@ const S = {
   ptourAria: { uk: "Тур для батьків, крок {n} з {m}", en: "Parent tour, step {n} of {m}", es: "Recorrido para padres, paso {n} de {m}" },
   ptourStart: { uk: "Почати керування", en: "Start managing", es: "Empezar a gestionar" },
   ptourShow: { uk: "Показати тур для батьків", en: "Show parent tour", es: "Mostrar recorrido para padres" },
+  // mission block (child home)
+  msKicker: { uk: "Розділ {n} з 10", en: "Chapter {n} of 10", es: "Capítulo {n} de 10" },
+  msLabel: { uk: "Місія: {mission}", en: "Mission: {mission}", es: "Misión: {mission}" },
+  msHint: { uk: "Виконуй складніші батьківські квести, щоб заробити ще {n} EXP.", en: "Complete harder parent quests to earn {n} more EXP.", es: "Completa misiones más difíciles de tus padres para ganar {n} EXP más." },
+  msProgress: { uk: "{earned}/{total} EXP", en: "{earned}/{total} EXP", es: "{earned}/{total} EXP" },
+  msReward: { uk: "Винагорода: безкоштовний {drop}", en: "Reward: free {drop}", es: "Recompensa: {drop} gratis" },
+  msDone10t: { uk: "Історію завершено", en: "Story complete", es: "Historia completada" },
+  msDone10b: { uk: "You reached Family Legend. Every new family quest still earns currency and EXP.", en: "You reached Family Legend. Every new family quest still earns currency and EXP.", es: "You reached Family Legend. Every new family quest still earns currency and EXP." },
+  msFreeT: { uk: "Безкоштовну пригоду завершено", en: "Free adventure complete", es: "Aventura gratuita completada" },
+  msFreeB: { uk: "Your EXP keeps growing. Family Tasks Plus opens Level 4 and Chapters 4–10.", en: "Your EXP keeps growing. Family Tasks Plus opens Level 4 and Chapters 4–10.", es: "Your EXP keeps growing. Family Tasks Plus opens Level 4 and Chapters 4–10." },
+  // level modal (LevelRewardsPreview)
+  lmInside: { uk: "Усередині рівня {n}", en: "Inside Level {n}", es: "Dentro del nivel {n}" },
+  lmChestLine_pirates: { uk: "Одна таємна скриня зі скарбом і {m} різних програм.", en: "One secret treasure chest and {m} different programs.", es: "Un cofre del tesoro secreto y {m} programas diferentes." },
+  lmChestLine_space: { uk: "Один таємний контейнер із деталями й {m} різних програм.", en: "One secret parts crate and {m} different programs.", es: "Una caja secreta de repuestos y {m} programas diferentes." },
+  lmChestLine_dollhouse: { uk: "Одна таємна коробка для ремонту й {m} різних програм.", en: "One secret renovation box and {m} different programs.", es: "Una caja secreta de renovación y {m} programas diferentes." },
+  lmPill: { uk: "1 + {m}", en: "1 + {m}", es: "1 + {m}" },
+  lmChestName_pirates: { uk: "Таємна скриня зі скарбом", en: "Secret treasure chest", es: "Cofre del tesoro secreto" },
+  lmChestName_space: { uk: "Таємний контейнер із деталями", en: "Secret parts crate", es: "Caja secreta de repuestos" },
+  lmChestName_dollhouse: { uk: "Таємна коробка для ремонту", en: "Secret renovation box", es: "Caja secreta de renovación" },
+  lmChestHint_pirates: { uk: "Відкрий її, щоб отримати одну випадкову програму {n}-го рівня з колекції нижче.", en: "Open it to reveal one random Level {n} program from the collection below.", es: "Ábrelo para descubrir un programa aleatorio de nivel {n} de la colección de abajo." },
+  lmChestHint_space: { uk: "Відкрий його, щоб отримати одну випадкову програму {n}-го рівня з колекції нижче.", en: "Open it to reveal one random Level {n} program from the collection below.", es: "Ábrela para descubrir un programa aleatorio de nivel {n} de la colección de abajo." },
+  lmChestHint_dollhouse: { uk: "Відкрий її, щоб отримати одну випадкову програму {n}-го рівня з колекції нижче.", en: "Open it to reveal one random Level {n} program from the collection below.", es: "Ábrela para descubrir un programa aleatorio de nivel {n} de la colección de abajo." },
+  lmTitle: { uk: "Розділ {n} · {title}", en: "Chapter {n} · {title}", es: "Capítulo {n} · {title}" },
+  lmUnlocked: { uk: "ВІДКРИТО", en: "UNLOCKED", es: "DESBLOQUEADO" },
+  lmLocked: { uk: "ПОТРІБНО {n} EXP", en: "{n} EXP NEEDED", es: "SE NECESITAN {n} EXP" },
+  lmMissionWord: { uk: "Місія", en: "Mission", es: "Misión" },
+  lmEmpty: { uk: "Батьки можуть відновити стандартні програми цього рівня в налаштуваннях гри.", en: "A parent can restore this level's standard programs in Game setup.", es: "Tus padres pueden restaurar los programas estándar de este nivel en la configuración del juego." },
+  lmRowEarly: { uk: "Таємна скриня + 5 програм {n}-го рівня", en: "Secret chest + 5 Level {n} programs", es: "Cofre secreto + 5 programas de nivel {n}" },
+  lmRowPlus: { uk: "Розділ Plus · таємна скриня + 5 програм", en: "Plus chapter · secret chest + 5 programs", es: "Capítulo Plus · cofre secreto + 5 programas" },
+  lmRowLegend: { uk: "Сімейна легенда · таємна скриня + 5 програм", en: "Family Legend · secret chest + 5 programs", es: "Leyenda familiar · cofre secreto + 5 programas" },
+  // secret super bonus modal
+  scTitle: { uk: "Секретний супербонус", en: "Secret super bonus", es: "Superbónus secreto" },
+  scKicker: { uk: "ПІСЛЯ 10 РІВНЯ", en: "AFTER LEVEL 10", es: "DESPUÉS DEL NIVEL 10" },
+  scL1: { uk: "На тебе чекає супербонус.", en: "A super bonus is waiting.", es: "Te espera un superbónus." },
+  scL2: { uk: "Ти дістався кінця карти. Супербонус поки залишається таємницею.", en: "You reached the end of the map. The super bonus stays secret for now.", es: "Llegaste al final del mapa. El superbónus sigue siendo secreto por ahora." },
+  scL3: { uk: "Пройди рівні 1–10, щоб дістатися до нього. Що всередині — поки таємниця.", en: "Finish Levels 1–10 to reach it. What is inside stays secret for now.", es: "Completa los niveles 1–10 para llegar. Lo que hay dentro sigue siendo secreto por ahora." },
+  scHidden: { uk: "Вміст приховано", en: "Contents hidden", es: "Contenido oculto" },
+  scLater: { uk: "Цю винагороду відкриємо пізніше.", en: "We will reveal this reward later.", es: "Revelaremos esta recompensa más adelante." },
+  scBack: { uk: "Назад до карти", en: "Back to the map", es: "Volver al mapa" },
 };
 
 export const TASK_CATEGORIES = ["home", "study", "sport", "create", "kind", "nature", "other"];
@@ -368,6 +407,32 @@ export function worldName(id, lang) {
 }
 export function worldCurrency(id, lang) {
   return (WORLD_I18N[id]?.currency[lang] ?? WORLD_I18N[id]?.currency.uk ?? "");
+}
+
+// Localized display of potion_templates / module_templates rows.
+// Standard programs carry verbatim translations; custom parent programs
+// fall back to the single-language base columns.
+export function tplName(row, lang) {
+  if (!row) return "";
+  if (lang === "uk" && row.name_uk) return row.name_uk;
+  if (lang === "es" && row.name_es) return row.name_es;
+  return row.name || "";
+}
+export function tplEffect(row, lang) {
+  if (!row) return "";
+  if (lang === "uk" && row.effect_uk) return row.effect_uk;
+  if (lang === "es" && row.effect_es) return row.effect_es;
+  return row.effect || "";
+}
+export function tplBonus(row, lang) {
+  if (!row) return "";
+  if (lang === "uk" && row.bonus_uk) return row.bonus_uk;
+  if (lang === "es" && row.bonus_es) return row.bonus_es;
+  return row.bonus_text || "";
+}
+// Which row key the parent edits for the current UI language.
+export function langKey(base, lang) {
+  return lang === "uk" ? `${base}_uk` : lang === "es" ? `${base}_es` : base;
 }
 
 export function tr(lang, key, vars) {

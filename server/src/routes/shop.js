@@ -8,6 +8,8 @@ import {
   ensureWorldProgress,
   ownsModule,
   chestPriceFor,
+  localized,
+  langOfChild,
 } from "../game.js";
 import { notifyParent } from "../notify.js";
 
@@ -49,7 +51,7 @@ r.get("/setup", requireParent, (req, res) => {
 });
 
 r.post("/potions", requireParent, (req, res) => {
-  const { world_id, level, name, effect, price, in_chest } = req.body ?? {};
+  const { world_id, level, name, name_uk, name_es, effect, effect_uk, effect_es, price, in_chest } = req.body ?? {};
   if (!isWorld(world_id)) return res.status(400).json({ error: "unknown world" });
   if (!name || !String(name).trim()) return res.status(400).json({ error: "name required" });
   const lv = Math.min(10, Math.max(1, parseInt(level) || 1));
@@ -61,15 +63,20 @@ r.post("/potions", requireParent, (req, res) => {
   const { lastInsertRowid } = db
     .prepare(
       `INSERT INTO potion_templates
-       (parent_id, world_id, level, name, effect, price, in_chest, sort_order)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+       (parent_id, world_id, level, name, name_uk, name_es, effect, effect_uk, effect_es,
+        price, in_chest, sort_order)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       req.session.user_id,
       world_id,
       lv,
       String(name).trim(),
+      String(name_uk || "").trim(),
+      String(name_es || "").trim(),
       String(effect || "").trim(),
+      String(effect_uk || "").trim(),
+      String(effect_es || "").trim(),
       Math.max(0, parseInt(price) || 0),
       in_chest ? 1 : 0,
       maxOrder + 1
@@ -82,14 +89,20 @@ r.patch("/potions/:id", requireParent, (req, res) => {
     .prepare("SELECT * FROM potion_templates WHERE id = ? AND parent_id = ?")
     .get(req.params.id, req.session.user_id);
   if (!p) return res.status(404).json({ error: "potion not found" });
-  const { name, effect, price, in_chest, sort_order } = req.body ?? {};
+  const { name, name_uk, name_es, effect, effect_uk, effect_es, price, in_chest, sort_order } = req.body ?? {};
   db.prepare(
     `UPDATE potion_templates
-     SET name = ?, effect = ?, price = ?, in_chest = ?, sort_order = ?
+     SET name = ?, name_uk = ?, name_es = ?,
+         effect = ?, effect_uk = ?, effect_es = ?,
+         price = ?, in_chest = ?, sort_order = ?
      WHERE id = ?`
   ).run(
     name !== undefined ? String(name).trim() : p.name,
+    name_uk !== undefined ? String(name_uk).trim() : p.name_uk,
+    name_es !== undefined ? String(name_es).trim() : p.name_es,
     effect !== undefined ? String(effect).trim() : p.effect,
+    effect_uk !== undefined ? String(effect_uk).trim() : p.effect_uk,
+    effect_es !== undefined ? String(effect_es).trim() : p.effect_es,
     price !== undefined ? Math.max(0, parseInt(price) || 0) : p.price,
     in_chest !== undefined ? (in_chest ? 1 : 0) : p.in_chest,
     sort_order !== undefined ? parseInt(sort_order) || 0 : p.sort_order,
@@ -145,11 +158,20 @@ r.patch("/modules/:id", requireParent, (req, res) => {
     .prepare("SELECT * FROM module_templates WHERE id = ? AND parent_id = ?")
     .get(req.params.id, req.session.user_id);
   if (!m) return res.status(404).json({ error: "module not found" });
-  const { name, price, bonus_text } = req.body ?? {};
-  db.prepare("UPDATE module_templates SET name = ?, price = ?, bonus_text = ? WHERE id = ?").run(
+  const { name, name_uk, name_es, price, bonus_text, bonus_uk, bonus_es } = req.body ?? {};
+  db.prepare(
+    `UPDATE module_templates
+     SET name = ?, name_uk = ?, name_es = ?,
+         price = ?, bonus_text = ?, bonus_uk = ?, bonus_es = ?
+     WHERE id = ?`
+  ).run(
     name !== undefined ? String(name).trim() : m.name,
+    name_uk !== undefined ? String(name_uk).trim() : m.name_uk,
+    name_es !== undefined ? String(name_es).trim() : m.name_es,
     price !== undefined ? Math.max(1, parseInt(price) || 1) : m.price,
     bonus_text !== undefined ? String(bonus_text).trim() : m.bonus_text,
+    bonus_uk !== undefined ? String(bonus_uk).trim() : m.bonus_uk,
+    bonus_es !== undefined ? String(bonus_es).trim() : m.bonus_es,
     m.id
   );
   res.json({ ok: true });
@@ -159,6 +181,7 @@ r.patch("/modules/:id", requireParent, (req, res) => {
 
 function kidShopData(childId, worldId) {
   const pid = parentOf(childId);
+  const lang = langOfChild(childId);
   const prog = ensureWorldProgress(childId, worldId);
   const level = prog.level;
   const potions = db
@@ -182,8 +205,8 @@ function kidShopData(childId, worldId) {
     level,
     free_chests: prog.free_chests,
     chest_price: chestPriceFor(pid, worldId, level, childId),
-    potions,
-    modules: modules.map((m) => ({ ...m, owned: owned.has(m.module_key) })),
+    potions: potions.map((p) => localized(p, lang)),
+    modules: modules.map((m) => ({ ...localized(m, lang), owned: owned.has(m.module_key) })),
   };
 }
 
@@ -215,12 +238,14 @@ r.post("/:world_id/buy-potion/:potion_id", requireChild, (req, res) => {
   if (!spendCoins(req.session.user_id, world_id, potion.price)) {
     return res.status(400).json({ error: "not enough coins" });
   }
+  // inventory keeps the name/effect in the child's language at purchase time
+  const lp = localized(potion, langOfChild(req.session.user_id));
   const { lastInsertRowid } = db
     .prepare(
       `INSERT INTO kid_inventory (child_id, world_id, potion_template_id, name, effect)
        VALUES (?, ?, ?, ?, ?)`
     )
-    .run(req.session.user_id, world_id, potion.id, potion.name, potion.effect);
+    .run(req.session.user_id, world_id, potion.id, lp.name, lp.effect);
   notifyParent(req.session.user_id, {
     type: "potion_bought",
     title: "Program bought",
@@ -259,19 +284,20 @@ r.post("/:world_id/open-chest", requireChild, (req, res) => {
   }
 
   const drop = potions[Math.floor(Math.random() * potions.length)];
+  const ld = localized(drop, langOfChild(req.session.user_id));
   const { lastInsertRowid } = db
     .prepare(
       `INSERT INTO kid_inventory (child_id, world_id, potion_template_id, name, effect)
        VALUES (?, ?, ?, ?, ?)`
     )
-    .run(req.session.user_id, world_id, drop.id, drop.name, drop.effect);
+    .run(req.session.user_id, world_id, drop.id, ld.name, ld.effect);
   notifyParent(req.session.user_id, {
     type: "chest_opened",
     title: "Chest opened",
-    body: `Chest dropped: ${drop.name} (${nickOf(req.session.user_id)})`,
-    data: { nick: nickOf(req.session.user_id), drop: drop.name },
+    body: `Chest dropped: ${ld.name} (${nickOf(req.session.user_id)})`,
+    data: { nick: nickOf(req.session.user_id), drop: ld.name },
   });
-  res.json({ ok: true, id: lastInsertRowid, drop: { name: drop.name, effect: drop.effect }, usedFree });
+  res.json({ ok: true, id: lastInsertRowid, drop: { name: ld.name, effect: ld.effect }, usedFree });
 });
 
 r.post("/:world_id/buy-module/:key", requireChild, (req, res) => {
