@@ -140,7 +140,67 @@ export default function Shop({ world, onBack, onChanged }) {
           </div>
         </div>
       )}
+
+      <hr style={{ margin: "24px 0" }} />
+      <RewardAsk />
     </div>
+  );
+}
+
+function RewardAsk() {
+  const { t } = useLang();
+  const [text, setText] = useState("");
+  const [mine, setMine] = useState([]);
+  const [sent, setSent] = useState(false);
+
+  const load = async () => {
+    const r = await api("/api/rewards/mine");
+    setMine(r.rewards);
+  };
+  useEffect(() => {
+    load().catch(() => {});
+  }, []);
+
+  const send = async (e) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    try {
+      await api("/api/rewards/request", { method: "POST", body: { text: text.trim() } });
+      setText("");
+      setSent(true);
+      setTimeout(() => setSent(false), 3000);
+      load().catch(() => {});
+    } catch {
+      /* offline */
+    }
+  };
+
+  const st = (s) => (s === "approved" ? t("rwApproved") : s === "declined" ? t("rwDeclined") : t("rwPending"));
+
+  return (
+    <section>
+      <h3>🎁 {t("rewards")}</h3>
+      <form onSubmit={send} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+        <input
+          placeholder={t("rewardPh")}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          style={{ flex: 1, padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+          maxLength={300}
+        />
+        <button type="submit">{t("askForOne")}</button>
+      </form>
+      {sent && <p style={{ color: "green" }}><small>{t("plusRequestSent")}</small></p>}
+      {mine.length > 0 && (
+        <ul>
+          {mine.map((r) => (
+            <li key={r.id}>
+              {r.text} — <small>{st(r.status)}</small>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

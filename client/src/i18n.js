@@ -143,6 +143,15 @@ const S = {
   // notifications
   notifs: { uk: "Сповіщення", en: "Notifications", es: "Notificaciones" },
   noNotifs: { uk: "Поки порожньо.", en: "Nothing here yet.", es: "Nada por aquí todavía." },
+  // family rewards ("Ask for one")
+  rewards: { uk: "Сімейні винагороди", en: "Family rewards", es: "Recompensas familiares" },
+  askForOne: { uk: "Попросити", en: "Ask for one", es: "Pedir una" },
+  rewardPh: { uk: "Яку винагороду хочеш попросити?", en: "What reward do you want to ask for?", es: "¿Qué recompensa quieres pedir?" },
+  rewardRequests: { uk: "Запити винагород", en: "Reward requests", es: "Solicitudes de recompensas" },
+  noRewards: { uk: "Поки немає запитів.", en: "No requests yet.", es: "Aún no hay solicitudes." },
+  rwPending: { uk: "чекає", en: "pending", es: "pendiente" },
+  rwApproved: { uk: "схвалено", en: "approved", es: "aprobada" },
+  rwDeclined: { uk: "відхилено", en: "declined", es: "rechazada" },
   // task categories & difficulty
   category: { uk: "Категорія", en: "Category", es: "Categoría" },
   difficulty: { uk: "Складність", en: "Difficulty", es: "Dificultad" },

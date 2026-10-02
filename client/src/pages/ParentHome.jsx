@@ -110,6 +110,9 @@ export default function ParentHome() {
       <SubscriptionPanel />
 
       <hr style={{ margin: "24px 0" }} />
+      <RewardsPanel />
+
+      <hr style={{ margin: "24px 0" }} />
       <ParentTasks kids={kids} />
 
       <hr style={{ margin: "24px 0" }} />
@@ -149,3 +152,72 @@ function SubscriptionPanel() {
 }
 
 const panelBox = { border: "1px solid #ddd", borderRadius: 12, padding: 16, background: "#fafafa" };
+
+function RewardsPanel() {
+  const { t } = useLang();
+  const [pending, setPending] = useState([]);
+  const [history, setHistory] = useState([]);
+
+  const load = async () => {
+    const [p, h] = await Promise.all([
+      api("/api/rewards/inbox"),
+      api("/api/rewards/history"),
+    ]);
+    setPending(p.rewards);
+    setHistory(h.rewards);
+  };
+
+  useEffect(() => {
+    load().catch(() => {});
+  }, []);
+
+  const decide = async (id, action) => {
+    try {
+      await api(`/api/rewards/${id}/${action}`, { method: "POST" });
+      await load();
+    } catch {
+      /* offline */
+    }
+  };
+
+  const st = (s) =>
+    s === "approved" ? t("rwApproved") : s === "declined" ? t("rwDeclined") : t("rwPending");
+
+  return (
+    <section>
+      <h2>🎁 {t("rewards")}</h2>
+      {pending.length === 0 && <p><small>{t("noRewards")}</small></p>}
+      {pending.map((r) => (
+        <div key={r.id} style={rewardRow}>
+          <div><b>{r.child_nickname}</b>: {r.text}</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={() => decide(r.id, "approve")}>{t("approve")}</button>
+            <button onClick={() => decide(r.id, "decline")}>{t("decline")}</button>
+          </div>
+        </div>
+      ))}
+      {history.length > 0 && (
+        <>
+          <h3>{t("history")}</h3>
+          <ul>
+            {history.map((r) => (
+              <li key={r.id}>
+                <b>{r.child_nickname}</b>: {r.text} — <small>{st(r.status)}</small>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
+
+const rewardRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 8,
+  padding: "8px 0",
+  borderBottom: "1px solid #eee",
+  flexWrap: "wrap",
+};
