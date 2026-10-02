@@ -215,4 +215,4 @@ const row = { display: "flex", justifyContent: "space-between", alignItems: "cen
 const btn = { padding: "12px 20px", borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 };
 const chestBox = { border: "2px dashed #9c27b0", borderRadius: 12, padding: 16, marginBottom: 16, textAlign: "center" };
 const overlay = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 10 };
-const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%", textAlign: "center" };
+const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%", textAlign: "center", maxHeight: "85vh", overflowY: "auto" };

@@ -7,7 +7,7 @@ import { notify, notifyParent } from "../notify.js";
 
 const r = Router();
 
-const CATS = ["home", "study", "sport", "create", "kind", "nature", "other"];
+const CATS = ["dishes", "vacuum", "tidying", "laundry", "homework", "kindness", "other"];
 function cleanCat(v) {
   return CATS.includes(v) ? v : "other";
 }

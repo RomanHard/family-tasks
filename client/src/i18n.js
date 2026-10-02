@@ -182,12 +182,12 @@ const S = {
   diff1: { uk: "Легко (10 EXP)", en: "Easy (10 EXP)", es: "Fácil (10 EXP)" },
   diff2: { uk: "Середньо (20 EXP)", en: "Medium (20 EXP)", es: "Media (20 EXP)" },
   diff3: { uk: "Складно (35 EXP)", en: "Hard (35 EXP)", es: "Difícil (35 EXP)" },
-  cat_home: { uk: "Дім", en: "Home", es: "Casa" },
-  cat_study: { uk: "Навчання", en: "Study", es: "Estudio" },
-  cat_sport: { uk: "Спорт", en: "Sports", es: "Deporte" },
-  cat_create: { uk: "Творчість", en: "Creativity", es: "Creatividad" },
-  cat_kind: { uk: "Доброта", en: "Kindness", es: "Amabilidad" },
-  cat_nature: { uk: "Природа", en: "Nature", es: "Naturaleza" },
+  cat_dishes: { uk: "Посуд", en: "Dishes", es: "Platos" },
+  cat_vacuum: { uk: "Пилососіння", en: "Vacuuming", es: "Aspirar" },
+  cat_tidying: { uk: "Прибирання", en: "Tidying", es: "Ordenar" },
+  cat_laundry: { uk: "Прання", en: "Laundry", es: "Lavandería" },
+  cat_homework: { uk: "Домашнє завдання", en: "Homework", es: "Tarea escolar" },
+  cat_kindness: { uk: "Добра справа", en: "Kindness", es: "Amabilidad" },
   cat_other: { uk: "Інше", en: "Other", es: "Otro" },
   // game setup: coverage, archive
   coverageOk: { uk: "✅ {n}/5 програм у скрині, ефекти унікальні", en: "✅ {n}/5 chest programs, unique effects", es: "✅ {n}/5 programas en el cofre, efectos únicos" },
@@ -301,7 +301,7 @@ const S = {
   kidResetSent: { uk: "Батьків повідомлено. Попроси їх встановити тобі новий пароль.", en: "Your parents have been notified. Ask them to set you a new password.", es: "Tus padres han sido notificados. Pídeles que te pongan una nueva contraseña." },
 };
 
-export const TASK_CATEGORIES = ["home", "study", "sport", "create", "kind", "nature", "other"];
+export const TASK_CATEGORIES = ["dishes", "vacuum", "tidying", "laundry", "homework", "kindness", "other"];
 export const DIFF_EXP = { 1: 10, 2: 20, 3: 35 };
 
 export function catLabel(id, lang) {

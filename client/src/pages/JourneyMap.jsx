@@ -267,5 +267,5 @@ const overlay = {
   padding: 16,
   zIndex: 10,
 };
-const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%" };
+const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%", maxHeight: "85vh", overflowY: "auto" };
 const btnPrimary = { padding: "10px 18px", borderRadius: 8, border: "none", background: "#9c27b0", color: "#fff", fontSize: 15 };

@@ -137,4 +137,4 @@ const overlay = {
   padding: 16,
   zIndex: 50,
 };
-const modalBox = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 360, width: "100%" };
+const modalBox = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 360, width: "100%", maxHeight: "85vh", overflowY: "auto" };
