@@ -142,11 +142,24 @@ CREATE TABLE IF NOT EXISTS purchased_modules (
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE(child_id, world_id, module_key)
 );
+
+CREATE TABLE IF NOT EXISTS notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  parent_id INTEGER NOT NULL REFERENCES parents(id) ON DELETE CASCADE,
+  child_id INTEGER REFERENCES children(id) ON DELETE CASCADE,
+  type TEXT NOT NULL DEFAULT '',
+  title TEXT NOT NULL DEFAULT '',
+  body TEXT NOT NULL DEFAULT '',
+  data TEXT NOT NULL DEFAULT '{}',
+  read INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `);
 
 // migrations for existing databases
 addColumn("parents", "language", "TEXT NOT NULL DEFAULT 'uk'");
 addColumn("children", "language", "TEXT NOT NULL DEFAULT 'uk'");
+addColumn("parents", "plan", "TEXT NOT NULL DEFAULT 'free'");
 
 export function getDb() {
   return db;

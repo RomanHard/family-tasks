@@ -155,7 +155,8 @@ export default function GameSetup() {
       <div style={{ ...tabs, marginTop: 8 }}>
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((lv) => (
           <button key={lv} onClick={() => setLevel(lv)} style={level === lv ? tabActive : tabBtn}>
-            {lv}
+            {lv}{" "}
+            <small style={lv > 3 ? planPlus : planFree}>{lv > 3 ? "PLUS" : "FREE"}</small>
           </button>
         ))}
       </div>
@@ -271,3 +272,5 @@ const card = { display: "flex", gap: 8, alignItems: "center", padding: 8, border
 const input = { padding: 8, borderRadius: 6, border: "1px solid #ccc", fontSize: 14 };
 const btn = { padding: "10px 18px", borderRadius: 8, border: "1px solid #ccc", background: "#f5f5f5" };
 const btnPrimary = { ...btn, background: "#333", color: "#fff", border: "none" };
+const planPlus = { fontSize: 10, fontWeight: "bold", color: "#9c27b0" };
+const planFree = { fontSize: 10, fontWeight: "bold", color: "#2e7d32" };

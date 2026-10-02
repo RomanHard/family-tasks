@@ -128,6 +128,18 @@ const S = {
   // misc
   levelUp: { uk: "🎉 Новий рівень! {f} → {t} у світі «{w}»", en: "🎉 Level up! {f} → {t} in “{w}”", es: "🎉 ¡Nuevo nivel! {f} → {t} en «{w}»" },
   watchIntro: { uk: "Дивитись вступ", en: "Watch intro", es: "Ver la intro" },
+  // subscription / paywall
+  subscriptionTitle: { uk: "Підписка", en: "Subscription", es: "Suscripción" },
+  currentPlan: { uk: "Поточний план", en: "Current plan", es: "Plan actual" },
+  planFree: { uk: "Безкоштовний", en: "Free", es: "Gratis" },
+  planPlus: { uk: "Family Tasks Plus", en: "Family Tasks Plus", es: "Family Tasks Plus" },
+  previewPlus: { uk: "Попередній перегляд Plus", en: "Preview Plus access", es: "Vista previa de Plus" },
+  switchToFree: { uk: "Повернутись на Free", en: "Switch back to Free", es: "Volver a Gratis" },
+  billingNote: { uk: "Реальні платежі буде підключено до публічного релізу.", en: "Billing will be connected for the public release.", es: "Los pagos reales se conectarán para el lanzamiento público." },
+  plusLockedTitle: { uk: "Рівень Plus 🔒", en: "Plus level 🔒", es: "Nivel Plus 🔒" },
+  plusLockedBody: { uk: "Рівні 4–10 доступні з Family Tasks Plus. Твій EXP продовжує накопичуватись!", en: "Levels 4–10 need Family Tasks Plus. Your EXP keeps accumulating!", es: "Los niveles 4–10 requieren Family Tasks Plus. ¡Tu EXP sigue acumulándose!" },
+  askParents: { uk: "Попросити батьків", en: "Ask parents", es: "Pedir a los padres" },
+  plusRequestSent: { uk: "Запит надіслано батькам ✓", en: "Request sent to parents ✓", es: "Solicitud enviada a los padres ✓" },
 };
 
 export const LANGS = [

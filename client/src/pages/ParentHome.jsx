@@ -103,6 +103,9 @@ export default function ParentHome() {
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
       <hr style={{ margin: "24px 0" }} />
+      <SubscriptionPanel />
+
+      <hr style={{ margin: "24px 0" }} />
       <ParentTasks kids={kids} />
 
       <hr style={{ margin: "24px 0" }} />
@@ -110,3 +113,35 @@ export default function ParentHome() {
     </main>
   );
 }
+
+function SubscriptionPanel() {
+  const { t } = useLang();
+  const [plan, setPlan] = useState("free");
+
+  useEffect(() => {
+    api("/api/subscription/plan").then((r) => setPlan(r.plan)).catch(() => {});
+  }, []);
+
+  const toggle = async () => {
+    const next = plan === "plus" ? "free" : "plus";
+    try {
+      const r = await api("/api/subscription/plan", { method: "PATCH", body: { plan: next } });
+      setPlan(r.plan);
+    } catch {
+      /* stay on current plan */
+    }
+  };
+
+  return (
+    <section style={panelBox}>
+      <h2 style={{ marginTop: 0 }}>{t("subscriptionTitle")}</h2>
+      <p>
+        {t("currentPlan")}: <b>{plan === "plus" ? t("planPlus") : t("planFree")}</b>
+      </p>
+      <button onClick={toggle}>{plan === "plus" ? t("switchToFree") : t("previewPlus")}</button>
+      <p><small>{t("billingNote")}</small></p>
+    </section>
+  );
+}
+
+const panelBox = { border: "1px solid #ddd", borderRadius: 12, padding: 16, background: "#fafafa" };

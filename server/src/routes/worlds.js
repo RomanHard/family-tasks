@@ -126,12 +126,23 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
     .all(me ? me.parent_id : 0, req.session.user_id, world_id)
     .map((m) => ({ name: m.name, bonus: m.bonus_text }));
 
+  // Paywall: on the free plan the visible level is capped at 3 and
+  // points 4+ are locked; EXP keeps accumulating underneath.
+  let plan = "free";
+  if (me) {
+    const prow = db.prepare("SELECT plan FROM parents WHERE id = ?").get(me.parent_id);
+    plan = prow?.plan || "free";
+  }
+  const visibleLevel = plan === "plus" ? level : Math.min(level, 3);
+
   const points = EXP_THRESHOLDS.map((threshold, i) => {
     const lv = i + 1;
+    const paywalled = plan !== "plus" && lv > 3;
     return {
       level: lv,
       threshold,
       status: lv < level ? "completed" : lv === level ? "current" : "locked",
+      paywalled,
       potions: potionsByLevel[lv] || [],
     };
   });
@@ -140,6 +151,8 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
     world_id,
     exp,
     level,
+    visible_level: visibleLevel,
+    plan,
     exp_to_next: expToNextLevel(exp),
     maxed: level >= MAX_LEVEL,
     points,

@@ -4,10 +4,12 @@ import { useLang } from "../lang.jsx";
 import { worldName } from "../i18n.js";
 
 // Journey map: 10 tappable level points + the secret ??? point after level 10.
+// On the free plan, points 4+ are locked behind the Family Tasks Plus paywall.
 export default function JourneyMap({ world, onBack }) {
   const { t, lang } = useLang();
   const [data, setData] = useState(null);
-  const [modal, setModal] = useState(null); // {kind:'level', point} | {kind:'secret'}
+  const [modal, setModal] = useState(null); // {kind:'level', point} | {kind:'secret'} | {kind:'paywall'}
+  const [requested, setRequested] = useState(false);
 
   const STATUS = { completed: t("stCompleted"), current: t("stCurrent"), locked: t("stLocked") };
 
@@ -17,13 +19,26 @@ export default function JourneyMap({ world, onBack }) {
 
   if (!data) return <p>{t("loadingMap")}</p>;
 
+  const askPlus = async () => {
+    try {
+      await api("/api/subscription/request", { method: "POST" });
+      setRequested(true);
+    } catch {
+      /* already requested or offline — stay quiet */
+    }
+  };
+
+  const planTag = (lv) => (
+    <span style={lv > 3 ? tagPlus : tagFree}>{lv > 3 ? "PLUS" : "FREE"}</span>
+  );
+
   return (
     <div>
       <button onClick={onBack}>← {t("back")}</button>
       <h2>{t("journey")} — {worldName(world.id, lang)}</h2>
       <p>
         <small>
-          {t("level")} {data.level} • {data.exp} EXP
+          {t("level")} {data.visible_level} • {data.exp} EXP
           {data.maxed ? ` • ${t("maxed")}` : ` • ${t("expToNext", { n: data.exp_to_next, l: data.level + 1 })}`}
         </small>
       </p>
@@ -32,14 +47,20 @@ export default function JourneyMap({ world, onBack }) {
         {data.points.map((p) => (
           <button
             key={p.level}
-            onClick={() => setModal({ kind: "level", point: p })}
+            onClick={() => (p.paywalled ? setModal({ kind: "paywall" }) : setModal({ kind: "level", point: p }))}
             style={{
               ...dot,
-              ...(p.status === "completed" ? dotDone : p.status === "current" ? dotCurrent : dotLocked),
+              ...(p.paywalled
+                ? dotPaywalled
+                : p.status === "completed"
+                  ? dotDone
+                  : p.status === "current"
+                    ? dotCurrent
+                    : dotLocked),
             }}
-            title={`${t("level")} ${p.level} — ${STATUS[p.status]}`}
+            title={`${t("level")} ${p.level} — ${p.paywalled ? "PLUS" : STATUS[p.status]}`}
           >
-            {p.level}
+            {p.paywalled ? "🔒" : p.level}
           </button>
         ))}
         <button
@@ -66,7 +87,7 @@ export default function JourneyMap({ world, onBack }) {
 
       {modal?.kind === "level" && (
         <Modal onClose={() => setModal(null)}>
-          <h3>{t("level")} {modal.point.level}</h3>
+          <h3>{t("level")} {modal.point.level} {planTag(modal.point.level)}</h3>
           <p>{t("threshold")} {modal.point.threshold} EXP</p>
           <p>{t("status")} {STATUS[modal.point.status]}</p>
           {modal.point.potions.length > 0 ? (
@@ -82,6 +103,18 @@ export default function JourneyMap({ world, onBack }) {
             </>
           ) : (
             <p><small>{t("noPotions")}</small></p>
+          )}
+        </Modal>
+      )}
+
+      {modal?.kind === "paywall" && (
+        <Modal onClose={() => setModal(null)}>
+          <h3>{t("plusLockedTitle")}</h3>
+          <p>{t("plusLockedBody")}</p>
+          {requested ? (
+            <p><b>{t("plusRequestSent")}</b></p>
+          ) : (
+            <button onClick={askPlus} style={btnPrimary}>{t("askParents")}</button>
           )}
         </Modal>
       )}
@@ -122,6 +155,7 @@ const dot = {
 const dotDone = { background: "#4caf50", borderColor: "#4caf50", color: "#fff" };
 const dotCurrent = { background: "#ffeb3b", borderColor: "#f0ad4e" };
 const dotLocked = { opacity: 0.45 };
+const dotPaywalled = { borderStyle: "dashed", borderColor: "#9c27b0", color: "#9c27b0", opacity: 0.8 };
 const dotSecret = { borderStyle: "dashed", borderColor: "#9c27b0", color: "#9c27b0" };
 const overlay = {
   position: "fixed",
@@ -134,3 +168,27 @@ const overlay = {
   zIndex: 10,
 };
 const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%" };
+const tagPlus = {
+  display: "inline-block",
+  fontSize: 11,
+  fontWeight: "bold",
+  background: "#9c27b0",
+  color: "#fff",
+  borderRadius: 4,
+  padding: "2px 6px",
+  marginLeft: 8,
+  verticalAlign: "middle",
+};
+const tagFree = {
+  display: "inline-block",
+  fontSize: 11,
+  fontWeight: "bold",
+  background: "#e8f5e9",
+  color: "#2e7d32",
+  border: "1px solid #2e7d32",
+  borderRadius: 4,
+  padding: "2px 6px",
+  marginLeft: 8,
+  verticalAlign: "middle",
+};
+const btnPrimary = { padding: "10px 18px", borderRadius: 8, border: "none", background: "#9c27b0", color: "#fff", fontSize: 15 };

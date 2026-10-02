@@ -9,6 +9,7 @@ import childrenRoutes from "./routes/children.js";
 import tasksRoutes from "./routes/tasks.js";
 import worldsRoutes from "./routes/worlds.js";
 import shopRoutes from "./routes/shop.js";
+import subscriptionRoutes from "./routes/subscription.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/children", childrenRoutes);
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/worlds", worldsRoutes);
 app.use("/api/shop", shopRoutes);
+app.use("/api/subscription", subscriptionRoutes);
 
 // game art (images, videos) — single source in repo-root assets/
 const assetsDir = path.join(__dirname, "..", "..", "assets");
