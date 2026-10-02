@@ -11,6 +11,7 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [video, setVideo] = useState(null);
+  const [travelWarn, setTravelWarn] = useState(false);
 
   const selected = worlds.find((w) => w.id === picked);
   const isFirstEntry = selected && !selected.entered;
@@ -54,11 +55,35 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
         )}
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-          <button style={btn} onClick={confirm} disabled={isFirstEntry && !name.trim()}>
+          <button
+            style={btn}
+            onClick={() => (isFirstEntry ? confirm() : setTravelWarn(true))}
+            disabled={isFirstEntry && !name.trim()}
+          >
             {isFirstEntry ? t("startAdventure") : t("continue")}
           </button>
           <button onClick={() => setPicked(null)}>{t("back")}</button>
         </div>
+        {travelWarn && (
+          <div style={overlay} onClick={() => setTravelWarn(false)}>
+            <div style={modalBox} onClick={(e) => e.stopPropagation()}>
+              <h3 style={{ marginTop: 0 }}>🔄 {t("travelTitle")}</h3>
+              <p>{t("travelBody")}</p>
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+                <button onClick={() => setTravelWarn(false)}>{t("cancel")}</button>
+                <button
+                  style={btn}
+                  onClick={() => {
+                    setTravelWarn(false);
+                    confirm();
+                  }}
+                >
+                  {t("travelConfirm")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -102,3 +127,14 @@ const card = {
 };
 const input = { padding: 10, borderRadius: 8, border: "1px solid #ccc", fontSize: 16, width: "100%", boxSizing: "border-box" };
 const btn = { padding: "12px 20px", borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 };
+const overlay = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0,0,0,0.4)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 16,
+  zIndex: 50,
+};
+const modalBox = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 360, width: "100%" };
