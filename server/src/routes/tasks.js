@@ -6,6 +6,15 @@ import { notify, notifyParent } from "../notify.js";
 
 const r = Router();
 
+const CATS = ["home", "study", "sport", "create", "kind", "nature", "other"];
+function cleanCat(v) {
+  return CATS.includes(v) ? v : "other";
+}
+function cleanDiff(v) {
+  const d = parseInt(v);
+  return [1, 2, 3].includes(d) ? d : 1;
+}
+
 function logEvent(taskId, actorType, actorId, event, note = "") {
   db.prepare(
     "INSERT INTO task_events (task_id, actor_type, actor_id, event, note) VALUES (?, ?, ?, ?, ?)"
@@ -47,7 +56,7 @@ r.get("/", requireParent, (req, res) => {
 
 // Create a task (child_id null = for all kids)
 r.post("/", requireParent, (req, res) => {
-  const { child_id, title, details, coins, exp, deadline } = req.body ?? {};
+  const { child_id, title, details, coins, exp, deadline, category, difficulty } = req.body ?? {};
   if (!title || !String(title).trim()) {
     return res.status(400).json({ error: "title required" });
   }
@@ -63,8 +72,8 @@ r.post("/", requireParent, (req, res) => {
     : String(deadline || "").trim();
   const { lastInsertRowid } = db
     .prepare(
-      `INSERT INTO tasks (parent_id, child_id, title, details, coins, exp, deadline)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (parent_id, child_id, title, details, coins, exp, deadline, category, difficulty)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       req.session.user_id,
@@ -73,7 +82,9 @@ r.post("/", requireParent, (req, res) => {
       String(details || "").trim(),
       Math.max(0, parseInt(coins) || 0),
       Math.max(0, parseInt(exp) || 0),
-      finalDeadline
+      finalDeadline,
+      cleanCat(category),
+      cleanDiff(difficulty)
     );
   logEvent(lastInsertRowid, "parent", req.session.user_id, "created");
   // notify the assignee, or every kid when the task is for all
@@ -101,7 +112,7 @@ r.patch("/:id", requireParent, (req, res) => {
   const t = parentTask(req.session.user_id, req.params.id);
   if (!t) return res.status(404).json({ error: "task not found" });
   if (t.status === "approved") return res.status(400).json({ error: "already approved" });
-  const { title, details, coins, exp, child_id, deadline } = req.body ?? {};
+  const { title, details, coins, exp, child_id, deadline, category, difficulty } = req.body ?? {};
   let assigneeId = t.child_id;
   if (child_id !== undefined) {
     if (child_id === null) assigneeId = null;
@@ -115,7 +126,7 @@ r.patch("/:id", requireParent, (req, res) => {
   }
   db.prepare(
     `UPDATE tasks SET title = ?, details = ?, coins = ?, exp = ?, child_id = ?, deadline = ?,
-     updated_at = datetime('now') WHERE id = ?`
+     category = ?, difficulty = ?, updated_at = datetime('now') WHERE id = ?`
   ).run(
     title !== undefined ? String(title).trim() : t.title,
     details !== undefined ? String(details).trim() : t.details,
@@ -123,6 +134,8 @@ r.patch("/:id", requireParent, (req, res) => {
     exp !== undefined ? Math.max(0, parseInt(exp) || 0) : t.exp,
     assigneeId,
     deadline !== undefined ? String(deadline).trim() : t.deadline,
+    category !== undefined ? cleanCat(category) : t.category,
+    difficulty !== undefined ? cleanDiff(difficulty) : t.difficulty,
     t.id
   );
   logEvent(t.id, "parent", req.session.user_id, "edited");

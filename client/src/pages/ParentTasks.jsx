@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
+import { TASK_CATEGORIES, DIFF_EXP, catLabel } from "../i18n.js";
 
 const STATUS_KEY = {
   ready: "stReady",
@@ -11,10 +12,10 @@ const STATUS_KEY = {
 };
 
 export default function ParentTasks({ kids }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [tasks, setTasks] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const [form, setForm] = useState({ title: "", details: "", coins: "5", exp: "10", child_id: "", deadline: "" });
+  const [form, setForm] = useState({ title: "", details: "", coins: "5", exp: "10", child_id: "", deadline: "", category: "other", difficulty: "1" });
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
 
@@ -53,9 +54,16 @@ export default function ParentTasks({ kids }) {
           exp: form.exp,
           child_id: form.child_id || null,
           deadline: form.deadline,
+          category: form.category,
+          difficulty: parseInt(form.difficulty) || 1,
         },
-      }).then(() => setForm({ title: "", details: "", coins: "5", exp: "10", child_id: "", deadline: "" }))
+      }).then(() => setForm({ title: "", details: "", coins: "5", exp: "10", child_id: "", deadline: "", category: "other", difficulty: "1" }))
     );
+  };
+
+  // picking a difficulty presets EXP (still editable manually afterwards)
+  const setDifficulty = (d) => {
+    setForm({ ...form, difficulty: d, exp: String(DIFF_EXP[d] || 10) });
   };
 
   const saveEdit = (id, data) =>
@@ -110,7 +118,8 @@ export default function ParentTasks({ kids }) {
           {awaiting.map((task) => (
             <div key={task.id} style={row}>
               <div>
-                <b>{task.title}</b> <small>— {task.child_nickname || t("allKids")}</small>
+                <b>{task.title}</b> <small style={catBadge}>{catLabel(task.category, lang)}</small>{" "}
+                <small>— {task.child_nickname || t("allKids")}</small>
                 {task.kid_note && <div><small>📝 {task.kid_note}</small></div>}
                 <div><small>+{task.coins} {t("coins")}, +{task.exp} EXP</small></div>
               </div>
@@ -135,7 +144,7 @@ export default function ParentTasks({ kids }) {
         ) : (
           <div key={task.id} style={row}>
             <div>
-              <b>{task.title}</b>{" "}
+              <b>{task.title}</b> <small style={catBadge}>{catLabel(task.category, lang)}</small>{" "}
               <small style={badge}>{t(STATUS_KEY[task.status])}</small>{" "}
               <small>— {task.child_nickname || t("allKids")}</small>
               {task.deadline && <span> <small>📅 {task.deadline}</small></span>}
@@ -162,6 +171,20 @@ export default function ParentTasks({ kids }) {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <label>{t("coins")} <input type="number" min="0" value={form.coins} onChange={(e) => setForm({ ...form, coins: e.target.value })} style={{ width: 70 }} /></label>
           <label>EXP <input type="number" min="0" value={form.exp} onChange={(e) => setForm({ ...form, exp: e.target.value })} style={{ width: 70 }} /></label>
+          <label>{t("category")}{" "}
+            <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+              {TASK_CATEGORIES.map((c) => (
+                <option key={c} value={c}>{catLabel(c, lang)}</option>
+              ))}
+            </select>
+          </label>
+          <label>{t("difficulty")}{" "}
+            <select value={form.difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+              {[1, 2, 3].map((d) => (
+                <option key={d} value={String(d)}>{t(`diff${d}`)}</option>
+              ))}
+            </select>
+          </label>
           <select value={form.child_id} onChange={(e) => setForm({ ...form, child_id: e.target.value })}>
             <option value="">{t("allKids")}</option>
             {kids.map((k) => (
@@ -177,7 +200,7 @@ export default function ParentTasks({ kids }) {
 }
 
 function EditForm({ task, kids, onSave, onCancel }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [f, setF] = useState({
     title: task.title,
     details: task.details,
@@ -185,7 +208,10 @@ function EditForm({ task, kids, onSave, onCancel }) {
     exp: task.exp,
     child_id: task.child_id || "",
     deadline: task.deadline || "",
+    category: task.category || "other",
+    difficulty: String(task.difficulty || 1),
   });
+  const setDiff = (d) => setF({ ...f, difficulty: d, exp: DIFF_EXP[d] || 10 });
   return (
     <form
       style={row}
@@ -200,6 +226,20 @@ function EditForm({ task, kids, onSave, onCancel }) {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <label>{t("coins")} <input type="number" min="0" value={f.coins} onChange={(e) => setF({ ...f, coins: e.target.value })} style={{ width: 70 }} /></label>
           <label>EXP <input type="number" min="0" value={f.exp} onChange={(e) => setF({ ...f, exp: e.target.value })} style={{ width: 70 }} /></label>
+          <label>{t("category")}{" "}
+            <select value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })}>
+              {TASK_CATEGORIES.map((c) => (
+                <option key={c} value={c}>{catLabel(c, lang)}</option>
+              ))}
+            </select>
+          </label>
+          <label>{t("difficulty")}{" "}
+            <select value={f.difficulty} onChange={(e) => setDiff(e.target.value)}>
+              {[1, 2, 3].map((d) => (
+                <option key={d} value={String(d)}>{t(`diff${d}`)}</option>
+              ))}
+            </select>
+          </label>
           <select value={f.child_id} onChange={(e) => setF({ ...f, child_id: e.target.value })}>
             <option value="">{t("allKids")}</option>
             {kids.map((k) => (
@@ -220,3 +260,4 @@ function EditForm({ task, kids, onSave, onCancel }) {
 const box = { border: "1px solid #ddd", borderRadius: 8, padding: 12, marginBottom: 16, background: "#fafafa" };
 const row = { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "1px solid #eee", flexWrap: "wrap" };
 const badge = { background: "#eee", borderRadius: 4, padding: "2px 6px" };
+const catBadge = { background: "#e3f2fd", color: "#1565c0", borderRadius: 4, padding: "2px 6px" };

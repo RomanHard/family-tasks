@@ -160,6 +160,8 @@ CREATE TABLE IF NOT EXISTS notifications (
 addColumn("parents", "language", "TEXT NOT NULL DEFAULT 'uk'");
 addColumn("children", "language", "TEXT NOT NULL DEFAULT 'uk'");
 addColumn("parents", "plan", "TEXT NOT NULL DEFAULT 'free'");
+addColumn("tasks", "category", "TEXT NOT NULL DEFAULT 'other'");
+addColumn("tasks", "difficulty", "INTEGER NOT NULL DEFAULT 1");
 
 export function getDb() {
   return db;

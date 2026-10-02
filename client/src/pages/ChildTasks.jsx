@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
+import { catLabel } from "../i18n.js";
 
 export default function ChildTasks() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const [tasks, setTasks] = useState([]);
   const [history, setHistory] = useState([]);
   const [mySuggestions, setMySuggestions] = useState([]);
@@ -59,7 +60,7 @@ export default function ChildTasks() {
 
       {byStatus("ready").map((x) => (
         <div key={x.id} style={card}>
-          <b>{x.title}</b>
+          <b>{x.title}</b> <small style={catBadge}>{catLabel(x.category, lang)}</small>
           {x.details && <div><small>{x.details}</small></div>}
           {x.deadline && <div><small>📅 {x.deadline}</small></div>}
           <div><small>+{x.coins} {t("coins")}, +{x.exp} EXP</small></div>
@@ -71,7 +72,7 @@ export default function ChildTasks() {
 
       {byStatus("working").map((x) => (
         <div key={x.id} style={{ ...card, borderColor: "#f0ad4e" }}>
-          <b>{x.title}</b> <small>— {STATUS.working}</small>
+          <b>{x.title}</b> <small style={catBadge}>{catLabel(x.category, lang)}</small> <small>— {STATUS.working}</small>
           {x.details && <div><small>{x.details}</small></div>}
           <input
             placeholder={t("notePh")}
@@ -91,7 +92,7 @@ export default function ChildTasks() {
 
       {byStatus("done").map((x) => (
         <div key={x.id} style={{ ...card, borderColor: "#5bc0de", opacity: 0.85 }}>
-          <b>{x.title}</b> <small>— {STATUS.done} ⏳</small>
+          <b>{x.title}</b> <small style={catBadge}>{catLabel(x.category, lang)}</small> <small>— {STATUS.done} ⏳</small>
           {x.kid_note && <div><small>📝 {x.kid_note}</small></div>}
         </div>
       ))}
@@ -127,7 +128,8 @@ export default function ChildTasks() {
           <ul>
             {history.map((x) => (
               <li key={x.id}>
-                ✅ {x.title} <small>(+{x.coins} {t("coins")}, +{x.exp} EXP)</small>
+                ✅ {x.title} <small style={catBadge}>{catLabel(x.category, lang)}</small>{" "}
+                <small>(+{x.coins} {t("coins")}, +{x.exp} EXP)</small>
               </li>
             ))}
           </ul>
@@ -147,3 +149,4 @@ const card = {
   gap: 6,
   alignItems: "flex-start",
 };
+const catBadge = { background: "#e3f2fd", color: "#1565c0", borderRadius: 4, padding: "2px 6px" };

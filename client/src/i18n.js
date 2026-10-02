@@ -143,7 +143,27 @@ const S = {
   // notifications
   notifs: { uk: "Сповіщення", en: "Notifications", es: "Notificaciones" },
   noNotifs: { uk: "Поки порожньо.", en: "Nothing here yet.", es: "Nada por aquí todavía." },
+  // task categories & difficulty
+  category: { uk: "Категорія", en: "Category", es: "Categoría" },
+  difficulty: { uk: "Складність", en: "Difficulty", es: "Dificultad" },
+  diff1: { uk: "Легко (10 EXP)", en: "Easy (10 EXP)", es: "Fácil (10 EXP)" },
+  diff2: { uk: "Середньо (20 EXP)", en: "Medium (20 EXP)", es: "Media (20 EXP)" },
+  diff3: { uk: "Складно (35 EXP)", en: "Hard (35 EXP)", es: "Difícil (35 EXP)" },
+  cat_home: { uk: "Дім", en: "Home", es: "Casa" },
+  cat_study: { uk: "Навчання", en: "Study", es: "Estudio" },
+  cat_sport: { uk: "Спорт", en: "Sports", es: "Deporte" },
+  cat_create: { uk: "Творчість", en: "Creativity", es: "Creatividad" },
+  cat_kind: { uk: "Доброта", en: "Kindness", es: "Amabilidad" },
+  cat_nature: { uk: "Природа", en: "Nature", es: "Naturaleza" },
+  cat_other: { uk: "Інше", en: "Other", es: "Otro" },
 };
+
+export const TASK_CATEGORIES = ["home", "study", "sport", "create", "kind", "nature", "other"];
+export const DIFF_EXP = { 1: 10, 2: 20, 3: 35 };
+
+export function catLabel(id, lang) {
+  return tr(lang, `cat_${TASK_CATEGORIES.includes(id) ? id : "other"}`);
+}
 
 // Localized notification templates by type. Stored title/body (English) are
 // used as fallback for unknown types. `data` carries template variables.
