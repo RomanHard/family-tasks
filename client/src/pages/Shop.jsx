@@ -3,9 +3,13 @@ import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
 import { worldName, worldCurrency } from "../i18n.js";
 
-export default function Shop({ world, onBack, onChanged }) {
+export default function Shop({ world, onBack, onChanged, initialTab }) {
   const { t, lang } = useLang();
-  const [tab, setTab] = useState("programs"); // programs | modules | inventory
+  const [tab, setTab] = useState(initialTab || "programs"); // programs | modules | inventory
+
+  useEffect(() => {
+    if (initialTab) setTab(initialTab);
+  }, [initialTab]);
   const [data, setData] = useState(null);
   const [items, setItems] = useState([]);
   const [drop, setDrop] = useState(null);

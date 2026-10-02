@@ -6,6 +6,9 @@ import { LANGS } from "../i18n.js";
 import ParentTasks from "./ParentTasks.jsx";
 import GameSetup from "./GameSetup.jsx";
 import NotifBell from "../components/NotifBell.jsx";
+import Tour from "../components/Tour.jsx";
+
+const PARENT_TOUR_KEY = "ft_parent_tour_done";
 
 export default function ParentHome() {
   const { user, logout, refresh } = useAuth();
@@ -14,6 +17,8 @@ export default function ParentHome() {
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [ptour, setPtour] = useState(false);
+  const [kidTourPreview, setKidTourPreview] = useState(false);
 
   const load = async () => {
     const { children } = await api("/api/children");
@@ -23,6 +28,37 @@ export default function ParentHome() {
   useEffect(() => {
     load().catch(() => {});
   }, []);
+
+  // Parent tour auto-launches on first login; completion is persisted.
+  useEffect(() => {
+    let done = false;
+    try {
+      done = !!localStorage.getItem(PARENT_TOUR_KEY);
+    } catch {
+      /* private mode */
+    }
+    if (!done) setPtour(true);
+  }, []);
+
+  const finishPTour = () => {
+    try {
+      localStorage.setItem(PARENT_TOUR_KEY, "1");
+    } catch {
+      /* private mode */
+    }
+    setPtour(false);
+  };
+
+  // 6 steps when the family has children, 5 when not.
+  const ptourSteps =
+    kids.length > 0
+      ? [1, 2, 3, 4, 5, 6].map((n) => ({ title: t(`ptourK${n}t`), body: t(`ptourK${n}b`) }))
+      : [1, 2, 3, 4, 5].map((n) => ({ title: t(`ptourN${n}t`), body: t(`ptourN${n}b`) }));
+
+  const kidTourSteps = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => ({
+    title: t(`kidTour${n}t`),
+    body: t(`kidTour${n}b`),
+  }));
 
   const addChild = async (e) => {
     e.preventDefault();
@@ -61,6 +97,32 @@ export default function ParentHome() {
 
   return (
     <main style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
+      {ptour && (
+        <Tour
+          steps={ptourSteps}
+          stepOf={(n, m) => t("ptourStepOf", { n, m })}
+          ariaLabel={(n, m) => t("ptourAria", { n, m })}
+          skipLabel={t("tourSkip")}
+          backLabel={t("tourBack")}
+          nextLabel={t("tourNext")}
+          startLabel={t("ptourStart")}
+          transitionLabel={t("tourTransition")}
+          onDone={finishPTour}
+        />
+      )}
+      {kidTourPreview && (
+        <Tour
+          steps={kidTourSteps}
+          stepOf={(n) => t("tourStepOf", { n })}
+          ariaLabel={(n) => t("tourAriaKid", { n })}
+          skipLabel={t("tourSkip")}
+          backLabel={t("tourBack")}
+          nextLabel={t("tourNext")}
+          startLabel={t("tourStartKid")}
+          transitionLabel={t("tourTransition")}
+          onDone={() => setKidTourPreview(false)}
+        />
+      )}
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>{t("parentTitle")}</h1>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -68,6 +130,10 @@ export default function ParentHome() {
           <button onClick={logout}>{t("logout")}</button>
         </div>
       </header>
+      <p>
+        <button onClick={() => setPtour(true)} style={tourBtn}>🧭 {t("ptourShow")}</button>{" "}
+        <button onClick={() => setKidTourPreview(true)} style={tourBtn}>👧 {t("tourShowKid")}</button>
+      </p>
       <p>{user?.email}</p>
       <p>
         <label>
@@ -167,6 +233,7 @@ function SubscriptionPanel() {
 }
 
 const panelBox = { border: "1px solid #ddd", borderRadius: 12, padding: 16, background: "#fafafa" };
+const tourBtn = { padding: "6px 10px", borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: "pointer" };
 
 function RewardsPanel() {
   const { t } = useLang();

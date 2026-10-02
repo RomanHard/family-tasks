@@ -5,7 +5,7 @@ import { worldName } from "../i18n.js";
 import IntroVideo from "./IntroVideo.jsx";
 
 // Active world dashboard: character, level/EXP, currency, navigation.
-export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onChanged }) {
+export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onTour, onChanged }) {
   const { t, lang } = useLang();
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(world.character_name);
@@ -65,6 +65,7 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onC
         <button style={btn} onClick={onShop}>🛒 {t("shop")}</button>
         <button onClick={onJourney}>🗺 {t("journey")}</button>
         <button onClick={() => setReplay(true)}>🎬 {t("watchIntro")}</button>
+        <button onClick={onTour}>🧭 {t("tourReplay")}</button>
         <button onClick={onSwitchWorld}>🔄 {t("switchWorld")}</button>
       </div>
       {replay && <IntroVideo videos={world.videos} onDone={() => setReplay(false)} />}

@@ -25,7 +25,7 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
       });
       // backstory cartoon plays on first entry into each world
       if (r.firstEntry) setVideo(r.world);
-      else onDone();
+      else onDone({ firstEntry: false, worldId: picked });
     } catch (e) {
       setError(e.message);
     }
@@ -34,7 +34,7 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
   if (picked && selected) {
     return (
       <div style={{ maxWidth: 420 }}>
-        {video && <IntroVideo videos={video.videos} onDone={onDone} />}
+        {video && <IntroVideo videos={video.videos} onDone={() => onDone({ firstEntry: true, worldId: picked })} />}
         <img src={selected.art} alt={worldName(selected.id, lang)} style={hero} />
         <h2>{worldName(selected.id, lang)}</h2>
         {isFirstEntry ? (
