@@ -1,4 +1,5 @@
 import { useAuth } from "../auth.jsx";
+import ChildTasks from "./ChildTasks.jsx";
 
 export default function ChildHome() {
   const { user, logout } = useAuth();
@@ -8,7 +9,7 @@ export default function ChildHome() {
         <h1>Привіт, {user?.nickname}! 🎮</h1>
         <button onClick={logout}>Вийти</button>
       </header>
-      <p>Твої світи, завдання і крамниця з'являться тут у наступних фазах.</p>
+      <ChildTasks />
     </main>
   );
 }

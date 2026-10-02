@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { getDb } from "./db.js";
 import authRoutes from "./routes/auth.js";
 import childrenRoutes from "./routes/children.js";
+import tasksRoutes from "./routes/tasks.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -21,6 +22,7 @@ app.get("/api/health", (_req, res) => {
 });
 app.use("/api/auth", authRoutes);
 app.use("/api/children", childrenRoutes);
+app.use("/api/tasks", tasksRoutes);
 
 // ---- static client (production) ----
 const publicDir = path.join(__dirname, "..", "public");

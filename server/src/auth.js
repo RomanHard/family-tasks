@@ -62,6 +62,15 @@ export function requireParent(req, res, next) {
   });
 }
 
+export function requireChild(req, res, next) {
+  requireAuth(req, res, () => {
+    if (req.session.user_type !== "child") {
+      return res.status(403).json({ error: "children only" });
+    }
+    next();
+  });
+}
+
 export const SESSION_COOKIE_OPTS = {
   httpOnly: true,
   sameSite: "lax",

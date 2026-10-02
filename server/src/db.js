@@ -33,6 +33,42 @@ CREATE TABLE IF NOT EXISTS sessions (
   expires_at TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+CREATE TABLE IF NOT EXISTS tasks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  parent_id INTEGER NOT NULL REFERENCES parents(id) ON DELETE CASCADE,
+  child_id INTEGER REFERENCES children(id) ON DELETE SET NULL,
+  title TEXT NOT NULL,
+  details TEXT NOT NULL DEFAULT '',
+  coins INTEGER NOT NULL DEFAULT 0,
+  exp INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'ready'
+    CHECK (status IN ('ready','working','done','approved','paused')),
+  kid_note TEXT NOT NULL DEFAULT '',
+  deleted INTEGER NOT NULL DEFAULT 0,
+  paused_from TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS task_events (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  task_id INTEGER NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  actor_type TEXT NOT NULL CHECK (actor_type IN ('parent','child')),
+  actor_id INTEGER NOT NULL,
+  event TEXT NOT NULL,
+  note TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS task_suggestions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  parent_id INTEGER NOT NULL REFERENCES parents(id) ON DELETE CASCADE,
+  child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  details TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted','declined')),
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 `);
 
 export function getDb() {

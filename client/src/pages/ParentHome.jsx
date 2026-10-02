@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../auth.jsx";
+import ParentTasks from "./ParentTasks.jsx";
 
 export default function ParentHome() {
   const { user, logout } = useAuth();
@@ -65,6 +66,8 @@ export default function ParentHome() {
         <button type="submit">Додати</button>
       </form>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
+
+      <ParentTasks kids={kids} />
     </main>
   );
 }
