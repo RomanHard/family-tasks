@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
-import { worldName, worldCurrency } from "../i18n.js";
+import { worldName } from "../i18n.js";
 import IntroVideo from "./IntroVideo.jsx";
 
 // First entry or world switching. On first entry the child also names their character.
@@ -76,8 +76,8 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
               <div>
                 <small>
                   {w.entered
-                    ? `${w.character_name} • ${t("level")} ${w.level} • ${w.coins} ${worldCurrency(w.id, lang)}`
-                    : `${t("newWorld")} • ${t("currencyWord")} ${worldCurrency(w.id, lang)}`}
+                    ? `${w.character_name} • ${t("level")} ${w.level} • ${w.exp} EXP`
+                    : t("newWorld")}
                 </small>
               </div>
             </div>

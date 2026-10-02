@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
-import { worldName, worldCurrency } from "../i18n.js";
+import { worldName } from "../i18n.js";
 import IntroVideo from "./IntroVideo.jsx";
 
 // Active world dashboard: character, level/EXP, currency, navigation.
@@ -60,10 +60,6 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onC
           <div style={{ ...barFill, width: `${pct}%` }} />
         </div>
       </div>
-
-      <p>
-        💰 {world.coins} {worldCurrency(world.id, lang)}
-      </p>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button style={btn} onClick={onShop}>🛒 {t("shop")}</button>

@@ -76,8 +76,8 @@ export default function ParentTasks({ kids }) {
     );
   };
 
-  const awaiting = tasks.filter((t) => t.status === "done");
-  const active = tasks.filter((t) => ["ready", "working", "paused"].includes(t.status));
+  const awaiting = tasks.filter((x) => x.status === "done");
+  const active = tasks.filter((x) => ["ready", "working", "paused"].includes(x.status));
 
   return (
     <section>
@@ -107,18 +107,18 @@ export default function ParentTasks({ kids }) {
       {awaiting.length > 0 && (
         <div style={box}>
           <h3>{t("awaiting")} ({awaiting.length})</h3>
-          {awaiting.map((t) => (
-            <div key={t.id} style={row}>
+          {awaiting.map((task) => (
+            <div key={task.id} style={row}>
               <div>
-                <b>{t.title}</b> <small>— {t.child_nickname || t("allKids")}</small>
-                {t.kid_note && <div><small>📝 {t.kid_note}</small></div>}
-                <div><small>+{t.coins} {t("coins")}, +{t.exp} EXP</small></div>
+                <b>{task.title}</b> <small>— {task.child_nickname || t("allKids")}</small>
+                {task.kid_note && <div><small>📝 {task.kid_note}</small></div>}
+                <div><small>+{task.coins} {t("coins")}, +{task.exp} EXP</small></div>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => act(() => api(`/api/tasks/${t.id}/approve`, { method: "POST" }))}>
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/approve`, { method: "POST" }))}>
                   ✅ {t("approve")}
                 </button>
-                <button onClick={() => act(() => api(`/api/tasks/${t.id}/reject`, { method: "POST" }))}>
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/reject`, { method: "POST" }))}>
                   ↩ {t("sendBack")}
                 </button>
               </div>
@@ -129,27 +129,27 @@ export default function ParentTasks({ kids }) {
 
       <h3>{t("active")}</h3>
       {active.length === 0 && <p>{t("noActive")}</p>}
-      {active.map((t) =>
-        editing === t.id ? (
-          <EditForm key={t.id} task={t} kids={kids} onSave={(d) => saveEdit(t.id, d)} onCancel={() => setEditing(null)} />
+      {active.map((task) =>
+        editing === task.id ? (
+          <EditForm key={task.id} task={task} kids={kids} onSave={(d) => saveEdit(task.id, d)} onCancel={() => setEditing(null)} />
         ) : (
-          <div key={t.id} style={row}>
+          <div key={task.id} style={row}>
             <div>
-              <b>{t.title}</b>{" "}
-              <small style={badge}>{t(STATUS_KEY[t.status])}</small>{" "}
-              <small>— {t.child_nickname || t("allKids")}</small>
-              {t.deadline && <span> <small>📅 {t.deadline}</small></span>}
-              {t.details && <div><small>{t.details}</small></div>}
-              <div><small>+{t.coins} {t("coins")}, +{t.exp} EXP</small></div>
+              <b>{task.title}</b>{" "}
+              <small style={badge}>{t(STATUS_KEY[task.status])}</small>{" "}
+              <small>— {task.child_nickname || t("allKids")}</small>
+              {task.deadline && <span> <small>📅 {task.deadline}</small></span>}
+              {task.details && <div><small>{task.details}</small></div>}
+              <div><small>+{task.coins} {t("coins")}, +{task.exp} EXP</small></div>
             </div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              <button onClick={() => setEditing(t.id)}>{t("edit")}</button>
-              {t.status === "paused" ? (
-                <button onClick={() => act(() => api(`/api/tasks/${t.id}/resume`, { method: "POST" }))}>▶ {t("resume")}</button>
+              <button onClick={() => setEditing(task.id)}>{t("edit")}</button>
+              {task.status === "paused" ? (
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/resume`, { method: "POST" }))}>▶ {t("resume")}</button>
               ) : (
-                <button onClick={() => act(() => api(`/api/tasks/${t.id}/pause`, { method: "POST" }))}>⏸ {t("pause")}</button>
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/pause`, { method: "POST" }))}>⏸ {t("pause")}</button>
               )}
-              <button onClick={() => remove(t.id, t.title)}>🗑 {t("delete")}</button>
+              <button onClick={() => remove(task.id, task.title)}>🗑 {t("delete")}</button>
             </div>
           </div>
         )
