@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { api } from "../api.js";
+import { useLang } from "../lang.jsx";
+import { worldName, worldCurrency } from "../i18n.js";
 
 // First entry or world switching. On first entry the child also names their character.
 export default function WorldSelect({ worlds, switchArt, onDone }) {
+  const { t, lang } = useLang();
   const [picked, setPicked] = useState(null);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -26,14 +29,14 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
   if (picked && selected) {
     return (
       <div style={{ maxWidth: 420 }}>
-        <img src={selected.art} alt={selected.name_uk} style={hero} />
-        <h2>{selected.name_uk}</h2>
+        <img src={selected.art} alt={worldName(selected.id, lang)} style={hero} />
+        <h2>{worldName(selected.id, lang)}</h2>
         {isFirstEntry ? (
           <>
-            <p>Хто буде героєм цього світу? Придумай ім'я персонажа:</p>
+            <p>{t("nameHero")}</p>
             <input
               style={input}
-              placeholder="Ім'я персонажа"
+              placeholder={t("charNamePh")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={30}
@@ -41,16 +44,15 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
           </>
         ) : (
           <p>
-            Повернутись до «{selected.character_name}»? Прогрес збережено: рівень{" "}
-            {selected.level}, {selected.exp} EXP.
+            {t("continue")}: «{selected.character_name}»? {t("level")} {selected.level}, {selected.exp} EXP.
           </p>
         )}
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
           <button style={btn} onClick={confirm} disabled={isFirstEntry && !name.trim()}>
-            {isFirstEntry ? "Почати пригоду!" : "Продовжити"}
+            {isFirstEntry ? t("startAdventure") : t("continue")}
           </button>
-          <button onClick={() => setPicked(null)}>Назад</button>
+          <button onClick={() => setPicked(null)}>{t("back")}</button>
         </div>
       </div>
     );
@@ -58,19 +60,19 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
 
   return (
     <div>
-      <h2>Обери світ</h2>
+      <h2>{t("chooseWorld")}</h2>
       {switchArt && <img src={switchArt} alt="" style={{ ...hero, maxHeight: 160 }} />}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {worlds.map((w) => (
           <button key={w.id} onClick={() => setPicked(w.id)} style={card}>
-            <img src={w.art} alt={w.name_uk} style={thumb} />
+            <img src={w.art} alt={worldName(w.id, lang)} style={thumb} />
             <div style={{ textAlign: "left" }}>
-              <b>{w.name_uk}</b>
+              <b>{worldName(w.id, lang)}</b>
               <div>
                 <small>
                   {w.entered
-                    ? `${w.character_name} • рівень ${w.level} • ${w.coins} ${w.currency_uk}`
-                    : `Новий світ • валюта: ${w.currency_uk}`}
+                    ? `${w.character_name} • ${t("level")} ${w.level} • ${w.coins} ${worldCurrency(w.id, lang)}`
+                    : `${t("newWorld")} • ${t("currencyWord")} ${worldCurrency(w.id, lang)}`}
                 </small>
               </div>
             </div>

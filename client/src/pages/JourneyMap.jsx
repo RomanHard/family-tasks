@@ -1,27 +1,30 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
-
-const STATUS_UA = { completed: "пройдено", current: "поточний", locked: "закрито" };
+import { useLang } from "../lang.jsx";
+import { worldName } from "../i18n.js";
 
 // Journey map: 10 tappable level points + the secret ??? point after level 10.
 export default function JourneyMap({ world, onBack }) {
+  const { t, lang } = useLang();
   const [data, setData] = useState(null);
   const [modal, setModal] = useState(null); // {kind:'level', point} | {kind:'secret'}
+
+  const STATUS = { completed: t("stCompleted"), current: t("stCurrent"), locked: t("stLocked") };
 
   useEffect(() => {
     api(`/api/worlds/${world.id}/journey`).then(setData).catch(() => {});
   }, [world.id]);
 
-  if (!data) return <p>Завантаження карти…</p>;
+  if (!data) return <p>{t("loadingMap")}</p>;
 
   return (
     <div>
-      <button onClick={onBack}>← Назад</button>
-      <h2>Карта подорожі — {world.name_uk}</h2>
+      <button onClick={onBack}>← {t("back")}</button>
+      <h2>{t("journey")} — {worldName(world.id, lang)}</h2>
       <p>
         <small>
-          Рівень {data.level} • {data.exp} EXP
-          {data.maxed ? " • максимум!" : ` • ще ${data.exp_to_next} EXP до рівня ${data.level + 1}`}
+          {t("level")} {data.level} • {data.exp} EXP
+          {data.maxed ? ` • ${t("maxed")}` : ` • ${t("expToNext", { n: data.exp_to_next, l: data.level + 1 })}`}
         </small>
       </p>
 
@@ -34,7 +37,7 @@ export default function JourneyMap({ world, onBack }) {
               ...dot,
               ...(p.status === "completed" ? dotDone : p.status === "current" ? dotCurrent : dotLocked),
             }}
-            title={`Рівень ${p.level} — ${STATUS_UA[p.status]}`}
+            title={`${t("level")} ${p.level} — ${STATUS[p.status]}`}
           >
             {p.level}
           </button>
@@ -50,7 +53,7 @@ export default function JourneyMap({ world, onBack }) {
 
       {data.modules.length > 0 && (
         <div style={{ marginTop: 16 }}>
-          <h3>Мої модулі</h3>
+          <h3>{t("myModules")}</h3>
           <ul>
             {data.modules.map((m, i) => (
               <li key={i}>
@@ -63,22 +66,22 @@ export default function JourneyMap({ world, onBack }) {
 
       {modal?.kind === "level" && (
         <Modal onClose={() => setModal(null)}>
-          <h3>Рівень {modal.point.level}</h3>
-          <p>Поріг: {modal.point.threshold} EXP</p>
-          <p>Статус: {STATUS_UA[modal.point.status]}</p>
+          <h3>{t("level")} {modal.point.level}</h3>
+          <p>{t("threshold")} {modal.point.threshold} EXP</p>
+          <p>{t("status")} {STATUS[modal.point.status]}</p>
           {modal.point.potions.length > 0 ? (
             <>
-              <h4>Зілля рівня</h4>
+              <h4>{t("levelPotions")}</h4>
               <ul>
                 {modal.point.potions.map((b, i) => (
                   <li key={i}>
-                    <b>{b.name}</b> — {b.effect} <small>({b.price} монет)</small>
+                    <b>{b.name}</b> — {b.effect} <small>({b.price})</small>
                   </li>
                 ))}
               </ul>
             </>
           ) : (
-            <p><small>Зілля цього рівня ще не додані.</small></p>
+            <p><small>{t("noPotions")}</small></p>
           )}
         </Modal>
       )}
@@ -86,11 +89,7 @@ export default function JourneyMap({ world, onBack }) {
       {modal?.kind === "secret" && (
         <Modal onClose={() => setModal(null)}>
           <h3>???</h3>
-          {data.secret.unlocked ? (
-            <p>Ти дійшов до кінця карти. Що тут — поки що таємниця навіть для нас 🤫</p>
-          ) : (
-            <p>Щось приховане чекає тих, хто пройде всі 10 рівнів…</p>
-          )}
+          <p>{data.secret.unlocked ? t("secretUnlocked") : t("secretLocked")}</p>
         </Modal>
       )}
     </div>
@@ -98,11 +97,12 @@ export default function JourneyMap({ world, onBack }) {
 }
 
 function Modal({ children, onClose }) {
+  const { t } = useLang();
   return (
     <div style={overlay} onClick={onClose}>
       <div style={box} onClick={(e) => e.stopPropagation()}>
         {children}
-        <button onClick={onClose} style={{ marginTop: 12 }}>Закрити</button>
+        <button onClick={onClose} style={{ marginTop: 12 }}>{t("close")}</button>
       </div>
     </div>
   );

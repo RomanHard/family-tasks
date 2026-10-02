@@ -9,6 +9,14 @@ export const db = new DatabaseSync(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL;");
 db.exec("PRAGMA foreign_keys = ON;");
 
+// light migration helper: add a column only if missing
+function addColumn(table, name, def) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  if (!cols.some((c) => c.name === name)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${name} ${def}`);
+  }
+}
+
 // ---- schema (v1: scaffold; extended per phase) ----
 db.exec(`
 CREATE TABLE IF NOT EXISTS parents (
@@ -135,6 +143,10 @@ CREATE TABLE IF NOT EXISTS purchased_modules (
   UNIQUE(child_id, world_id, module_key)
 );
 `);
+
+// migrations for existing databases
+addColumn("parents", "language", "TEXT NOT NULL DEFAULT 'uk'");
+addColumn("children", "language", "TEXT NOT NULL DEFAULT 'uk'");
 
 export function getDb() {
   return db;

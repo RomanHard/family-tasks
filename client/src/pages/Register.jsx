@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth.jsx";
+import { useLang } from "../lang.jsx";
 
 export default function Register() {
   const { registerParent } = useAuth();
+  const { t, lang } = useLang();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,7 +15,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
     try {
-      await registerParent(email, password);
+      await registerParent(email, password, lang);
       navigate("/parent", { replace: true });
     } catch (err) {
       setError(err.message);
@@ -22,11 +24,11 @@ export default function Register() {
 
   return (
     <main style={{ fontFamily: "system-ui", maxWidth: 360, margin: "40px auto", padding: 16 }}>
-      <h1>Реєстрація батьків</h1>
+      <h1>{t("registerTitle")}</h1>
       <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <input
           style={input}
-          placeholder="Email"
+          placeholder={t("email")}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -34,7 +36,7 @@ export default function Register() {
         />
         <input
           style={input}
-          placeholder="Пароль (мін. 6 символів)"
+          placeholder={t("passwordHint")}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -42,11 +44,11 @@ export default function Register() {
         />
         {error && <p style={{ color: "crimson" }}>{error}</p>}
         <button style={button} type="submit">
-          Створити акаунт
+          {t("createAccount")}
         </button>
       </form>
       <p>
-        Вже є акаунт? <Link to="/login">Увійти</Link>
+        {t("haveAccount")} <Link to="/login">{t("login")}</Link>
       </p>
     </main>
   );

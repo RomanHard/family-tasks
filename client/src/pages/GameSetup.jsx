@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import { useLang } from "../lang.jsx";
+import { worldName } from "../i18n.js";
 
-const WORLDS = [
-  { id: "pirates", name: "Пірати" },
-  { id: "space", name: "В комп'ютері" },
-  { id: "dollhouse", name: "Ляльковий дім" },
-];
+const WORLDS = ["pirates", "space", "dollhouse"];
 
 // Parent Game Setup: potions per world/level + chest price + modules.
 // Edits live in a draft until Save; leaving without Save discards everything.
 export default function GameSetup() {
+  const { t, lang } = useLang();
   const [world, setWorld] = useState("pirates");
   const [level, setLevel] = useState(1);
   const [tab, setTab] = useState("potions");
@@ -141,14 +140,14 @@ export default function GameSetup() {
 
   return (
     <section>
-      <h2>Налаштування гри</h2>
+      <h2>{t("setupTitle")}</h2>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
-      {saved && <p style={{ color: "green" }}>Збережено ✓</p>}
+      {saved && <p style={{ color: "green" }}>{t("savedOk")}</p>}
 
       <div style={tabs}>
         {WORLDS.map((w) => (
-          <button key={w.id} onClick={() => setWorld(w.id)} style={world === w.id ? tabActive : tabBtn}>
-            {w.name}
+          <button key={w} onClick={() => setWorld(w)} style={world === w ? tabActive : tabBtn}>
+            {worldName(w, lang)}
           </button>
         ))}
       </div>
@@ -163,22 +162,18 @@ export default function GameSetup() {
 
       <div style={{ ...tabs, marginTop: 8 }}>
         <button onClick={() => setTab("potions")} style={tab === "potions" ? tabActive : tabBtn}>
-          Зілля
+          {t("programs")}
         </button>
         <button onClick={() => setTab("modules")} style={tab === "modules" ? tabActive : tabBtn}>
-          Модулі
+          {t("modules")}
         </button>
       </div>
 
       {tab === "potions" && (
         <div>
-          <p>
-            <small>
-              Рівень {level}: у скрині зараз {inChestCount} зілля (рекомендовано 5).
-            </small>
-          </p>
+          <p><small>{t("inChestCount", { l: level, n: inChestCount })}</small></p>
           <label>
-            Ціна скрині:{" "}
+            {t("chestPrice")}{" "}
             <input
               type="number"
               min="1"
@@ -192,19 +187,19 @@ export default function GameSetup() {
             .map((p) => (
               <div key={p.id} style={card}>
                 <input
-                  placeholder="Назва"
+                  placeholder={t("name")}
                   value={p.name}
                   onChange={(e) => editPotion(p.id, { name: e.target.value })}
                   style={{ ...input, flex: 2 }}
                 />
                 <input
-                  placeholder="Ефект"
+                  placeholder={t("effect")}
                   value={p.effect}
                   onChange={(e) => editPotion(p.id, { effect: e.target.value })}
                   style={{ ...input, flex: 3 }}
                 />
                 <label>
-                  <small>Ціна</small>
+                  <small>{t("price")}</small>
                   <input
                     type="number"
                     min="0"
@@ -213,26 +208,26 @@ export default function GameSetup() {
                     style={{ width: 64 }}
                   />
                 </label>
-                <label title="У скрині">
-                  <small>Скриня</small>
+                <label title={t("inChest")}>
+                  <small>{t("inChest")}</small>
                   <input
                     type="checkbox"
                     checked={!!p.in_chest}
                     onChange={(e) => editPotion(p.id, { in_chest: e.target.checked ? 1 : 0 })}
                   />
                 </label>
-                <button onClick={() => move(p.id, -1)} title="Вгору">↑</button>
-                <button onClick={() => move(p.id, 1)} title="Вниз">↓</button>
-                <button onClick={() => removePotion(p.id)} title="Видалити">✕</button>
+                <button onClick={() => move(p.id, -1)} title="↑">↑</button>
+                <button onClick={() => move(p.id, 1)} title="↓">↓</button>
+                <button onClick={() => removePotion(p.id)} title={t("delete")}>✕</button>
               </div>
             ))}
-          <button onClick={addPotion} style={{ marginTop: 8 }}>+ Додати зілля</button>
+          <button onClick={addPotion} style={{ marginTop: 8 }}>+ {t("addPotion")}</button>
         </div>
       )}
 
       {tab === "modules" && (
         <div>
-          <p><small>Модулі — постійні покращення, купуються один раз. Ціни бажано тримати високими.</small></p>
+          <p><small>{t("modulesHint2")}</small></p>
           {modules.map((m) => (
             <div key={m.id} style={card}>
               <input
@@ -242,7 +237,7 @@ export default function GameSetup() {
               />
               <small style={{ flex: 3 }}>{m.bonus_text}</small>
               <label>
-                <small>Ціна</small>
+                <small>{t("price")}</small>
                 <input
                   type="number"
                   min="1"
@@ -258,12 +253,12 @@ export default function GameSetup() {
 
       <div style={{ marginTop: 16, display: "flex", gap: 8, alignItems: "center" }}>
         <button onClick={save} disabled={!dirty} style={dirty ? btnPrimary : btn}>
-          Зберегти
+          {t("save")}
         </button>
         <button onClick={discard} disabled={!dirty}>
-          Скасувати зміни
+          {t("discard")}
         </button>
-        {dirty && <small style={{ color: "#b45309" }}>Є незбережені зміни</small>}
+        {dirty && <small style={{ color: "#b45309" }}>{t("unsaved")}</small>}
       </div>
     </section>
   );

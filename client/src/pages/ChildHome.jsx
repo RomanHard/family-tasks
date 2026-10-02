@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../auth.jsx";
+import { useLang } from "../lang.jsx";
+import { worldName } from "../i18n.js";
 import WorldSelect from "./WorldSelect.jsx";
 import WorldHome from "./WorldHome.jsx";
 import JourneyMap from "./JourneyMap.jsx";
@@ -9,6 +11,7 @@ import ChildTasks from "./ChildTasks.jsx";
 
 export default function ChildHome() {
   const { user, logout } = useAuth();
+  const { t, lang } = useLang();
   const [worlds, setWorlds] = useState(null);
   const [view, setView] = useState("home"); // home | journey | select | shop
   const [leveledUp, setLeveledUp] = useState(null);
@@ -22,7 +25,7 @@ export default function ChildHome() {
       const key = `ft_seen_level_${active.id}`;
       const seen = parseInt(localStorage.getItem(key) || "0", 10);
       if (seen && active.level > seen) {
-        setLeveledUp({ from: seen, to: active.level, worldName: active.name_uk });
+        setLeveledUp({ from: seen, to: active.level, worldId: active.id });
       }
       localStorage.setItem(key, String(active.level));
     }
@@ -32,20 +35,20 @@ export default function ChildHome() {
     load().catch(() => {});
   }, [load]);
 
-  if (!worlds) return <p style={{ padding: 24 }}>Завантаження…</p>;
+  if (!worlds) return <p style={{ padding: 24 }}>{t("loading")}</p>;
 
   const active = worlds.find((w) => w.is_active);
 
   return (
     <main style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Привіт, {user?.nickname}! 🎮</h1>
-        <button onClick={logout}>Вийти</button>
+        <h1>{t("hello")} {user?.nickname}! 🎮</h1>
+        <button onClick={logout}>{t("logout")}</button>
       </header>
 
       {leveledUp && (
         <div style={celebrate}>
-          🎉 Новий рівень! {leveledUp.from} → {leveledUp.to} у світі «{leveledUp.worldName}»
+          {t("levelUp", { f: leveledUp.from, t: leveledUp.to, w: worldName(leveledUp.worldId, lang) })}
           <button onClick={() => setLeveledUp(null)} style={{ marginLeft: 8 }}>OK</button>
         </div>
       )}

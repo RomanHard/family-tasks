@@ -30,10 +30,10 @@ export function AuthProvider({ children }) {
     setUser(user);
   };
 
-  const registerParent = async (email, password) => {
+  const registerParent = async (email, password, language) => {
     const { user } = await api("/api/auth/parent/register", {
       method: "POST",
-      body: { email, password },
+      body: { email, password, language },
     });
     setUser(user);
   };

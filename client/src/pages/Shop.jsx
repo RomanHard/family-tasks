@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import { useLang } from "../lang.jsx";
+import { worldName, worldCurrency } from "../i18n.js";
 
 export default function Shop({ world, onBack, onChanged }) {
+  const { t, lang } = useLang();
   const [tab, setTab] = useState("programs"); // programs | modules | inventory
   const [data, setData] = useState(null);
   const [items, setItems] = useState([]);
@@ -36,22 +39,24 @@ export default function Shop({ world, onBack, onChanged }) {
       if (r) setDrop(r.drop);
     });
 
-  if (!data) return <p>Завантаження крамниці…</p>;
+  if (!data) return <p>{t("loadingShop")}</p>;
+
+  const cur = worldCurrency(world.id, lang);
 
   return (
     <div>
-      <button onClick={onBack}>← Назад</button>
-      <h2>Крамниця — {world.name_uk}</h2>
+      <button onClick={onBack}>← {t("back")}</button>
+      <h2>{t("shop")} — {worldName(world.id, lang)}</h2>
       <p>
-        💰 {data.coins} {world.currency_uk}
-        {data.free_chests > 0 && <span> • 🎁 безкоштовних скринь: {data.free_chests}</span>}
+        💰 {data.coins} {cur}
+        {data.free_chests > 0 && <span> • 🎁 {data.free_chests}</span>}
       </p>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
       <div style={tabs}>
-        {["programs", "modules", "inventory"].map((t) => (
-          <button key={t} onClick={() => setTab(t)} style={tab === t ? tabActive : tabBtn}>
-            {t === "programs" ? "Програми" : t === "modules" ? "Модулі" : `Інвентар (${items.filter((i) => !i.used).length})`}
+        {["programs", "modules", "inventory"].map((tb) => (
+          <button key={tb} onClick={() => setTab(tb)} style={tab === tb ? tabActive : tabBtn}>
+            {tb === "programs" ? t("programs") : tb === "modules" ? t("modules") : `${t("inventory")} (${items.filter((i) => !i.used).length})`}
           </button>
         ))}
       </div>
@@ -59,13 +64,13 @@ export default function Shop({ world, onBack, onChanged }) {
       {tab === "programs" && (
         <div>
           <div style={chestBox}>
-            <h3>🎁 Містична скриня (рівень {data.level})</h3>
-            <p>Одна випадкова програма рівня з колекції нижче.</p>
+            <h3>🎁 {t("chestTitle", { l: data.level })}</h3>
+            <p>{t("chestDesc")}</p>
             <button style={btn} onClick={openChest}>
-              Відкрити за {data.free_chests > 0 ? "безкоштовно 🎁" : `${data.chest_price} ${world.currency_uk}`}
+              {t("openFor")} {data.free_chests > 0 ? t("freeWord") : `${data.chest_price} ${cur}`}
             </button>
           </div>
-          {data.potions.length === 0 && <p>Поки порожньо — батьки ще додають програми.</p>}
+          {data.potions.length === 0 && <p>{t("noPotionsShop")}</p>}
           {data.potions.map((p) => (
             <div key={p.id} style={row}>
               <div>
@@ -76,7 +81,7 @@ export default function Shop({ world, onBack, onChanged }) {
                 onClick={() => act(() => api(`/api/shop/${world.id}/buy-potion/${p.id}`, { method: "POST" }))}
                 disabled={data.coins < p.price}
               >
-                Купити ({p.price})
+                {t("buy")} ({p.price})
               </button>
             </div>
           ))}
@@ -85,7 +90,7 @@ export default function Shop({ world, onBack, onChanged }) {
 
       {tab === "modules" && (
         <div>
-          <p><small>Модулі купуються один раз і дають постійний бонус.</small></p>
+          <p><small>{t("modulesHint")}</small></p>
           {data.modules.map((m) => (
             <div key={m.module_key} style={row}>
               <div>
@@ -97,7 +102,7 @@ export default function Shop({ world, onBack, onChanged }) {
                   onClick={() => act(() => api(`/api/shop/${world.id}/buy-module/${m.module_key}`, { method: "POST" }))}
                   disabled={data.coins < m.price}
                 >
-                  Купити ({m.price})
+                  {t("buy")} ({m.price})
                 </button>
               )}
             </div>
@@ -107,7 +112,7 @@ export default function Shop({ world, onBack, onChanged }) {
 
       {tab === "inventory" && (
         <div>
-          {items.length === 0 && <p>Порожньо. Заглянь до скрині! 🎁</p>}
+          {items.length === 0 && <p>{t("invEmpty")}</p>}
           {items.map((it) => (
             <div key={it.id} style={{ ...row, opacity: it.used ? 0.5 : 1 }}>
               <div>
@@ -116,7 +121,7 @@ export default function Shop({ world, onBack, onChanged }) {
               </div>
               {!it.used && (
                 <button onClick={() => act(() => api(`/api/shop/inventory/${it.id}/use`, { method: "POST" }))}>
-                  Використати
+                  {t("use")}
                 </button>
               )}
             </div>
@@ -127,11 +132,11 @@ export default function Shop({ world, onBack, onChanged }) {
       {drop && (
         <div style={overlay} onClick={() => setDrop(null)}>
           <div style={box} onClick={(e) => e.stopPropagation()}>
-            <h3>🎉 Зі скрині випало:</h3>
+            <h3>🎉 {t("dropTitle")}</h3>
             <p><b>{drop.name}</b></p>
             <p><small>{drop.effect}</small></p>
-            <p><small>Додано в інвентар!</small></p>
-            <button onClick={() => setDrop(null)}>Круто!</button>
+            <p><small>{t("addedInv")}</small></p>
+            <button onClick={() => setDrop(null)}>{t("cool")}</button>
           </div>
         </div>
       )}

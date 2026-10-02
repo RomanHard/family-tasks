@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
+import { useLang } from "../lang.jsx";
 
-const STATUS_UA = {
-  ready: "Готове",
-  working: "В роботі",
-  done: "На перевірці",
-  approved: "Схвалено",
-  paused: "На паузі",
+const STATUS_KEY = {
+  ready: "stReady",
+  working: "stWorking",
+  done: "stDone",
+  approved: "stApproved",
+  paused: "stPaused",
 };
 
 export default function ParentTasks({ kids }) {
+  const { t } = useLang();
   const [tasks, setTasks] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [form, setForm] = useState({ title: "", details: "", coins: "5", exp: "10", child_id: "", deadline: "" });
@@ -60,14 +62,14 @@ export default function ParentTasks({ kids }) {
     act(() => api(`/api/tasks/${id}`, { method: "PATCH", body: data }).then(() => setEditing(null)));
 
   const remove = (id, title) => {
-    if (!window.confirm(`Видалити завдання «${title}»? Історія збережеться.`)) return;
+    if (!window.confirm(t("confirmDelete", { title }))) return;
     act(() => api(`/api/tasks/${id}`, { method: "DELETE" }));
   };
 
   const acceptSuggestion = (id) => {
-    const coins = window.prompt("Монет за завдання:", "5");
+    const coins = window.prompt(t("coins"), "5");
     if (coins === null) return;
-    const exp = window.prompt("EXP за завдання:", "10");
+    const exp = window.prompt("EXP", "10");
     if (exp === null) return;
     act(() =>
       api(`/api/tasks/suggestions/${id}/accept`, { method: "POST", body: { coins, exp } })
@@ -79,12 +81,12 @@ export default function ParentTasks({ kids }) {
 
   return (
     <section>
-      <h2>Завдання</h2>
+      <h2>{t("tasks")}</h2>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
       {suggestions.length > 0 && (
         <div style={box}>
-          <h3>Пропозиції від дітей ({suggestions.length})</h3>
+          <h3>{t("suggestions")} ({suggestions.length})</h3>
           {suggestions.map((s) => (
             <div key={s.id} style={row}>
               <div>
@@ -92,9 +94,9 @@ export default function ParentTasks({ kids }) {
                 {s.details && <div><small>{s.details}</small></div>}
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => acceptSuggestion(s.id)}>Прийняти</button>
+                <button onClick={() => acceptSuggestion(s.id)}>{t("accept")}</button>
                 <button onClick={() => act(() => api(`/api/tasks/suggestions/${s.id}/decline`, { method: "POST" }))}>
-                  Відхилити
+                  {t("decline")}
                 </button>
               </div>
             </div>
@@ -104,20 +106,20 @@ export default function ParentTasks({ kids }) {
 
       {awaiting.length > 0 && (
         <div style={box}>
-          <h3>Чекають перевірки ({awaiting.length})</h3>
+          <h3>{t("awaiting")} ({awaiting.length})</h3>
           {awaiting.map((t) => (
             <div key={t.id} style={row}>
               <div>
-                <b>{t.title}</b> <small>— {t.child_nickname || "всім"}</small>
+                <b>{t.title}</b> <small>— {t.child_nickname || t("allKids")}</small>
                 {t.kid_note && <div><small>📝 {t.kid_note}</small></div>}
-                <div><small>+{t.coins} монет, +{t.exp} EXP</small></div>
+                <div><small>+{t.coins} {t("coins")}, +{t.exp} EXP</small></div>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 <button onClick={() => act(() => api(`/api/tasks/${t.id}/approve`, { method: "POST" }))}>
-                  ✅ Схвалити
+                  ✅ {t("approve")}
                 </button>
                 <button onClick={() => act(() => api(`/api/tasks/${t.id}/reject`, { method: "POST" }))}>
-                  ↩ Повернути
+                  ↩ {t("sendBack")}
                 </button>
               </div>
             </div>
@@ -125,8 +127,8 @@ export default function ParentTasks({ kids }) {
         </div>
       )}
 
-      <h3>Активні</h3>
-      {active.length === 0 && <p>Немає активних завдань.</p>}
+      <h3>{t("active")}</h3>
+      {active.length === 0 && <p>{t("noActive")}</p>}
       {active.map((t) =>
         editing === t.id ? (
           <EditForm key={t.id} task={t} kids={kids} onSave={(d) => saveEdit(t.id, d)} onCancel={() => setEditing(null)} />
@@ -134,47 +136,48 @@ export default function ParentTasks({ kids }) {
           <div key={t.id} style={row}>
             <div>
               <b>{t.title}</b>{" "}
-              <small style={badge}>{STATUS_UA[t.status]}</small>{" "}
-              <small>— {t.child_nickname || "всім"}</small>
-              {t.deadline && <span> <small>📅 до {t.deadline}</small></span>}
+              <small style={badge}>{t(STATUS_KEY[t.status])}</small>{" "}
+              <small>— {t.child_nickname || t("allKids")}</small>
+              {t.deadline && <span> <small>📅 {t.deadline}</small></span>}
               {t.details && <div><small>{t.details}</small></div>}
-              <div><small>+{t.coins} монет, +{t.exp} EXP</small></div>
+              <div><small>+{t.coins} {t("coins")}, +{t.exp} EXP</small></div>
             </div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              <button onClick={() => setEditing(t.id)}>Редагувати</button>
+              <button onClick={() => setEditing(t.id)}>{t("edit")}</button>
               {t.status === "paused" ? (
-                <button onClick={() => act(() => api(`/api/tasks/${t.id}/resume`, { method: "POST" }))}>▶ Продовжити</button>
+                <button onClick={() => act(() => api(`/api/tasks/${t.id}/resume`, { method: "POST" }))}>▶ {t("resume")}</button>
               ) : (
-                <button onClick={() => act(() => api(`/api/tasks/${t.id}/pause`, { method: "POST" }))}>⏸ Пауза</button>
+                <button onClick={() => act(() => api(`/api/tasks/${t.id}/pause`, { method: "POST" }))}>⏸ {t("pause")}</button>
               )}
-              <button onClick={() => remove(t.id, t.title)}>🗑 Видалити</button>
+              <button onClick={() => remove(t.id, t.title)}>🗑 {t("delete")}</button>
             </div>
           </div>
         )
       )}
 
-      <h3>Нове завдання</h3>
+      <h3>{t("newTask")}</h3>
       <form onSubmit={create} style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 420 }}>
-        <input placeholder="Назва*" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-        <input placeholder="Деталі" value={form.details} onChange={(e) => setForm({ ...form, details: e.target.value })} />
-        <div style={{ display: "flex", gap: 8 }}>
-          <label>Монети <input type="number" min="0" value={form.coins} onChange={(e) => setForm({ ...form, coins: e.target.value })} style={{ width: 70 }} /></label>
+        <input placeholder={t("titleReq")} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+        <input placeholder={t("details")} value={form.details} onChange={(e) => setForm({ ...form, details: e.target.value })} />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <label>{t("coins")} <input type="number" min="0" value={form.coins} onChange={(e) => setForm({ ...form, coins: e.target.value })} style={{ width: 70 }} /></label>
           <label>EXP <input type="number" min="0" value={form.exp} onChange={(e) => setForm({ ...form, exp: e.target.value })} style={{ width: 70 }} /></label>
           <select value={form.child_id} onChange={(e) => setForm({ ...form, child_id: e.target.value })}>
-            <option value="">Всім дітям</option>
+            <option value="">{t("allKids")}</option>
             {kids.map((k) => (
               <option key={k.id} value={k.id}>{k.nickname}</option>
             ))}
           </select>
-          <label>Дедлайн <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
+          <label>{t("deadline")} <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
         </div>
-        <button type="submit" style={{ maxWidth: 200 }}>Додати завдання</button>
+        <button type="submit" style={{ maxWidth: 200 }}>{t("addTask")}</button>
       </form>
     </section>
   );
 }
 
 function EditForm({ task, kids, onSave, onCancel }) {
+  const { t } = useLang();
   const [f, setF] = useState({
     title: task.title,
     details: task.details,
@@ -193,22 +196,22 @@ function EditForm({ task, kids, onSave, onCancel }) {
     >
       <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
         <input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} required />
-        <input value={f.details} onChange={(e) => setF({ ...f, details: e.target.value })} placeholder="Деталі" />
-        <div style={{ display: "flex", gap: 8 }}>
-          <label>Монети <input type="number" min="0" value={f.coins} onChange={(e) => setF({ ...f, coins: e.target.value })} style={{ width: 70 }} /></label>
+        <input value={f.details} onChange={(e) => setF({ ...f, details: e.target.value })} placeholder={t("details")} />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <label>{t("coins")} <input type="number" min="0" value={f.coins} onChange={(e) => setF({ ...f, coins: e.target.value })} style={{ width: 70 }} /></label>
           <label>EXP <input type="number" min="0" value={f.exp} onChange={(e) => setF({ ...f, exp: e.target.value })} style={{ width: 70 }} /></label>
           <select value={f.child_id} onChange={(e) => setF({ ...f, child_id: e.target.value })}>
-            <option value="">Всім дітям</option>
+            <option value="">{t("allKids")}</option>
             {kids.map((k) => (
               <option key={k.id} value={k.id}>{k.nickname}</option>
             ))}
           </select>
-          <label>Дедлайн <input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></label>
+          <label>{t("deadline")} <input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></label>
         </div>
       </div>
       <div style={{ display: "flex", gap: 6 }}>
-        <button type="submit">Зберегти</button>
-        <button type="button" onClick={onCancel}>Скасувати</button>
+        <button type="submit">{t("save")}</button>
+        <button type="button" onClick={onCancel}>{t("cancel")}</button>
       </div>
     </form>
   );

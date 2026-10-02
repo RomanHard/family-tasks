@@ -1,13 +1,9 @@
 import { useEffect, useState } from "react";
 import { api } from "../api.js";
-
-const STATUS_UA = {
-  ready: "Готове",
-  working: "В роботі",
-  done: "На перевірці у батьків",
-};
+import { useLang } from "../lang.jsx";
 
 export default function ChildTasks() {
+  const { t } = useLang();
   const [tasks, setTasks] = useState([]);
   const [history, setHistory] = useState([]);
   const [mySuggestions, setMySuggestions] = useState([]);
@@ -15,13 +11,15 @@ export default function ChildTasks() {
   const [suggest, setSuggest] = useState({ title: "", details: "" });
   const [error, setError] = useState("");
 
+  const STATUS = { ready: t("stReady"), working: t("stWorking"), done: t("stDoneKid") };
+
   const load = async () => {
-    const [t, h, s] = await Promise.all([
+    const [tRes, h, s] = await Promise.all([
       api("/api/tasks/mine/list"),
       api("/api/tasks/mine/history"),
       api("/api/tasks/suggest/mine"),
     ]);
-    setTasks(t.tasks);
+    setTasks(tRes.tasks);
     setHistory(h.tasks);
     setMySuggestions(s.suggestions);
   };
@@ -49,77 +47,75 @@ export default function ChildTasks() {
     );
   };
 
-  const byStatus = (s) => tasks.filter((t) => t.status === s);
+  const byStatus = (s) => tasks.filter((x) => x.status === s);
+  const sgStatus = (s) => (s === "pending" ? t("sgPending") : s === "accepted" ? t("sgAccepted") : t("sgDeclined"));
 
   return (
     <section>
-      <h2>Мої завдання</h2>
+      <h2>{t("myTasks")}</h2>
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
-      {tasks.length === 0 && <p>Поки немає завдань. Запропонуй своє нижче! 👇</p>}
+      {tasks.length === 0 && <p>{t("noTasks")}</p>}
 
-      {byStatus("ready").map((t) => (
-        <div key={t.id} style={card}>
-          <b>{t.title}</b>
-          {t.details && <div><small>{t.details}</small></div>}
-          {t.deadline && <div><small>📅 до {t.deadline}</small></div>}
-          <div><small>+{t.coins} монет, +{t.exp} EXP після перевірки</small></div>
-          <button onClick={() => act(() => api(`/api/tasks/${t.id}/start`, { method: "POST" }))}>
-            ▶ Почати
+      {byStatus("ready").map((x) => (
+        <div key={x.id} style={card}>
+          <b>{x.title}</b>
+          {x.details && <div><small>{x.details}</small></div>}
+          {x.deadline && <div><small>📅 {x.deadline}</small></div>}
+          <div><small>+{x.coins} {t("coins")}, +{x.exp} EXP</small></div>
+          <button onClick={() => act(() => api(`/api/tasks/${x.id}/start`, { method: "POST" }))}>
+            ▶ {t("start")}
           </button>
         </div>
       ))}
 
-      {byStatus("working").map((t) => (
-        <div key={t.id} style={{ ...card, borderColor: "#f0ad4e" }}>
-          <b>{t.title}</b> <small>— {STATUS_UA.working}</small>
-          {t.details && <div><small>{t.details}</small></div>}
+      {byStatus("working").map((x) => (
+        <div key={x.id} style={{ ...card, borderColor: "#f0ad4e" }}>
+          <b>{x.title}</b> <small>— {STATUS.working}</small>
+          {x.details && <div><small>{x.details}</small></div>}
           <input
-            placeholder="Нотатка для батьків (необов'язково)"
-            value={note[t.id] || ""}
-            onChange={(e) => setNote({ ...note, [t.id]: e.target.value })}
+            placeholder={t("notePh")}
+            value={note[x.id] || ""}
+            onChange={(e) => setNote({ ...note, [x.id]: e.target.value })}
             style={{ width: "100%", marginTop: 6 }}
           />
           <button
             onClick={() =>
-              act(() => api(`/api/tasks/${t.id}/finish`, { method: "POST", body: { note: note[t.id] || "" } }))
+              act(() => api(`/api/tasks/${x.id}/finish`, { method: "POST", body: { note: note[x.id] || "" } }))
             }
           >
-            ✅ Готово, на перевірку
+            ✅ {t("finish")}
           </button>
         </div>
       ))}
 
-      {byStatus("done").map((t) => (
-        <div key={t.id} style={{ ...card, borderColor: "#5bc0de", opacity: 0.85 }}>
-          <b>{t.title}</b> <small>— {STATUS_UA.done} ⏳</small>
-          {t.kid_note && <div><small>📝 {t.kid_note}</small></div>}
+      {byStatus("done").map((x) => (
+        <div key={x.id} style={{ ...card, borderColor: "#5bc0de", opacity: 0.85 }}>
+          <b>{x.title}</b> <small>— {STATUS.done} ⏳</small>
+          {x.kid_note && <div><small>📝 {x.kid_note}</small></div>}
         </div>
       ))}
 
-      <h3>Запропонувати завдання</h3>
+      <h3>{t("suggestH")}</h3>
       <form onSubmit={sendSuggest} style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 420 }}>
         <input
-          placeholder="Що хочеш запропонувати?*"
+          placeholder={t("suggestPh")}
           value={suggest.title}
           onChange={(e) => setSuggest({ ...suggest, title: e.target.value })}
           required
         />
         <input
-          placeholder="Деталі"
+          placeholder={t("details")}
           value={suggest.details}
           onChange={(e) => setSuggest({ ...suggest, details: e.target.value })}
         />
-        <button type="submit" style={{ maxWidth: 200 }}>Надіслати батькам</button>
+        <button type="submit" style={{ maxWidth: 200 }}>{t("sendSuggestion")}</button>
       </form>
       {mySuggestions.length > 0 && (
         <ul>
           {mySuggestions.map((s) => (
             <li key={s.id}>
-              {s.title} —{" "}
-              <small>
-                {s.status === "pending" ? "⏳ чекає" : s.status === "accepted" ? "✅ прийнято" : "❌ відхилено"}
-              </small>
+              {s.title} — <small>{sgStatus(s.status)}</small>
             </li>
           ))}
         </ul>
@@ -127,11 +123,11 @@ export default function ChildTasks() {
 
       {history.length > 0 && (
         <>
-          <h3>Історія</h3>
+          <h3>{t("history")}</h3>
           <ul>
-            {history.map((t) => (
-              <li key={t.id}>
-                ✅ {t.title} <small>(+{t.coins} монет, +{t.exp} EXP)</small>
+            {history.map((x) => (
+              <li key={x.id}>
+                ✅ {x.title} <small>(+{x.coins} {t("coins")}, +{x.exp} EXP)</small>
               </li>
             ))}
           </ul>

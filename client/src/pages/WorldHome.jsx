@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { api } from "../api.js";
+import { useLang } from "../lang.jsx";
+import { worldName, worldCurrency } from "../i18n.js";
 
 // Active world dashboard: character, level/EXP, currency, navigation.
 export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onChanged }) {
+  const { t, lang } = useLang();
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(world.character_name);
 
@@ -22,7 +25,7 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onC
 
   return (
     <div>
-      <img src={world.art} alt={world.name_uk} style={hero} />
+      <img src={world.art} alt={worldName(world.id, lang)} style={hero} />
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
         {renaming ? (
           <>
@@ -38,18 +41,18 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onC
         ) : (
           <>
             <h2 style={{ margin: 0 }}>{world.character_name}</h2>
-            <button onClick={() => setRenaming(true)} title="Змінити ім'я">✏️</button>
+            <button onClick={() => setRenaming(true)} title={t("edit")}>✏️</button>
           </>
         )}
       </div>
       <p style={{ margin: "4px 0" }}>
-        <b>{world.name_uk}</b> • Рівень {world.level}
+        <b>{worldName(world.id, lang)}</b> • {t("level")} {world.level}
       </p>
 
       <div style={{ margin: "12px 0" }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <small>EXP: {world.exp}</small>
-          <small>{next === 0 ? "Максимум!" : `Ще ${next} EXP до рівня ${world.level + 1}`}</small>
+          <small>{next === 0 ? t("maxed") : t("expToNext", { n: next, l: world.level + 1 })}</small>
         </div>
         <div style={barBg}>
           <div style={{ ...barFill, width: `${pct}%` }} />
@@ -57,13 +60,13 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onC
       </div>
 
       <p>
-        💰 {world.coins} {world.currency_uk}
+        💰 {world.coins} {worldCurrency(world.id, lang)}
       </p>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button style={btn} onClick={onShop}>🛒 Крамниця</button>
-        <button onClick={onJourney}>🗺 Карта подорожі</button>
-        <button onClick={onSwitchWorld}>🔄 Змінити світ</button>
+        <button style={btn} onClick={onShop}>🛒 {t("shop")}</button>
+        <button onClick={onJourney}>🗺 {t("journey")}</button>
+        <button onClick={onSwitchWorld}>🔄 {t("switchWorld")}</button>
       </div>
     </div>
   );

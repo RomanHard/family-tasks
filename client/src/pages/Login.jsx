@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth.jsx";
+import { useLang } from "../lang.jsx";
+import { LANGS } from "../i18n.js";
 
 export default function Login() {
   const { loginParent, loginChild } = useAuth();
+  const { t, lang, setLang } = useLang();
   const navigate = useNavigate();
   const [mode, setMode] = useState("parent"); // parent | child
   const [email, setEmail] = useState("");
@@ -29,26 +32,33 @@ export default function Login() {
 
   return (
     <main style={styles.page}>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+        <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t("language")}>
+          {LANGS.map((l) => (
+            <option key={l.id} value={l.id}>{l.label}</option>
+          ))}
+        </select>
+      </div>
       <h1>Family Tasks</h1>
       <div style={styles.tabs}>
         <button
           style={mode === "parent" ? styles.tabActive : styles.tab}
           onClick={() => setMode("parent")}
         >
-          Батьки
+          {t("parents")}
         </button>
         <button
           style={mode === "child" ? styles.tabActive : styles.tab}
           onClick={() => setMode("child")}
         >
-          Діти
+          {t("kids")}
         </button>
       </div>
       <form onSubmit={submit} style={styles.form}>
         {mode === "parent" ? (
           <input
             style={styles.input}
-            placeholder="Email"
+            placeholder={t("email")}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -57,7 +67,7 @@ export default function Login() {
         ) : (
           <input
             style={styles.input}
-            placeholder="Нікнейм"
+            placeholder={t("nickname")}
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
             required
@@ -65,7 +75,7 @@ export default function Login() {
         )}
         <input
           style={styles.input}
-          placeholder="Пароль"
+          placeholder={t("password")}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -73,12 +83,12 @@ export default function Login() {
         />
         {error && <p style={styles.error}>{error}</p>}
         <button style={styles.button} type="submit">
-          Увійти
+          {t("login")}
         </button>
       </form>
       {mode === "parent" && (
         <p>
-          Немає акаунту? <Link to="/register">Зареєструватися</Link>
+          {t("noAccount")} <Link to="/register">{t("register")}</Link>
         </p>
       )}
     </main>
