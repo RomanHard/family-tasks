@@ -10,20 +10,39 @@ export const WORLDS = [
     name_uk: "Пірати",
     currency_uk: "золото",
     art: "/assets/images/media-generation-main-pirates-treasure-map-0-0aedaaaa-1e39-49a4-a15d-01f00cc68c2b.webp",
+    videos: {
+      en: "/assets/videos/pirates-backstory-en.mp4",
+      es: "/assets/videos/pirates-backstory-es.mp4",
+    },
   },
   {
     id: "space",
     name_uk: "В комп'ютері",
     currency_uk: "вольт",
     art: "/assets/images/media-generation-main-space-ship-repair-0-abc02b17-eddc-4342-8d98-a2745a3835d1.webp",
+    videos: {
+      en: "/assets/videos/space-backstory-en.mp4",
+      es: "/assets/videos/space-backstory-es.mp4",
+    },
   },
   {
     id: "dollhouse",
     name_uk: "Ляльковий дім",
     currency_uk: "м²",
     art: "/assets/images/media-generation-main-dollhouse-empty-0-0711303a-0344-44fc-a028-f32977c0f631.webp",
+    videos: {
+      en: "/assets/videos/dollhouse-backstory-en.mp4",
+      es: "/assets/videos/dollhouse-backstory-es.mp4",
+    },
   },
 ];
+
+// Narration language: EN/ES only for now (UK voiceover deferred — UK UI plays EN).
+export function videoFor(worldId, lang) {
+  const w = WORLDS.find((x) => x.id === worldId);
+  if (!w) return null;
+  return w.videos[lang === "es" ? "es" : "en"];
+}
 
 export const WORLD_SWITCH_ART =
   "/assets/images/world-switch-collage.webp";

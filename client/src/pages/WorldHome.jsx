@@ -2,12 +2,14 @@ import { useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
 import { worldName, worldCurrency } from "../i18n.js";
+import IntroVideo from "./IntroVideo.jsx";
 
 // Active world dashboard: character, level/EXP, currency, navigation.
 export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onChanged }) {
   const { t, lang } = useLang();
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(world.character_name);
+  const [replay, setReplay] = useState(false);
 
   const next = world.exp_to_next;
   const pct = next === 0 ? 100 : Math.round((1 - next / (next + gainedThisLevel(world))) * 100);
@@ -66,8 +68,10 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onC
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button style={btn} onClick={onShop}>🛒 {t("shop")}</button>
         <button onClick={onJourney}>🗺 {t("journey")}</button>
+        <button onClick={() => setReplay(true)}>🎬 {t("watchIntro")}</button>
         <button onClick={onSwitchWorld}>🔄 {t("switchWorld")}</button>
       </div>
+      {replay && <IntroVideo videos={world.videos} onDone={() => setReplay(false)} />}
     </div>
   );
 }

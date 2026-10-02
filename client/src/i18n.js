@@ -127,6 +127,7 @@ const S = {
   savedOk: { uk: "Збережено ✓", en: "Saved ✓", es: "Guardado ✓" },
   // misc
   levelUp: { uk: "🎉 Новий рівень! {f} → {t} у світі «{w}»", en: "🎉 Level up! {f} → {t} in “{w}”", es: "🎉 ¡Nuevo nivel! {f} → {t} en «{w}»" },
+  watchIntro: { uk: "Дивитись вступ", en: "Watch intro", es: "Ver la intro" },
 };
 
 export const LANGS = [

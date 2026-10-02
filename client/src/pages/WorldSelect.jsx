@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api } from "../api.js";
 import { useLang } from "../lang.jsx";
 import { worldName, worldCurrency } from "../i18n.js";
+import IntroVideo from "./IntroVideo.jsx";
 
 // First entry or world switching. On first entry the child also names their character.
 export default function WorldSelect({ worlds, switchArt, onDone }) {
@@ -9,6 +10,7 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
   const [picked, setPicked] = useState(null);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [video, setVideo] = useState(null);
 
   const selected = worlds.find((w) => w.id === picked);
   const isFirstEntry = selected && !selected.entered;
@@ -16,11 +18,13 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
   const confirm = async () => {
     setError("");
     try {
-      await api("/api/worlds/select", {
+      const r = await api("/api/worlds/select", {
         method: "POST",
         body: { world_id: picked, character_name: name },
       });
-      onDone();
+      // backstory cartoon plays on first entry into each world
+      if (r.firstEntry) setVideo(r.world);
+      else onDone();
     } catch (e) {
       setError(e.message);
     }
@@ -29,6 +33,7 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
   if (picked && selected) {
     return (
       <div style={{ maxWidth: 420 }}>
+        {video && <IntroVideo videos={video.videos} onDone={onDone} />}
         <img src={selected.art} alt={worldName(selected.id, lang)} style={hero} />
         <h2>{worldName(selected.id, lang)}</h2>
         {isFirstEntry ? (
