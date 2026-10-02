@@ -9,6 +9,7 @@ import {
   SESSION_COOKIE_OPTS,
 } from "../auth.js";
 import { seedParent } from "../seed.js";
+import { notify } from "../notify.js";
 
 const r = Router();
 
@@ -76,6 +77,25 @@ r.post("/child/login", async (req, res) => {
     }
   }
   return res.status(401).json({ error: "invalid nickname or password" });
+});
+
+// Password reset request (public, from the login screen): creates an in-app
+// notification for the parent account. No email/tokens — same as the original app.
+// Always returns ok to avoid email enumeration.
+r.post("/password-reset-request", (req, res) => {
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  if (email) {
+    const p = db.prepare("SELECT id FROM parents WHERE email = ?").get(email);
+    if (p) {
+      notify(p.id, {
+        type: "password_reset_request",
+        title: "Password reset requested",
+        body: `${email} requests a password reset.`,
+        data: { email },
+      });
+    }
+  }
+  res.json({ ok: true });
 });
 
 r.post("/logout", (req, res) => {

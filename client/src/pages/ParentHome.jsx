@@ -47,6 +47,18 @@ export default function ParentHome() {
     await load();
   };
 
+  const changeKidPassword = async (kid) => {
+    const pw = window.prompt(t("newPwPrompt", { nick: kid.nickname }));
+    if (pw === null) return;
+    setError("");
+    try {
+      await api(`/api/children/${kid.id}/password`, { method: "POST", body: { password: pw } });
+      window.alert(t("pwChanged"));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <main style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -82,7 +94,10 @@ export default function ParentHome() {
               {LANGS.map((l) => (
                 <option key={l.id} value={l.id}>{l.label}</option>
               ))}
-            </select>
+            </select>{" "}
+            <button onClick={() => changeKidPassword(k)} title={t("changePw")}>
+              🔑 {t("changePw")}
+            </button>
           </li>
         ))}
       </ul>
