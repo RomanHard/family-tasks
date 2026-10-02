@@ -7,6 +7,7 @@ import { getDb } from "./db.js";
 import authRoutes from "./routes/auth.js";
 import childrenRoutes from "./routes/children.js";
 import tasksRoutes from "./routes/tasks.js";
+import worldsRoutes from "./routes/worlds.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -23,6 +24,11 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/children", childrenRoutes);
 app.use("/api/tasks", tasksRoutes);
+app.use("/api/worlds", worldsRoutes);
+
+// game art (images, videos) — single source in repo-root assets/
+const assetsDir = path.join(__dirname, "..", "..", "assets");
+app.use("/assets", express.static(assetsDir));
 
 // ---- static client (production) ----
 const publicDir = path.join(__dirname, "..", "public");

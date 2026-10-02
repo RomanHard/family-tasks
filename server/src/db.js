@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   kid_note TEXT NOT NULL DEFAULT '',
   deleted INTEGER NOT NULL DEFAULT 0,
   paused_from TEXT NOT NULL DEFAULT '',
+  completed_by INTEGER REFERENCES children(id) ON DELETE SET NULL,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -68,6 +69,18 @@ CREATE TABLE IF NOT EXISTS task_suggestions (
   details TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','accepted','declined')),
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE TABLE IF NOT EXISTS child_worlds (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+  world_id TEXT NOT NULL CHECK (world_id IN ('pirates','space','dollhouse')),
+  level INTEGER NOT NULL DEFAULT 1,
+  exp INTEGER NOT NULL DEFAULT 0,
+  coins INTEGER NOT NULL DEFAULT 0,
+  character_name TEXT NOT NULL DEFAULT '',
+  is_active INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(child_id, world_id)
 );
 `);
 

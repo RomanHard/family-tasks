@@ -12,6 +12,8 @@ WORKDIR /app/server
 COPY server/package*.json ./
 RUN npm ci --omit=dev
 COPY server/ ./
+# game art served at /assets
+COPY assets/ /app/assets/
 # built SPA served by express
 COPY --from=client-build /app/client/dist ./public
 ENV NODE_ENV=production

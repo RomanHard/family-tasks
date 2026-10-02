@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { db } from "../db.js";
 import { requireParent, requireChild } from "../auth.js";
+import { creditRewards } from "../game.js";
 
 const r = Router();
 
@@ -143,8 +144,16 @@ r.post("/:id/approve", requireParent, (req, res) => {
     "approved",
     `+${t.coins} coins, +${t.exp} exp`
   );
-  // NOTE: crediting coins/exp to the child's world wallet lands with the worlds phase.
-  res.json({ ok: true, granted: { coins: t.coins, exp: t.exp } });
+  // Credit the reward to the child's active world (per-world wallets).
+  const doerId = t.completed_by || t.child_id;
+  let reward = null;
+  if (doerId) {
+    const stillExists = db
+      .prepare("SELECT id FROM children WHERE id = ? AND parent_id = ?")
+      .get(doerId, req.session.user_id);
+    if (stillExists) reward = creditRewards(doerId, t.coins, t.exp);
+  }
+  res.json({ ok: true, granted: { coins: t.coins, exp: t.exp }, reward });
 });
 
 r.post("/:id/reject", requireParent, (req, res) => {
@@ -259,7 +268,10 @@ r.post("/:id/start", requireChild, (req, res) => {
   const t = childTask(req.session.user_id, req.params.id);
   if (!t) return res.status(404).json({ error: "task not found" });
   if (t.status !== "ready") return res.status(400).json({ error: "cannot start now" });
-  db.prepare("UPDATE tasks SET status = 'working' WHERE id = ?").run(t.id);
+  db.prepare("UPDATE tasks SET status = 'working', completed_by = ? WHERE id = ?").run(
+    req.session.user_id,
+    t.id
+  );
   logEvent(t.id, "child", req.session.user_id, "started");
   res.json({ ok: true });
 });
