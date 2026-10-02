@@ -62,6 +62,7 @@ export default function ChildTasks() {
         <div key={t.id} style={card}>
           <b>{t.title}</b>
           {t.details && <div><small>{t.details}</small></div>}
+          {t.deadline && <div><small>📅 до {t.deadline}</small></div>}
           <div><small>+{t.coins} монет, +{t.exp} EXP після перевірки</small></div>
           <button onClick={() => act(() => api(`/api/tasks/${t.id}/start`, { method: "POST" }))}>
             ▶ Почати

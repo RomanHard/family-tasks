@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import { useAuth } from "../auth.jsx";
 import ParentTasks from "./ParentTasks.jsx";
+import GameSetup from "./GameSetup.jsx";
 
 export default function ParentHome() {
   const { user, logout } = useAuth();
@@ -68,6 +69,9 @@ export default function ParentHome() {
       {error && <p style={{ color: "crimson" }}>{error}</p>}
 
       <ParentTasks kids={kids} />
+
+      <hr style={{ margin: "24px 0" }} />
+      <GameSetup />
     </main>
   );
 }

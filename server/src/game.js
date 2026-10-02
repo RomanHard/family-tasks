@@ -77,9 +77,42 @@ export function getActiveWorld(childId) {
     .get(childId);
 }
 
+export function ownsModule(childId, worldId, moduleKey) {
+  return !!db
+    .prepare(
+      "SELECT id FROM purchased_modules WHERE child_id = ? AND world_id = ? AND module_key = ?"
+    )
+    .get(childId, worldId, moduleKey);
+}
+
+/** +1 day deadline shield: extends the date when the child owns the module. */
+export function applyDeadlineBonus(childId, deadline) {
+  const d = String(deadline || "").trim();
+  if (!d || !childId) return "";
+  const active = getActiveWorld(childId);
+  if (!active || !ownsModule(childId, active.world_id, "deadline_1day")) return d;
+  const dt = new Date(d + "T12:00:00");
+  if (isNaN(dt)) return d;
+  dt.setDate(dt.getDate() + 1);
+  return dt.toISOString().slice(0, 10);
+}
+
+/** Chest price for a level, with −20% when the child owns the discount module. */
+export function chestPriceFor(parentId, worldId, level, childId) {
+  const row = db
+    .prepare("SELECT price FROM chest_prices WHERE parent_id = ? AND world_id = ? AND level = ?")
+    .get(parentId, worldId, level);
+  const base = row ? row.price : 20 * level;
+  if (childId && ownsModule(childId, worldId, "chest_discount_20")) {
+    return Math.max(1, Math.round(base * 0.8));
+  }
+  return base;
+}
+
 /**
  * Credit coins + EXP to the child's active world (creates a default
  * pirates progress when the child never picked a world).
+ * Applies permanent module bonuses (+10% coins / +10% EXP).
  * Returns { world_id, coins, exp, level, leveledUp: {from,to} | null }.
  */
 export function creditRewards(childId, coins, exp) {
@@ -87,22 +120,25 @@ export function creditRewards(childId, coins, exp) {
   if (!active) {
     active = setActiveWorld(childId, "pirates");
   }
+  let c = Math.max(0, coins);
+  let e = Math.max(0, exp);
+  if (ownsModule(childId, active.world_id, "coins_10")) c = Math.round(c * 1.1);
+  if (ownsModule(childId, active.world_id, "exp_10")) e = Math.round(e * 1.1);
   const beforeLevel = levelForExp(active.exp);
-  const newExp = active.exp + Math.max(0, exp);
-  const newCoins = active.coins + Math.max(0, coins);
+  const newExp = active.exp + e;
+  const newCoins = active.coins + c;
   const afterLevel = levelForExp(newExp);
-  db.prepare("UPDATE child_worlds SET exp = ?, coins = ?, level = ? WHERE id = ?").run(
-    newExp,
-    newCoins,
-    afterLevel,
-    active.id
-  );
+  const leveledUp = afterLevel > beforeLevel ? { from: beforeLevel, to: afterLevel } : null;
+  // level-up reward: a free mystic chest per gained level
+  const freeChests = leveledUp ? afterLevel - beforeLevel : 0;
+  db.prepare(
+    "UPDATE child_worlds SET exp = ?, coins = ?, level = ?, free_chests = free_chests + ? WHERE id = ?"
+  ).run(newExp, newCoins, afterLevel, freeChests, active.id);
   return {
     world_id: active.world_id,
     coins: newCoins,
     exp: newExp,
     level: afterLevel,
-    leveledUp:
-      afterLevel > beforeLevel ? { from: beforeLevel, to: afterLevel } : null,
+    leveledUp,
   };
 }

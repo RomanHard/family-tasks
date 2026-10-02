@@ -8,6 +8,7 @@ import {
   getSession,
   SESSION_COOKIE_OPTS,
 } from "../auth.js";
+import { seedParent } from "../seed.js";
 
 const r = Router();
 
@@ -25,6 +26,7 @@ r.post("/parent/register", async (req, res) => {
   const { lastInsertRowid } = db
     .prepare("INSERT INTO parents (email, password_hash) VALUES (?, ?)")
     .run(normalized, hash);
+  seedParent(lastInsertRowid);
   const token = createSession("parent", lastInsertRowid);
   res
     .cookie("ft_session", token, SESSION_COOKIE_OPTS)

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db.js";
 import { requireParent, requireChild } from "../auth.js";
-import { creditRewards } from "../game.js";
+import { creditRewards, applyDeadlineBonus } from "../game.js";
 
 const r = Router();
 
@@ -46,7 +46,7 @@ r.get("/", requireParent, (req, res) => {
 
 // Create a task (child_id null = for all kids)
 r.post("/", requireParent, (req, res) => {
-  const { child_id, title, details, coins, exp } = req.body ?? {};
+  const { child_id, title, details, coins, exp, deadline } = req.body ?? {};
   if (!title || !String(title).trim()) {
     return res.status(400).json({ error: "title required" });
   }
@@ -57,10 +57,13 @@ r.post("/", requireParent, (req, res) => {
       .get(child_id, req.session.user_id);
     if (!assignee) return res.status(400).json({ error: "child not found" });
   }
+  const finalDeadline = assignee
+    ? applyDeadlineBonus(assignee.id, deadline)
+    : String(deadline || "").trim();
   const { lastInsertRowid } = db
     .prepare(
-      `INSERT INTO tasks (parent_id, child_id, title, details, coins, exp)
-       VALUES (?, ?, ?, ?, ?, ?)`
+      `INSERT INTO tasks (parent_id, child_id, title, details, coins, exp, deadline)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       req.session.user_id,
@@ -68,7 +71,8 @@ r.post("/", requireParent, (req, res) => {
       String(title).trim(),
       String(details || "").trim(),
       Math.max(0, parseInt(coins) || 0),
-      Math.max(0, parseInt(exp) || 0)
+      Math.max(0, parseInt(exp) || 0),
+      finalDeadline
     );
   logEvent(lastInsertRowid, "parent", req.session.user_id, "created");
   res.json({ ok: true, id: lastInsertRowid });
@@ -79,7 +83,7 @@ r.patch("/:id", requireParent, (req, res) => {
   const t = parentTask(req.session.user_id, req.params.id);
   if (!t) return res.status(404).json({ error: "task not found" });
   if (t.status === "approved") return res.status(400).json({ error: "already approved" });
-  const { title, details, coins, exp, child_id } = req.body ?? {};
+  const { title, details, coins, exp, child_id, deadline } = req.body ?? {};
   let assigneeId = t.child_id;
   if (child_id !== undefined) {
     if (child_id === null) assigneeId = null;
@@ -92,7 +96,7 @@ r.patch("/:id", requireParent, (req, res) => {
     }
   }
   db.prepare(
-    `UPDATE tasks SET title = ?, details = ?, coins = ?, exp = ?, child_id = ?,
+    `UPDATE tasks SET title = ?, details = ?, coins = ?, exp = ?, child_id = ?, deadline = ?,
      updated_at = datetime('now') WHERE id = ?`
   ).run(
     title !== undefined ? String(title).trim() : t.title,
@@ -100,6 +104,7 @@ r.patch("/:id", requireParent, (req, res) => {
     coins !== undefined ? Math.max(0, parseInt(coins) || 0) : t.coins,
     exp !== undefined ? Math.max(0, parseInt(exp) || 0) : t.exp,
     assigneeId,
+    deadline !== undefined ? String(deadline).trim() : t.deadline,
     t.id
   );
   logEvent(t.id, "parent", req.session.user_id, "edited");

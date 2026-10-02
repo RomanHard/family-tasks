@@ -58,6 +58,11 @@ r.post("/select", requireChild, (req, res) => {
       .get(req.session.user_id);
     const name = String(character_name || "").trim() || me.nickname;
     db.prepare("UPDATE child_worlds SET character_name = ? WHERE id = ?").run(name, row.id);
+    // welcome gift: the +10% EXP module, free
+    db.prepare(
+      `INSERT OR IGNORE INTO purchased_modules (child_id, world_id, module_key)
+       VALUES (?, ?, 'exp_10')`
+    ).run(req.session.user_id, world_id);
   } else if (character_name !== undefined && String(character_name).trim()) {
     db.prepare("UPDATE child_worlds SET character_name = ? WHERE id = ?").run(
       String(character_name).trim(),
@@ -90,6 +95,36 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
   const p = getWorldProgress(req.session.user_id, world_id);
   const exp = p ? p.exp : 0;
   const level = levelForExp(exp);
+  const me = db
+    .prepare("SELECT parent_id FROM children WHERE id = ?")
+    .get(req.session.user_id);
+
+  const potionsByLevel = {};
+  if (me) {
+    const rows = db
+      .prepare(
+        `SELECT level, name, effect, price FROM potion_templates
+         WHERE parent_id = ? AND world_id = ? AND in_chest = 1
+         ORDER BY level, sort_order, id`
+      )
+      .all(me.parent_id, world_id);
+    for (const x of rows) {
+      (potionsByLevel[x.level] = potionsByLevel[x.level] || []).push({
+        name: x.name,
+        effect: x.effect,
+        price: x.price,
+      });
+    }
+  }
+  const ownedModules = db
+    .prepare(
+      `SELECT mt.name, mt.bonus_text FROM purchased_modules pm
+       JOIN module_templates mt ON mt.world_id = pm.world_id AND mt.module_key = pm.module_key
+         AND mt.parent_id = ?
+       WHERE pm.child_id = ? AND pm.world_id = ?`
+    )
+    .all(me ? me.parent_id : 0, req.session.user_id, world_id)
+    .map((m) => ({ name: m.name, bonus: m.bonus_text }));
 
   const points = EXP_THRESHOLDS.map((threshold, i) => {
     const lv = i + 1;
@@ -97,8 +132,7 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
       level: lv,
       threshold,
       status: lv < level ? "completed" : lv === level ? "current" : "locked",
-      // filled by the shop/modules phases
-      bonuses: [],
+      potions: potionsByLevel[lv] || [],
     };
   });
 
@@ -109,6 +143,7 @@ r.get("/:world_id/journey", requireChild, (req, res) => {
     exp_to_next: expToNextLevel(exp),
     maxed: level >= MAX_LEVEL,
     points,
+    modules: ownedModules,
     secret: {
       id: "???",
       // undisclosed until reached; unlocks at max level

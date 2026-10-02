@@ -2,7 +2,7 @@ import { useState } from "react";
 import { api } from "../api.js";
 
 // Active world dashboard: character, level/EXP, currency, navigation.
-export default function WorldHome({ world, onJourney, onSwitchWorld, onChanged }) {
+export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onChanged }) {
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(world.character_name);
 
@@ -61,7 +61,8 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onChanged }
       </p>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button style={btn} onClick={onJourney}>🗺 Карта подорожі</button>
+        <button style={btn} onClick={onShop}>🛒 Крамниця</button>
+        <button onClick={onJourney}>🗺 Карта подорожі</button>
         <button onClick={onSwitchWorld}>🔄 Змінити світ</button>
       </div>
     </div>

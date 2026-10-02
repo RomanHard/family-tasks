@@ -1,0 +1,278 @@
+import { useEffect, useState } from "react";
+import { api } from "../api.js";
+
+const WORLDS = [
+  { id: "pirates", name: "Пірати" },
+  { id: "space", name: "В комп'ютері" },
+  { id: "dollhouse", name: "Ляльковий дім" },
+];
+
+// Parent Game Setup: potions per world/level + chest price + modules.
+// Edits live in a draft until Save; leaving without Save discards everything.
+export default function GameSetup() {
+  const [world, setWorld] = useState("pirates");
+  const [level, setLevel] = useState(1);
+  const [tab, setTab] = useState("potions");
+  const [potions, setPotions] = useState([]);
+  const [deletedIds, setDeletedIds] = useState([]);
+  const [chestPrice, setChestPrice] = useState(20);
+  const [modules, setModules] = useState([]);
+  const [dirty, setDirty] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const load = async (w = world, lv = level) => {
+    const s = await api(`/api/shop/setup?world_id=${w}&level=${lv}`);
+    setPotions(s.potions);
+    setDeletedIds([]);
+    setChestPrice(s.chest_price);
+    const m = await api(`/api/shop/modules?world_id=${w}`);
+    setModules(m.modules);
+    setDirty(false);
+  };
+
+  useEffect(() => {
+    load().catch((e) => setError(e.message));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [world, level]);
+
+  const markDirty = (fn) => {
+    fn();
+    setDirty(true);
+    setSaved(false);
+  };
+
+  const editPotion = (id, patch) =>
+    markDirty(() => setPotions((ps) => ps.map((p) => (p.id === id ? { ...p, ...patch } : p))));
+
+  const addPotion = () =>
+    markDirty(() =>
+      setPotions((ps) => [
+        ...ps,
+        {
+          id: `new-${Date.now()}`,
+          name: "",
+          effect: "",
+          price: 10,
+          in_chest: 1,
+          sort_order: ps.length,
+          _new: true,
+        },
+      ])
+    );
+
+  const removePotion = (id) =>
+    markDirty(() => {
+      setPotions((ps) => ps.filter((p) => p.id !== id));
+      const p = potions.find((x) => x.id === id);
+      if (p && !p._new) setDeletedIds((d) => [...d, id]);
+    });
+
+  const move = (id, dir) =>
+    markDirty(() =>
+      setPotions((ps) => {
+        const arr = [...ps].sort((a, b) => a.sort_order - b.sort_order);
+        const i = arr.findIndex((p) => p.id === id);
+        const j = i + dir;
+        if (i < 0 || j < 0 || j >= arr.length) return ps;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+        return arr.map((p, idx) => ({ ...p, sort_order: idx }));
+      })
+    );
+
+  const save = async () => {
+    setError("");
+    try {
+      for (const id of deletedIds) {
+        await api(`/api/shop/potions/${id}`, { method: "DELETE" });
+      }
+      for (const p of potions) {
+        if (p._new) {
+          await api("/api/shop/potions", {
+            method: "POST",
+            body: {
+              world_id: world,
+              level,
+              name: p.name,
+              effect: p.effect,
+              price: p.price,
+              in_chest: p.in_chest,
+            },
+          });
+        } else {
+          await api(`/api/shop/potions/${p.id}`, {
+            method: "PATCH",
+            body: {
+              name: p.name,
+              effect: p.effect,
+              price: p.price,
+              in_chest: p.in_chest,
+              sort_order: p.sort_order,
+            },
+          });
+        }
+      }
+      await api("/api/shop/chest-price", {
+        method: "PUT",
+        body: { world_id: world, level, price: chestPrice },
+      });
+      for (const m of modules) {
+        await api(`/api/shop/modules/${m.id}`, {
+          method: "PATCH",
+          body: { name: m.name, price: m.price },
+        });
+      }
+      setDirty(false);
+      setSaved(true);
+      await load();
+    } catch (e) {
+      setError(e.message);
+    }
+  };
+
+  const discard = () => {
+    load().catch((e) => setError(e.message));
+  };
+
+  const editModule = (id, patch) =>
+    markDirty(() => setModules((ms) => ms.map((m) => (m.id === id ? { ...m, ...patch } : m))));
+
+  const inChestCount = potions.filter((p) => p.in_chest).length;
+
+  return (
+    <section>
+      <h2>Налаштування гри</h2>
+      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {saved && <p style={{ color: "green" }}>Збережено ✓</p>}
+
+      <div style={tabs}>
+        {WORLDS.map((w) => (
+          <button key={w.id} onClick={() => setWorld(w.id)} style={world === w.id ? tabActive : tabBtn}>
+            {w.name}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ ...tabs, marginTop: 8 }}>
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((lv) => (
+          <button key={lv} onClick={() => setLevel(lv)} style={level === lv ? tabActive : tabBtn}>
+            {lv}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ ...tabs, marginTop: 8 }}>
+        <button onClick={() => setTab("potions")} style={tab === "potions" ? tabActive : tabBtn}>
+          Зілля
+        </button>
+        <button onClick={() => setTab("modules")} style={tab === "modules" ? tabActive : tabBtn}>
+          Модулі
+        </button>
+      </div>
+
+      {tab === "potions" && (
+        <div>
+          <p>
+            <small>
+              Рівень {level}: у скрині зараз {inChestCount} зілля (рекомендовано 5).
+            </small>
+          </p>
+          <label>
+            Ціна скрині:{" "}
+            <input
+              type="number"
+              min="1"
+              value={chestPrice}
+              onChange={(e) => markDirty(() => setChestPrice(parseInt(e.target.value) || 1))}
+              style={{ width: 80 }}
+            />
+          </label>
+          {potions
+            .sort((a, b) => a.sort_order - b.sort_order)
+            .map((p) => (
+              <div key={p.id} style={card}>
+                <input
+                  placeholder="Назва"
+                  value={p.name}
+                  onChange={(e) => editPotion(p.id, { name: e.target.value })}
+                  style={{ ...input, flex: 2 }}
+                />
+                <input
+                  placeholder="Ефект"
+                  value={p.effect}
+                  onChange={(e) => editPotion(p.id, { effect: e.target.value })}
+                  style={{ ...input, flex: 3 }}
+                />
+                <label>
+                  <small>Ціна</small>
+                  <input
+                    type="number"
+                    min="0"
+                    value={p.price}
+                    onChange={(e) => editPotion(p.id, { price: parseInt(e.target.value) || 0 })}
+                    style={{ width: 64 }}
+                  />
+                </label>
+                <label title="У скрині">
+                  <small>Скриня</small>
+                  <input
+                    type="checkbox"
+                    checked={!!p.in_chest}
+                    onChange={(e) => editPotion(p.id, { in_chest: e.target.checked ? 1 : 0 })}
+                  />
+                </label>
+                <button onClick={() => move(p.id, -1)} title="Вгору">↑</button>
+                <button onClick={() => move(p.id, 1)} title="Вниз">↓</button>
+                <button onClick={() => removePotion(p.id)} title="Видалити">✕</button>
+              </div>
+            ))}
+          <button onClick={addPotion} style={{ marginTop: 8 }}>+ Додати зілля</button>
+        </div>
+      )}
+
+      {tab === "modules" && (
+        <div>
+          <p><small>Модулі — постійні покращення, купуються один раз. Ціни бажано тримати високими.</small></p>
+          {modules.map((m) => (
+            <div key={m.id} style={card}>
+              <input
+                value={m.name}
+                onChange={(e) => editModule(m.id, { name: e.target.value })}
+                style={{ ...input, flex: 2 }}
+              />
+              <small style={{ flex: 3 }}>{m.bonus_text}</small>
+              <label>
+                <small>Ціна</small>
+                <input
+                  type="number"
+                  min="1"
+                  value={m.price}
+                  onChange={(e) => editModule(m.id, { price: parseInt(e.target.value) || 1 })}
+                  style={{ width: 70 }}
+                />
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginTop: 16, display: "flex", gap: 8, alignItems: "center" }}>
+        <button onClick={save} disabled={!dirty} style={dirty ? btnPrimary : btn}>
+          Зберегти
+        </button>
+        <button onClick={discard} disabled={!dirty}>
+          Скасувати зміни
+        </button>
+        {dirty && <small style={{ color: "#b45309" }}>Є незбережені зміни</small>}
+      </div>
+    </section>
+  );
+}
+
+const tabs = { display: "flex", gap: 6, flexWrap: "wrap" };
+const tabBtn = { padding: "8px 12px", borderRadius: 8, border: "1px solid #ccc", background: "#fff" };
+const tabActive = { ...tabBtn, background: "#eee", fontWeight: "bold", borderColor: "#333" };
+const card = { display: "flex", gap: 8, alignItems: "center", padding: 8, border: "1px solid #eee", borderRadius: 8, marginBottom: 6, flexWrap: "wrap" };
+const input = { padding: 8, borderRadius: 6, border: "1px solid #ccc", fontSize: 14 };
+const btn = { padding: "10px 18px", borderRadius: 8, border: "1px solid #ccc", background: "#f5f5f5" };
+const btnPrimary = { ...btn, background: "#333", color: "#fff", border: "none" };

@@ -12,7 +12,7 @@ const STATUS_UA = {
 export default function ParentTasks({ kids }) {
   const [tasks, setTasks] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const [form, setForm] = useState({ title: "", details: "", coins: "5", exp: "10", child_id: "" });
+  const [form, setForm] = useState({ title: "", details: "", coins: "5", exp: "10", child_id: "", deadline: "" });
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
 
@@ -50,8 +50,9 @@ export default function ParentTasks({ kids }) {
           coins: form.coins,
           exp: form.exp,
           child_id: form.child_id || null,
+          deadline: form.deadline,
         },
-      }).then(() => setForm({ title: "", details: "", coins: "5", exp: "10", child_id: "" }))
+      }).then(() => setForm({ title: "", details: "", coins: "5", exp: "10", child_id: "", deadline: "" }))
     );
   };
 
@@ -135,6 +136,7 @@ export default function ParentTasks({ kids }) {
               <b>{t.title}</b>{" "}
               <small style={badge}>{STATUS_UA[t.status]}</small>{" "}
               <small>— {t.child_nickname || "всім"}</small>
+              {t.deadline && <span> <small>📅 до {t.deadline}</small></span>}
               {t.details && <div><small>{t.details}</small></div>}
               <div><small>+{t.coins} монет, +{t.exp} EXP</small></div>
             </div>
@@ -164,6 +166,7 @@ export default function ParentTasks({ kids }) {
               <option key={k.id} value={k.id}>{k.nickname}</option>
             ))}
           </select>
+          <label>Дедлайн <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
         </div>
         <button type="submit" style={{ maxWidth: 200 }}>Додати завдання</button>
       </form>
@@ -178,6 +181,7 @@ function EditForm({ task, kids, onSave, onCancel }) {
     coins: task.coins,
     exp: task.exp,
     child_id: task.child_id || "",
+    deadline: task.deadline || "",
   });
   return (
     <form
@@ -199,6 +203,7 @@ function EditForm({ task, kids, onSave, onCancel }) {
               <option key={k.id} value={k.id}>{k.nickname}</option>
             ))}
           </select>
+          <label>Дедлайн <input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></label>
         </div>
       </div>
       <div style={{ display: "flex", gap: 6 }}>

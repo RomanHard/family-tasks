@@ -4,12 +4,13 @@ import { useAuth } from "../auth.jsx";
 import WorldSelect from "./WorldSelect.jsx";
 import WorldHome from "./WorldHome.jsx";
 import JourneyMap from "./JourneyMap.jsx";
+import Shop from "./Shop.jsx";
 import ChildTasks from "./ChildTasks.jsx";
 
 export default function ChildHome() {
   const { user, logout } = useAuth();
   const [worlds, setWorlds] = useState(null);
-  const [view, setView] = useState("home"); // home | journey | select
+  const [view, setView] = useState("home"); // home | journey | select | shop
   const [leveledUp, setLeveledUp] = useState(null);
 
   const load = useCallback(async () => {
@@ -58,12 +59,15 @@ export default function ChildHome() {
         />
       ) : view === "journey" ? (
         <JourneyMap world={active} onBack={() => setView("home")} />
+      ) : view === "shop" ? (
+        <Shop world={active} onBack={() => setView("home")} onChanged={load} />
       ) : (
         <>
           <WorldHome
             world={active}
             onJourney={() => setView("journey")}
             onSwitchWorld={() => setView("select")}
+            onShop={() => setView("shop")}
             onChanged={load}
           />
           <hr style={{ margin: "24px 0" }} />

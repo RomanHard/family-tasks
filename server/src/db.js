@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   deleted INTEGER NOT NULL DEFAULT 0,
   paused_from TEXT NOT NULL DEFAULT '',
   completed_by INTEGER REFERENCES children(id) ON DELETE SET NULL,
+  deadline TEXT NOT NULL DEFAULT '',
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -79,8 +80,59 @@ CREATE TABLE IF NOT EXISTS child_worlds (
   coins INTEGER NOT NULL DEFAULT 0,
   character_name TEXT NOT NULL DEFAULT '',
   is_active INTEGER NOT NULL DEFAULT 0,
+  free_chests INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE(child_id, world_id)
+);
+CREATE TABLE IF NOT EXISTS potion_templates (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  parent_id INTEGER NOT NULL REFERENCES parents(id) ON DELETE CASCADE,
+  world_id TEXT NOT NULL,
+  level INTEGER NOT NULL DEFAULT 1,
+  name TEXT NOT NULL,
+  effect TEXT NOT NULL DEFAULT '',
+  price INTEGER NOT NULL DEFAULT 10,
+  in_chest INTEGER NOT NULL DEFAULT 1,
+  sort_order INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS chest_prices (
+  parent_id INTEGER NOT NULL REFERENCES parents(id) ON DELETE CASCADE,
+  world_id TEXT NOT NULL,
+  level INTEGER NOT NULL,
+  price INTEGER NOT NULL,
+  PRIMARY KEY (parent_id, world_id, level)
+);
+
+CREATE TABLE IF NOT EXISTS kid_inventory (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+  world_id TEXT NOT NULL,
+  potion_template_id INTEGER REFERENCES potion_templates(id) ON DELETE SET NULL,
+  name TEXT NOT NULL,
+  effect TEXT NOT NULL DEFAULT '',
+  used INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS module_templates (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  parent_id INTEGER NOT NULL REFERENCES parents(id) ON DELETE CASCADE,
+  world_id TEXT NOT NULL,
+  module_key TEXT NOT NULL CHECK (module_key IN ('coins_10','deadline_1day','bedtime_30','exp_10','chest_discount_20')),
+  name TEXT NOT NULL,
+  bonus_text TEXT NOT NULL DEFAULT '',
+  price INTEGER NOT NULL DEFAULT 100,
+  UNIQUE(parent_id, world_id, module_key)
+);
+
+CREATE TABLE IF NOT EXISTS purchased_modules (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  child_id INTEGER NOT NULL REFERENCES children(id) ON DELETE CASCADE,
+  world_id TEXT NOT NULL,
+  module_key TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE(child_id, world_id, module_key)
 );
 `);
 

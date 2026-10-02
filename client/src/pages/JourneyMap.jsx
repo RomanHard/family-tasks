@@ -48,17 +48,37 @@ export default function JourneyMap({ world, onBack }) {
         </button>
       </div>
 
+      {data.modules.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <h3>Мої модулі</h3>
+          <ul>
+            {data.modules.map((m, i) => (
+              <li key={i}>
+                <b>{m.name}</b> — <small>{m.bonus}</small>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {modal?.kind === "level" && (
         <Modal onClose={() => setModal(null)}>
           <h3>Рівень {modal.point.level}</h3>
           <p>Поріг: {modal.point.threshold} EXP</p>
           <p>Статус: {STATUS_UA[modal.point.status]}</p>
-          {modal.point.bonuses.length > 0 && (
-            <ul>
-              {modal.point.bonuses.map((b, i) => (
-                <li key={i}>{b}</li>
-              ))}
-            </ul>
+          {modal.point.potions.length > 0 ? (
+            <>
+              <h4>Зілля рівня</h4>
+              <ul>
+                {modal.point.potions.map((b, i) => (
+                  <li key={i}>
+                    <b>{b.name}</b> — {b.effect} <small>({b.price} монет)</small>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p><small>Зілля цього рівня ще не додані.</small></p>
           )}
         </Modal>
       )}
