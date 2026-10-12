@@ -177,7 +177,8 @@ const S = {
   rwPending: { uk: "чекає", en: "pending", es: "pendiente" },
   rwApproved: { uk: "схвалено", en: "approved", es: "aprobada" },
   rwDeclined: { uk: "відхилено", en: "declined", es: "rechazada" },
-  // task categories & difficulty  category: { uk: "Категорія", en: "Category", es: "Categoría" },
+  // task categories & difficulty
+  category: { uk: "Категорія", en: "Category", es: "Categoría" },
   difficulty: { uk: "Складність", en: "Difficulty", es: "Dificultad" },
   diff1: { uk: "Легко (10 EXP)", en: "Easy (10 EXP)", es: "Fácil (10 EXP)" },
   diff2: { uk: "Середньо (20 EXP)", en: "Medium (20 EXP)", es: "Media (20 EXP)" },
