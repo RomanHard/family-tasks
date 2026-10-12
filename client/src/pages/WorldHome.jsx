@@ -94,13 +94,13 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onT
               maxLength={30}
               style={{ ...input, flex: 1 }}
             />
-            <button onClick={saveName}>OK</button>
-            <button onClick={() => { setRenaming(false); setName(world.character_name); }}>✕</button>
+            <button onClick={saveName} className="btn-primary btn-sm">OK</button>
+            <button onClick={() => { setRenaming(false); setName(world.character_name); }} className="btn-icon">✕</button>
           </>
         ) : (
           <>
-            <h2 style={{ margin: 0 }}>{world.character_name}</h2>
-            <button onClick={() => setRenaming(true)} title={t("edit")}>✏️</button>
+            <h2 style={{ margin: 0, fontSize: 24 }}>{world.character_name}</h2>
+            <button onClick={() => setRenaming(true)} title={t("edit")} className="btn-icon">✏️</button>
           </>
         )}
       </div>
@@ -120,10 +120,10 @@ export default function WorldHome({ world, onJourney, onSwitchWorld, onShop, onT
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button style={btn} onClick={onShop}>🛒 {t("shop")}</button>
-        <button onClick={onJourney}>🗺 {t("journey")}</button>
-        <button onClick={() => setReplay(true)}>🎬 {t("watchIntro")}</button>
-        <button onClick={onTour}>🧭 {t("tourReplay")}</button>
-        <button onClick={onSwitchWorld}>🔄 {t("switchWorld")}</button>
+        <button onClick={onJourney} style={navBtn}>🗺 {t("journey")}</button>
+        <button onClick={() => setReplay(true)} style={navBtn}>🎬 {t("watchIntro")}</button>
+        <button onClick={onTour} style={navBtn}>🧭 {t("tourReplay")}</button>
+        <button onClick={onSwitchWorld} style={navBtn}>🔄 {t("switchWorld")}</button>
       </div>
       <MissionBlock worldId={world.id} />
       {replay && <IntroVideo videos={world.videos} onDone={() => setReplay(false)} />}
@@ -138,16 +138,52 @@ function gainedThisLevel(world) {
   return Math.max(1, world.exp - base + world.exp_to_next);
 }
 
-const hero = { width: "100%", borderRadius: 12, maxHeight: 200, objectFit: "cover" };
-const input = { padding: 8, borderRadius: 8, border: "1px solid #ccc", fontSize: 16 };
-const btn = { padding: "12px 20px", borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 };
-const barBg = { height: 12, borderRadius: 6, background: "#eee", overflow: "hidden", marginTop: 4 };
-const barFill = { height: "100%", background: "#4caf50", borderRadius: 6 };
-const msBox = {
-  marginTop: 16,
-  border: "1px solid #e0d6bd",
-  borderRadius: 12,
-  padding: 14,
-  background: "#fffdf5",
+const hero = {
+  width: "100%",
+  borderRadius: 20,
+  maxHeight: 210,
+  objectFit: "cover",
+  boxShadow: "var(--shadow)",
 };
-const msKicker = { margin: "0 0 6px", fontSize: 12, fontWeight: "bold", color: "#9c27b0", letterSpacing: 0.5 };
+const input = {
+  padding: "10px 12px",
+  borderRadius: 12,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
+  fontSize: 16,
+  minWidth: 0,
+};
+const btn = {
+  padding: "13px 22px",
+  borderRadius: 12,
+  border: "none",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
+  fontSize: 16,
+  fontWeight: 700,
+  boxShadow: "0 8px 18px color-mix(in srgb, var(--accent) 30%, transparent)",
+};
+const navBtn = { padding: "12px 16px", fontSize: 15 };
+const barBg = {
+  height: 14,
+  borderRadius: 999,
+  background: "var(--surface-2)",
+  border: "1px solid var(--border)",
+  overflow: "hidden",
+  marginTop: 6,
+};
+const barFill = {
+  height: "100%",
+  background: "linear-gradient(90deg, var(--accent), var(--accent-2))",
+  borderRadius: 999,
+  transition: "width 0.5s ease",
+};
+const msBox = {
+  marginTop: 18,
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  padding: 16,
+  background: "var(--surface)",
+  boxShadow: "var(--shadow)",
+};
+const msKicker = { margin: "0 0 6px", fontSize: 12, fontWeight: "bold", color: "var(--accent)", letterSpacing: 0.8, textTransform: "uppercase" };

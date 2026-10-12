@@ -33,7 +33,7 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
 
   if (picked && selected) {
     return (
-      <div style={{ maxWidth: 420 }}>
+      <div style={detailCard}>
         {video && <IntroVideo videos={video.videos} onDone={() => onDone({ firstEntry: true, worldId: picked })} />}
         <img src={selected.art} alt={worldName(selected.id, lang)} style={hero} />
         <h2>{worldName(selected.id, lang)}</h2>
@@ -53,8 +53,8 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
             {t("continue")}: «{selected.character_name}»? {t("level")} {selected.level}, {selected.exp} EXP.
           </p>
         )}
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
-        <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+        {error && <p style={{ color: "var(--danger)", fontWeight: 600 }}>{error}</p>}
+        <div style={{ display: "flex", gap: 8, marginTop: 14 }}>
           <button
             style={btn}
             onClick={() => (isFirstEntry ? confirm() : setTravelWarn(true))}
@@ -62,7 +62,7 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
           >
             {isFirstEntry ? t("startAdventure") : t("continue")}
           </button>
-          <button onClick={() => setPicked(null)}>{t("back")}</button>
+          <button onClick={() => setPicked(null)} style={{ padding: "12px 18px", fontSize: 16 }}>{t("back")}</button>
         </div>
         {travelWarn && (
           <div style={overlay} onClick={() => setTravelWarn(false)}>
@@ -94,18 +94,19 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
       {switchArt && <img src={switchArt} alt="" style={{ ...hero, maxHeight: 160 }} />}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {worlds.map((w) => (
-          <button key={w.id} onClick={() => setPicked(w.id)} style={card}>
+          <button key={w.id} onClick={() => setPicked(w.id)} style={worldCard(w.id)}>
             <img src={w.art} alt={worldName(w.id, lang)} style={thumb} />
-            <div style={{ textAlign: "left" }}>
-              <b>{worldName(w.id, lang)}</b>
+            <div style={{ textAlign: "left", flex: 1, minWidth: 0 }}>
+              <b style={{ fontSize: 17 }}>{worldName(w.id, lang)}</b>
               <div>
-                <small>
+                <small style={{ color: "rgba(255,255,255,0.85)" }}>
                   {w.entered
                     ? `${w.character_name} • ${t("level")} ${w.level} • ${w.exp} EXP`
                     : t("newWorld")}
                 </small>
               </div>
             </div>
+            <span style={{ fontSize: 22, fontWeight: 800, opacity: 0.9 }}>›</span>
           </button>
         ))}
       </div>
@@ -113,20 +114,61 @@ export default function WorldSelect({ worlds, switchArt, onDone }) {
   );
 }
 
-const hero = { width: "100%", borderRadius: 12, maxHeight: 220, objectFit: "cover" };
-const thumb = { width: 72, height: 72, borderRadius: 8, objectFit: "cover" };
-const card = {
-  display: "flex",
-  gap: 12,
-  alignItems: "center",
-  padding: 8,
-  borderRadius: 12,
-  border: "1px solid #ddd",
-  background: "#fff",
-  cursor: "pointer",
+const hero = {
+  width: "100%",
+  borderRadius: 16,
+  maxHeight: 230,
+  objectFit: "cover",
+  boxShadow: "0 10px 24px rgba(23, 34, 56, 0.18)",
 };
-const input = { padding: 10, borderRadius: 8, border: "1px solid #ccc", fontSize: 16, width: "100%", boxSizing: "border-box" };
-const btn = { padding: "12px 20px", borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 };
+const thumb = { width: 84, height: 84, borderRadius: 14, objectFit: "cover", flexShrink: 0 };
+const detailCard = {
+  maxWidth: 440,
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  boxShadow: "var(--shadow)",
+  padding: 16,
+};
+// Canonical world-select card colors (docs/content-extract/themes-misc.md):
+// deep branded cards with white text; the art thumb sits on the left.
+const worldCard = (id) => ({
+  display: "flex",
+  gap: 14,
+  alignItems: "center",
+  padding: 12,
+  borderRadius: 20,
+  border: "1px solid transparent",
+  background:
+    id === "pirates"
+      ? "#124c51"
+      : id === "space"
+        ? "linear-gradient(135deg, #142b3d, #1b536b)"
+        : "#a64f61",
+  color: "#fff",
+  cursor: "pointer",
+  textAlign: "left",
+  boxShadow: "0 14px 30px rgba(20, 30, 50, 0.25)",
+});
+const input = {
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
+  fontSize: 16,
+  width: "100%",
+  boxSizing: "border-box",
+};
+const btn = {
+  padding: "13px 22px",
+  borderRadius: 12,
+  border: "none",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
+  fontSize: 16,
+  fontWeight: 700,
+  boxShadow: "0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent)",
+};
 const overlay = {
   position: "fixed",
   inset: 0,
@@ -137,4 +179,15 @@ const overlay = {
   padding: 16,
   zIndex: 50,
 };
-const modalBox = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 360, width: "100%", maxHeight: "85vh", overflowY: "auto" };
+const modalBox = {
+  background: "var(--surface)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  borderRadius: 20,
+  padding: 22,
+  maxWidth: 360,
+  width: "100%",
+  maxHeight: "85vh",
+  overflowY: "auto",
+  boxShadow: "var(--shadow)",
+};

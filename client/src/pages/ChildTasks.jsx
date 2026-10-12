@@ -54,7 +54,7 @@ export default function ChildTasks() {
   return (
     <section>
       <h2>{t("myTasks")}</h2>
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p style={{ color: "var(--danger)", fontWeight: 600 }}>{error}</p>}
 
       {tasks.length === 0 && <p>{t("noTasks")}</p>}
 
@@ -64,14 +64,14 @@ export default function ChildTasks() {
           {x.details && <div><small>{x.details}</small></div>}
           {x.deadline && <div><small>📅 {x.deadline}</small></div>}
           <div><small>+{x.coins} {t("coins")}, +{x.exp} EXP</small></div>
-          <button onClick={() => act(() => api(`/api/tasks/${x.id}/start`, { method: "POST" }))}>
+          <button onClick={() => act(() => api(`/api/tasks/${x.id}/start`, { method: "POST" }))} className="btn-primary">
             ▶ {t("start")}
           </button>
         </div>
       ))}
 
       {byStatus("working").map((x) => (
-        <div key={x.id} style={{ ...card, borderColor: "#f0ad4e" }}>
+        <div key={x.id} style={{ ...card, borderColor: "var(--accent-2)", borderWidth: 2 }}>
           <b>{x.title}</b> <small style={catBadge}>{catLabel(x.category, lang)}</small> <small>— {STATUS.working}</small>
           {x.details && <div><small>{x.details}</small></div>}
           <input
@@ -81,6 +81,7 @@ export default function ChildTasks() {
             style={{ width: "100%", marginTop: 6 }}
           />
           <button
+            className="btn-primary"
             onClick={() =>
               act(() => api(`/api/tasks/${x.id}/finish`, { method: "POST", body: { note: note[x.id] || "" } }))
             }
@@ -91,14 +92,14 @@ export default function ChildTasks() {
       ))}
 
       {byStatus("done").map((x) => (
-        <div key={x.id} style={{ ...card, borderColor: "#5bc0de", opacity: 0.85 }}>
+        <div key={x.id} style={{ ...card, borderColor: "var(--accent)", opacity: 0.85 }}>
           <b>{x.title}</b> <small style={catBadge}>{catLabel(x.category, lang)}</small> <small>— {STATUS.done} ⏳</small>
           {x.kid_note && <div><small>📝 {x.kid_note}</small></div>}
         </div>
       ))}
 
       <h3>{t("suggestH")}</h3>
-      <form onSubmit={sendSuggest} style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 420 }}>
+      <form onSubmit={sendSuggest} style={suggestForm}>
         <input
           placeholder={t("suggestPh")}
           value={suggest.title}
@@ -110,7 +111,7 @@ export default function ChildTasks() {
           value={suggest.details}
           onChange={(e) => setSuggest({ ...suggest, details: e.target.value })}
         />
-        <button type="submit" style={{ maxWidth: 200 }}>{t("sendSuggestion")}</button>
+        <button type="submit" className="btn-primary" style={{ alignSelf: "flex-start" }}>{t("sendSuggestion")}</button>
       </form>
       {mySuggestions.length > 0 && (
         <ul>
@@ -140,13 +141,33 @@ export default function ChildTasks() {
 }
 
 const card = {
-  border: "1px solid #ddd",
-  borderRadius: 8,
-  padding: 12,
-  marginBottom: 10,
+  border: "1px solid var(--border)",
+  borderRadius: 16,
+  padding: 14,
+  marginBottom: 12,
   display: "flex",
   flexDirection: "column",
-  gap: 6,
-  alignItems: "flex-start",
+  gap: 7,
+  alignItems: "stretch",
+  background: "var(--surface)",
+  boxShadow: "0 6px 18px rgba(23, 34, 56, 0.07)",
 };
-const catBadge = { background: "#e3f2fd", color: "#1565c0", borderRadius: 4, padding: "2px 6px" };
+const suggestForm = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 9,
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  padding: 14,
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
+};
+const catBadge = {
+  background: "color-mix(in srgb, var(--accent-2) 26%, var(--surface))",
+  color: "var(--text)",
+  borderRadius: 999,
+  padding: "2px 9px",
+  fontWeight: 700,
+  fontSize: 11,
+  whiteSpace: "nowrap",
+};

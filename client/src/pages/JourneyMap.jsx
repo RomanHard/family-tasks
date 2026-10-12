@@ -45,7 +45,8 @@ export default function JourneyMap({ world, onBack }) {
         <p><small>Free journey complete · EXP keeps saving for Plus</small></p>
       )}
 
-      <div style={path}>
+      <div style={panelCard}>
+      <div style={{ ...path, marginTop: 0 }}>
         {data.points.map((p) => (
           <div key={p.level} style={pointCol}>
             <button
@@ -86,11 +87,12 @@ export default function JourneyMap({ world, onBack }) {
           </button>
         </div>
       </div>
+      </div>
 
       {data.modules.length > 0 && (
-        <div style={{ marginTop: 16 }}>
-          <h3>{t("myModules")}</h3>
-          <ul>
+        <div style={panelCard}>
+          <h3 style={{ marginTop: 0 }}>{t("myModules")}</h3>
+          <ul style={{ marginBottom: 4 }}>
             {data.modules.map((m, i) => (
               <li key={i}>
                 <b>{m.name}</b> — <small>{m.bonus}</small>
@@ -114,7 +116,7 @@ export default function JourneyMap({ world, onBack }) {
             </span>
           </p>
           <p>✓ {modal.point.chapter.unlock}</p>
-          <p style={{ lineHeight: 1.5 }}>{modal.point.chapter.scene}</p>
+          <p style={{ lineHeight: 1.55 }}>{modal.point.chapter.scene}</p>
           <p>
             <b>{t("lmMissionWord")}:</b> {modal.point.chapter.mission}
           </p>
@@ -195,6 +197,14 @@ function Modal({ children, onClose, closeLabel }) {
 }
 
 const path = { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 16 };
+const panelCard = {
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  boxShadow: "var(--shadow)",
+  padding: "16px 12px 8px",
+  marginTop: 16,
+};
 const plusTag = {
   display: "inline-block",
   fontSize: 11,
@@ -209,63 +219,91 @@ const mapTag = {
   fontSize: 9,
   fontWeight: "bold",
   letterSpacing: 1,
-  marginTop: 2,
-  padding: "1px 7px",
+  marginTop: 3,
+  padding: "2px 7px",
   borderRadius: 999,
-  border: "1px solid #cbd7e6",
-  background: "#eef2f8",
-  color: "#607089",
+  border: "1px solid var(--border)",
+  background: "var(--surface-2)",
+  color: "var(--dim)",
 };
 const pwPreview = {
-  border: "1px dashed #c9a0dc",
-  borderRadius: 10,
-  padding: 12,
-  background: "#faf5ff",
+  border: "1px dashed #9c27b0",
+  borderRadius: 14,
+  padding: 13,
+  background: "color-mix(in srgb, #9c27b0 6%, var(--surface))",
   margin: "12px 0",
 };
 const pointCol = { display: "flex", flexDirection: "column", alignItems: "center", width: 76 };
-const rowLabel = { textAlign: "center", marginTop: 4, color: "#607089", lineHeight: 1.3 };
-const insideChrome = { margin: "0 0 4px", fontSize: 13, color: "#607089" };
+const rowLabel = { textAlign: "center", marginTop: 5, color: "var(--dim)", lineHeight: 1.3 };
+const insideChrome = { margin: "0 0 4px", fontSize: 13, color: "var(--dim)" };
 const kicker = { letterSpacing: 1, color: "#9c27b0", fontWeight: "bold" };
 const pillUnlocked = {
   display: "inline-block", fontSize: 12, fontWeight: "bold",
-  background: "#e8f5e9", color: "#2e7d32", border: "1px solid #2e7d32",
-  borderRadius: 20, padding: "3px 10px",
+  background: "color-mix(in srgb, var(--success) 14%, var(--surface))", color: "var(--success)", border: "1px solid var(--success)",
+  borderRadius: 999, padding: "3px 11px",
 };
 const pillLocked = {
   display: "inline-block", fontSize: 12, fontWeight: "bold",
-  background: "#f5f5f5", color: "#607089", border: "1px solid #ccc",
-  borderRadius: 20, padding: "3px 10px",
+  background: "var(--surface-2)", color: "var(--dim)", border: "1px solid var(--border)",
+  borderRadius: 999, padding: "3px 11px",
 };
 const pillChest = {
   display: "inline-block", fontSize: 12, fontWeight: "bold",
-  background: "#fff8e1", color: "#7a5c00", border: "1px solid #f5b82e",
-  borderRadius: 20, padding: "3px 10px",
+  background: "color-mix(in srgb, var(--accent-2) 22%, var(--surface))", color: "var(--text)", border: "1px solid var(--accent-2)",
+  borderRadius: 999, padding: "3px 11px",
 };
 const dot = {
-  width: 52,
-  height: 52,
+  width: 56,
+  height: 56,
   borderRadius: "50%",
-  border: "2px solid #ccc",
-  fontSize: 16,
+  border: "3px solid var(--border)",
+  fontSize: 17,
   fontWeight: "bold",
   cursor: "pointer",
-  background: "#fff",
+  background: "var(--surface)",
+  color: "var(--text)",
+  boxShadow: "0 6px 14px rgba(23, 34, 56, 0.10)",
+  padding: 0,
 };
-const dotDone = { background: "#4caf50", borderColor: "#4caf50", color: "#fff" };
-const dotCurrent = { background: "#ffeb3b", borderColor: "#f0ad4e" };
+const dotDone = { background: "var(--success)", borderColor: "var(--success)", color: "#fff" };
+const dotCurrent = {
+  background: "var(--accent-2)",
+  borderColor: "var(--accent-2)",
+  color: "#3a2a00",
+  boxShadow: "0 0 0 5px color-mix(in srgb, var(--accent-2) 38%, transparent)",
+};
 const dotLocked = { opacity: 0.45 };
-const dotPaywalled = { borderStyle: "dashed", borderColor: "#9c27b0", color: "#9c27b0", opacity: 0.8 };
+const dotPaywalled = { borderStyle: "dashed", borderColor: "#9c27b0", color: "#9c27b0", opacity: 0.85 };
 const dotSecret = { borderStyle: "dashed", borderColor: "#9c27b0", color: "#9c27b0" };
 const overlay = {
   position: "fixed",
   inset: 0,
-  background: "rgba(0,0,0,0.4)",
+  background: "rgba(10, 15, 30, 0.5)",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   padding: 16,
   zIndex: 10,
 };
-const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%", maxHeight: "85vh", overflowY: "auto" };
-const btnPrimary = { padding: "10px 18px", borderRadius: 8, border: "none", background: "#9c27b0", color: "#fff", fontSize: 15 };
+const box = {
+  background: "var(--surface)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  borderRadius: 20,
+  padding: 22,
+  maxWidth: 340,
+  width: "100%",
+  maxHeight: "85vh",
+  overflowY: "auto",
+  boxShadow: "var(--shadow)",
+};
+const btnPrimary = {
+  padding: "12px 20px",
+  borderRadius: 12,
+  border: "none",
+  background: "#9c27b0",
+  color: "#fff",
+  fontSize: 15,
+  fontWeight: 700,
+  boxShadow: "0 8px 18px rgba(156, 39, 176, 0.30)",
+};

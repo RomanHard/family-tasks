@@ -55,7 +55,7 @@ export default function Shop({ world, onBack, onChanged, initialTab }) {
         💰 {data.coins} {cur}
         {data.free_chests > 0 && <span> • 🎁 {data.free_chests}</span>}
       </p>
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p style={{ color: "var(--danger)", fontWeight: 600 }}>{error}</p>}
 
       <div style={tabs}>
         {["programs", "modules", "inventory"].map((tb) => (
@@ -140,7 +140,7 @@ export default function Shop({ world, onBack, onChanged, initialTab }) {
             <p><b>{drop.name}</b></p>
             <p><small>{drop.effect}</small></p>
             <p><small>{t("addedInv")}</small></p>
-            <button onClick={() => setDrop(null)}>{t("cool")}</button>
+            <button onClick={() => setDrop(null)} className="btn-primary">{t("cool")}</button>
           </div>
         </div>
       )}
@@ -189,12 +189,12 @@ function RewardAsk() {
           placeholder={t("rewardPh")}
           value={text}
           onChange={(e) => setText(e.target.value)}
-          style={{ flex: 1, padding: 8, borderRadius: 8, border: "1px solid #ccc" }}
+          style={{ flex: 1, padding: "11px 12px", borderRadius: 12, border: "1.5px solid var(--border)", background: "var(--surface)", fontSize: 15, minWidth: 0 }}
           maxLength={300}
         />
-        <button type="submit">{t("askForOne")}</button>
+        <button type="submit" className="btn-primary">{t("askForOne")}</button>
       </form>
-      {sent && <p style={{ color: "green" }}><small>{t("rewardRequestSent")}</small></p>}
+      {sent && <p style={{ color: "var(--success)" }}><small>{t("rewardRequestSent")}</small></p>}
       {mine.length > 0 && (
         <ul>
           {mine.map((r) => (
@@ -208,11 +208,73 @@ function RewardAsk() {
   );
 }
 
-const tabs = { display: "flex", gap: 8, margin: "12px 0" };
-const tabBtn = { padding: "8px 12px", borderRadius: 8, border: "1px solid #ccc", background: "#fff" };
-const tabActive = { ...tabBtn, background: "#eee", fontWeight: "bold", borderColor: "#333" };
-const row = { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, padding: "10px 0", borderBottom: "1px solid #eee" };
-const btn = { padding: "12px 20px", borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 };
-const chestBox = { border: "2px dashed #9c27b0", borderRadius: 12, padding: 16, marginBottom: 16, textAlign: "center" };
-const overlay = { position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16, zIndex: 10 };
-const box = { background: "#fff", borderRadius: 12, padding: 20, maxWidth: 320, width: "100%", textAlign: "center", maxHeight: "85vh", overflowY: "auto" };
+const tabs = { display: "flex", gap: 7, margin: "14px 0", flexWrap: "wrap" };
+const tabBtn = {
+  padding: "9px 14px",
+  borderRadius: 999,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
+  fontWeight: 600,
+};
+const tabActive = {
+  ...tabBtn,
+  background: "var(--accent)",
+  borderColor: "var(--accent)",
+  color: "var(--on-accent)",
+  fontWeight: 700,
+  boxShadow: "0 6px 14px color-mix(in srgb, var(--accent) 26%, transparent)",
+};
+const row = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 10,
+  padding: "12px 14px",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: 14,
+  marginBottom: 10,
+  flexWrap: "wrap",
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
+};
+const btn = {
+  padding: "13px 24px",
+  borderRadius: 12,
+  border: "none",
+  background: "var(--accent-2)",
+  color: "#3a2a00",
+  fontSize: 16,
+  fontWeight: 800,
+  boxShadow: "0 8px 18px color-mix(in srgb, var(--accent-2) 38%, transparent)",
+};
+const chestBox = {
+  border: "2px dashed var(--accent-2)",
+  borderRadius: "var(--radius)",
+  padding: 20,
+  marginBottom: 16,
+  textAlign: "center",
+  background: "color-mix(in srgb, var(--accent-2) 10%, var(--surface))",
+};
+const overlay = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(10, 15, 30, 0.5)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: 16,
+  zIndex: 10,
+};
+const box = {
+  background: "var(--surface)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  borderRadius: 20,
+  padding: 22,
+  maxWidth: 320,
+  width: "100%",
+  textAlign: "center",
+  maxHeight: "85vh",
+  overflowY: "auto",
+  boxShadow: "var(--shadow)",
+};

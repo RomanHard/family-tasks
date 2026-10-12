@@ -106,7 +106,7 @@ export default function ChildHome() {
     <main
       data-theme={user?.theme || "sky"}
       data-world={active?.id || undefined}
-      style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}
+      style={{ maxWidth: 600, margin: "24px auto", padding: "8px 16px 44px" }}
     >
       {tour && (
         <Tour
@@ -162,10 +162,11 @@ export default function ChildHome() {
 }
 
 const celebrate = {
-  background: "#fff8e1",
-  border: "2px solid #ffc107",
-  borderRadius: 12,
-  padding: 12,
+  background: "color-mix(in srgb, var(--accent-2) 24%, var(--surface))",
+  border: "2px solid var(--accent-2)",
+  borderRadius: "var(--radius)",
+  padding: 14,
   marginBottom: 16,
   fontWeight: "bold",
+  boxShadow: "var(--shadow)",
 };
