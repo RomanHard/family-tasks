@@ -232,13 +232,13 @@ export default function GameSetup() {
                   placeholder={t("name")}
                   value={p[nameKey] ?? ""}
                   onChange={(e) => editPotion(p.id, { [nameKey]: e.target.value })}
-                  style={{ ...input, flex: 2 }}
+                  style={{ ...input, flex: "2 1 150px" }}
                 />
                 <input
                   placeholder={t("effect")}
                   value={p[effectKey] ?? ""}
                   onChange={(e) => editPotion(p.id, { [effectKey]: e.target.value })}
-                  style={{ ...input, flex: 3 }}
+                  style={{ ...input, flex: "3 1 200px" }}
                 />
                 <label>
                   <small>{t("price")}</small>
@@ -288,9 +288,9 @@ export default function GameSetup() {
               <input
                 value={m[nameKey] ?? ""}
                 onChange={(e) => editModule(m.id, { [nameKey]: e.target.value })}
-                style={{ ...input, flex: 2 }}
+                style={{ ...input, flex: "2 1 150px" }}
               />
-              <small style={{ flex: 3 }}>
+              <small style={{ flex: "3 1 200px" }}>
                 <small>{t("bonusText")}</small>
                 <input
                   value={m.bonus_text}
