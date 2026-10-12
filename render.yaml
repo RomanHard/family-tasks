@@ -1,0 +1,18 @@
+# Render Blueprint — deploys Family Tasks as a free Docker web service.
+# Free tier notes: the service spins down after ~15 min idle (first request
+# wakes it in ~1 min) and the filesystem is ephemeral, so the SQLite DB can
+# reset on redeploys/restarts. Fine for testing; use a paid plan + persistent
+# disk (or an external DB) for real use.
+services:
+  - type: web
+    name: family-tasks
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true
