@@ -108,7 +108,7 @@ export default function ParentHome() {
   };
 
   return (
-    <main data-theme={user?.theme || "bright"} style={{ fontFamily: "system-ui", maxWidth: 560, margin: "24px auto", padding: 16 }}>
+    <main data-theme={user?.theme || "bright"} style={{ maxWidth: 600, margin: "24px auto", padding: "8px 16px 44px" }}>
       {ptour && (
         <Tour
           steps={ptourSteps}
@@ -172,14 +172,15 @@ export default function ParentHome() {
 
       <h2>{t("kidsTitle")}</h2>
       {kids.length === 0 && <p>{t("noKids")}</p>}
-      <ul>
+      <ul style={kidList}>
         {kids.map((k) => (
-          <li key={k.id}>
-            {k.nickname}{" "}
+          <li key={k.id} style={kidRow}>
+            <b>{k.nickname}</b>{" "}
             <select
               value={k.language || "uk"}
               onChange={(e) => setKidLang(k.id, e.target.value)}
               title={t("language")}
+              style={rowControl}
             >
               {LANGS.map((l) => (
                 <option key={l.id} value={l.id}>{l.label}</option>
@@ -189,12 +190,13 @@ export default function ParentHome() {
               value={k.theme || "sky"}
               onChange={(e) => setKidTheme(k.id, e.target.value)}
               title={t("kidThemeLabel")}
+              style={rowControl}
             >
               {KID_THEMES.map((th) => (
                 <option key={th} value={th}>{th[0].toUpperCase() + th.slice(1)}</option>
               ))}
             </select>{" "}
-            <button onClick={() => changeKidPassword(k)} title={t("changePw")}>
+            <button onClick={() => changeKidPassword(k)} title={t("changePw")} className="btn-sm">
               🔑 {t("changePw")}
             </button>
           </li>
@@ -202,12 +204,13 @@ export default function ParentHome() {
       </ul>
 
       <h3>{t("addChild")}</h3>
-      <form onSubmit={addChild} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <form onSubmit={addChild} style={addChildForm}>
         <input
           placeholder={t("nickname")}
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
           required
+          style={{ flex: "1 1 150px", minWidth: 0 }}
         />
         <input
           placeholder={t("password")}
@@ -215,10 +218,11 @@ export default function ParentHome() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={{ flex: "1 1 150px", minWidth: 0 }}
         />
-        <button type="submit">{t("add")}</button>
+        <button type="submit" className="btn-primary">{t("add")}</button>
       </form>
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p style={{ color: "var(--danger)", fontWeight: 600 }}>{error}</p>}
 
       <hr style={{ margin: "24px 0" }} />
       <SubscriptionPanel />
@@ -257,14 +261,14 @@ function SubscriptionPanel() {
     <section style={panelBox}>
       <h2 style={{ marginTop: 0 }}>{t("subscriptionTitle")}</h2>
       <p>
-        <span style={planBadge}>{plan === "plus" ? "PLUS PREVIEW" : t("freeBadge")}</span>
+        <span style={plan === "plus" ? planBadgePlus : planBadge}>{plan === "plus" ? "PLUS PREVIEW" : t("freeBadge")}</span>
       </p>
       <p>{t("currentPlan")}</p>
       <ul>
         <li>{t("planFreeBullet")}</li>
         <li>{t("planPlusBullet")}</li>
       </ul>
-      <button onClick={toggle}>{plan === "plus" ? t("stayFree") : t("previewPlusBtn")}</button>
+      <button onClick={toggle} className="btn-primary">{plan === "plus" ? t("stayFree") : t("previewPlusBtn")}</button>
       <p><small>{t("previewNote")}</small></p>
     </section>
   );
@@ -275,14 +279,64 @@ const planBadge = {
   fontSize: 11,
   fontWeight: "bold",
   letterSpacing: 1,
-  padding: "4px 10px",
+  padding: "5px 11px",
   borderRadius: 999,
-  border: "1px solid #cbd7e6",
-  background: "#eaf0f8",
+  border: "1px solid var(--border)",
+  background: "var(--surface-2)",
+  color: "var(--dim)",
 };
 
-const panelBox = { border: "1px solid #ddd", borderRadius: 12, padding: 16, background: "#fafafa" };
-const tourBtn = { padding: "6px 10px", borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: "pointer" };
+const planBadgePlus = {
+  ...planBadge,
+  border: "1px solid transparent",
+  background: "var(--accent-2)",
+  color: "#3a2a00",
+};
+
+const panelBox = {
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  padding: 18,
+  background: "var(--surface)",
+  boxShadow: "var(--shadow)",
+};
+
+const tourBtn = {
+  padding: "8px 14px",
+  borderRadius: 999,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
+  cursor: "pointer",
+  fontWeight: 600,
+};
+
+const rowControl = { padding: "8px 10px", fontSize: 14, borderRadius: 10 };
+
+const kidList = { listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 };
+
+const kidRow = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  flexWrap: "wrap",
+  margin: 0,
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: 14,
+  padding: "10px 12px",
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
+};
+
+const addChildForm = {
+  display: "flex",
+  gap: 8,
+  flexWrap: "wrap",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  padding: 14,
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
+};
 
 function RewardsPanel() {
   const { t } = useLang();
@@ -328,8 +382,8 @@ function RewardsPanel() {
         <div key={r.id} style={rewardRow}>
           <div><b>{r.child_nickname}</b>: {r.text}</div>
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={() => decide(r.id, "approve")}>{t("setCoinPrice")}</button>
-            <button onClick={() => decide(r.id, "decline")}>{t("decline")}</button>
+            <button onClick={() => decide(r.id, "approve")} className="btn-primary btn-sm">{t("setCoinPrice")}</button>
+            <button onClick={() => decide(r.id, "decline")} className="btn-sm">{t("decline")}</button>
           </div>
         </div>
       ))}
@@ -355,7 +409,11 @@ const rewardRow = {
   justifyContent: "space-between",
   alignItems: "center",
   gap: 8,
-  padding: "8px 0",
-  borderBottom: "1px solid #eee",
+  padding: "11px 13px",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: 14,
+  marginBottom: 9,
   flexWrap: "wrap",
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
 };

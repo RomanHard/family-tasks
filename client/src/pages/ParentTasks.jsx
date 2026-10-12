@@ -90,7 +90,7 @@ export default function ParentTasks({ kids }) {
   return (
     <section>
       <h2>{t("tasks")}</h2>
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p style={{ color: "var(--danger)", fontWeight: 600 }}>{error}</p>}
 
       {suggestions.length > 0 && (
         <div style={box}>
@@ -102,8 +102,8 @@ export default function ParentTasks({ kids }) {
                 {s.details && <div><small>{s.details}</small></div>}
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => acceptSuggestion(s.id)}>{t("accept")}</button>
-                <button onClick={() => act(() => api(`/api/tasks/suggestions/${s.id}/decline`, { method: "POST" }))}>
+                <button onClick={() => acceptSuggestion(s.id)} className="btn-primary btn-sm">{t("accept")}</button>
+                <button onClick={() => act(() => api(`/api/tasks/suggestions/${s.id}/decline`, { method: "POST" }))} className="btn-sm">
                   {t("decline")}
                 </button>
               </div>
@@ -124,10 +124,10 @@ export default function ParentTasks({ kids }) {
                 <div><small>+{task.coins} {t("coins")}, +{task.exp} EXP</small></div>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
-                <button onClick={() => act(() => api(`/api/tasks/${task.id}/approve`, { method: "POST" }))}>
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/approve`, { method: "POST" }))} className="btn-primary btn-sm">
                   ✅ {t("approve")}
                 </button>
-                <button onClick={() => act(() => api(`/api/tasks/${task.id}/reject`, { method: "POST" }))}>
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/reject`, { method: "POST" }))} className="btn-sm">
                   ↩ {t("sendBack")}
                 </button>
               </div>
@@ -152,48 +152,50 @@ export default function ParentTasks({ kids }) {
               <div><small>+{task.coins} {t("coins")}, +{task.exp} EXP</small></div>
             </div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              <button onClick={() => setEditing(task.id)}>{t("edit")}</button>
+              <button onClick={() => setEditing(task.id)} className="btn-sm">{t("edit")}</button>
               {task.status === "paused" ? (
-                <button onClick={() => act(() => api(`/api/tasks/${task.id}/resume`, { method: "POST" }))}>▶ {t("resume")}</button>
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/resume`, { method: "POST" }))} className="btn-sm">▶ {t("resume")}</button>
               ) : (
-                <button onClick={() => act(() => api(`/api/tasks/${task.id}/pause`, { method: "POST" }))}>⏸ {t("pause")}</button>
+                <button onClick={() => act(() => api(`/api/tasks/${task.id}/pause`, { method: "POST" }))} className="btn-sm">⏸ {t("pause")}</button>
               )}
-              <button onClick={() => remove(task.id, task.title)}>🗑 {t("delete")}</button>
+              <button onClick={() => remove(task.id, task.title)} className="btn-sm">🗑 {t("delete")}</button>
             </div>
           </div>
         )
       )}
 
       <h3>{t("newTask")}</h3>
-      <form onSubmit={create} style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 420 }}>
+      <form onSubmit={create} style={formCard}>
         <input placeholder={t("titleReq")} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
         <input placeholder={t("details")} value={form.details} onChange={(e) => setForm({ ...form, details: e.target.value })} />
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <label>{t("coins")} <input type="number" min="0" value={form.coins} onChange={(e) => setForm({ ...form, coins: e.target.value })} style={{ width: 70 }} /></label>
-          <label>EXP <input type="number" min="0" value={form.exp} onChange={(e) => setForm({ ...form, exp: e.target.value })} style={{ width: 70 }} /></label>
-          <label>{t("category")}{" "}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <label style={fieldCol}>{t("coins")} <input type="number" min="0" value={form.coins} onChange={(e) => setForm({ ...form, coins: e.target.value })} style={{ width: 76 }} /></label>
+          <label style={fieldCol}>EXP <input type="number" min="0" value={form.exp} onChange={(e) => setForm({ ...form, exp: e.target.value })} style={{ width: 76 }} /></label>
+          <label style={fieldCol}>{t("category")}{" "}
             <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
               {TASK_CATEGORIES.map((c) => (
                 <option key={c} value={c}>{catLabel(c, lang)}</option>
               ))}
             </select>
           </label>
-          <label>{t("difficulty")}{" "}
+          <label style={fieldCol}>{t("difficulty")}{" "}
             <select value={form.difficulty} onChange={(e) => setDifficulty(e.target.value)}>
               {[1, 2, 3].map((d) => (
                 <option key={d} value={String(d)}>{t(`diff${d}`)}</option>
               ))}
             </select>
           </label>
-          <select value={form.child_id} onChange={(e) => setForm({ ...form, child_id: e.target.value })}>
-            <option value="">{t("allKids")}</option>
-            {kids.map((k) => (
-              <option key={k.id} value={k.id}>{k.nickname}</option>
-            ))}
-          </select>
-          <label>{t("deadline")} <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
+          <label style={fieldCol}>
+            <select value={form.child_id} onChange={(e) => setForm({ ...form, child_id: e.target.value })}>
+              <option value="">{t("allKids")}</option>
+              {kids.map((k) => (
+                <option key={k.id} value={k.id}>{k.nickname}</option>
+              ))}
+            </select>
+          </label>
+          <label style={fieldCol}>{t("deadline")} <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} /></label>
         </div>
-        <button type="submit" style={{ maxWidth: 200 }}>{t("addTask")}</button>
+        <button type="submit" className="btn-primary" style={{ alignSelf: "flex-start" }}>{t("addTask")}</button>
       </form>
     </section>
   );
@@ -223,41 +225,89 @@ function EditForm({ task, kids, onSave, onCancel }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
         <input value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} required />
         <input value={f.details} onChange={(e) => setF({ ...f, details: e.target.value })} placeholder={t("details")} />
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <label>{t("coins")} <input type="number" min="0" value={f.coins} onChange={(e) => setF({ ...f, coins: e.target.value })} style={{ width: 70 }} /></label>
-          <label>EXP <input type="number" min="0" value={f.exp} onChange={(e) => setF({ ...f, exp: e.target.value })} style={{ width: 70 }} /></label>
-          <label>{t("category")}{" "}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <label style={fieldCol}>{t("coins")} <input type="number" min="0" value={f.coins} onChange={(e) => setF({ ...f, coins: e.target.value })} style={{ width: 76 }} /></label>
+          <label style={fieldCol}>EXP <input type="number" min="0" value={f.exp} onChange={(e) => setF({ ...f, exp: e.target.value })} style={{ width: 76 }} /></label>
+          <label style={fieldCol}>{t("category")}{" "}
             <select value={f.category} onChange={(e) => setF({ ...f, category: e.target.value })}>
               {TASK_CATEGORIES.map((c) => (
                 <option key={c} value={c}>{catLabel(c, lang)}</option>
               ))}
             </select>
           </label>
-          <label>{t("difficulty")}{" "}
+          <label style={fieldCol}>{t("difficulty")}{" "}
             <select value={f.difficulty} onChange={(e) => setDiff(e.target.value)}>
               {[1, 2, 3].map((d) => (
                 <option key={d} value={String(d)}>{t(`diff${d}`)}</option>
               ))}
             </select>
           </label>
-          <select value={f.child_id} onChange={(e) => setF({ ...f, child_id: e.target.value })}>
-            <option value="">{t("allKids")}</option>
-            {kids.map((k) => (
-              <option key={k.id} value={k.id}>{k.nickname}</option>
-            ))}
-          </select>
-          <label>{t("deadline")} <input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></label>
+          <label style={fieldCol}>
+            <select value={f.child_id} onChange={(e) => setF({ ...f, child_id: e.target.value })}>
+              <option value="">{t("allKids")}</option>
+              {kids.map((k) => (
+                <option key={k.id} value={k.id}>{k.nickname}</option>
+              ))}
+            </select>
+          </label>
+          <label style={fieldCol}>{t("deadline")} <input type="date" value={f.deadline} onChange={(e) => setF({ ...f, deadline: e.target.value })} /></label>
         </div>
       </div>
       <div style={{ display: "flex", gap: 6 }}>
-        <button type="submit">{t("save")}</button>
-        <button type="button" onClick={onCancel}>{t("cancel")}</button>
+        <button type="submit" className="btn-primary btn-sm">{t("save")}</button>
+        <button type="button" onClick={onCancel} className="btn-sm">{t("cancel")}</button>
       </div>
     </form>
   );
 }
 
-const box = { border: "1px solid #ddd", borderRadius: 8, padding: 12, marginBottom: 16, background: "#fafafa" };
-const row = { display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "1px solid #eee", flexWrap: "wrap" };
-const badge = { background: "#eee", borderRadius: 4, padding: "2px 6px" };
-const catBadge = { background: "#e3f2fd", color: "#1565c0", borderRadius: 4, padding: "2px 6px" };
+const box = {
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  padding: 16,
+  marginBottom: 16,
+  background: "var(--surface)",
+  boxShadow: "var(--shadow)",
+};
+const row = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 10,
+  padding: "12px 14px",
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: 14,
+  marginBottom: 10,
+  flexWrap: "wrap",
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
+};
+const formCard = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+  background: "var(--surface)",
+  border: "1px solid var(--border)",
+  borderRadius: "var(--radius)",
+  padding: 16,
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
+};
+const fieldCol = { display: "flex", flexDirection: "column", gap: 5 };
+const badge = {
+  background: "var(--surface-2)",
+  color: "var(--dim)",
+  borderRadius: 999,
+  padding: "2px 9px",
+  fontWeight: 700,
+  fontSize: 11,
+  whiteSpace: "nowrap",
+};
+const catBadge = {
+  background: "color-mix(in srgb, var(--accent-2) 26%, var(--surface))",
+  color: "var(--text)",
+  borderRadius: 999,
+  padding: "2px 9px",
+  fontWeight: 700,
+  fontSize: 11,
+  whiteSpace: "nowrap",
+};

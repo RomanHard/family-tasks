@@ -175,8 +175,8 @@ export default function GameSetup() {
   return (
     <section>
       <h2>{t("setupTitle")}</h2>
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-      {saved && <p style={{ color: "green" }}>{t("savedOk")}</p>}
+      {error && <p style={{ color: "var(--danger)", fontWeight: 600 }}>{error}</p>}
+      {saved && <p style={{ color: "var(--success)", fontWeight: 600 }}>{t("savedOk")}</p>}
 
       <div style={tabs}>
         {WORLDS.map((w) => (
@@ -190,7 +190,7 @@ export default function GameSetup() {
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((lv) => (
           <button key={lv} onClick={() => setLevel(lv)} style={level === lv ? tabActive : tabBtn}>
             {lv}{" "}
-            <small style={lv > 3 ? planPlus : planFree}>{lv > 3 ? "PLUS" : "FREE"}</small>
+            <small style={level === lv ? planOnActive : lv > 3 ? planPlus : planFree}>{lv > 3 ? "PLUS" : "FREE"}</small>
           </button>
         ))}
       </div>
@@ -206,13 +206,13 @@ export default function GameSetup() {
 
       {tab === "potions" && (
         <div>
-          <p style={{ color: coverageOk ? "green" : "#b45309" }}>
+          <p style={{ color: coverageOk ? "var(--success)" : "var(--warn)", fontWeight: 600 }}>
             <small>
               {coverageOk ? t("coverageOk", { n: inChestCount }) : t("coverageWarn", { n: inChestCount })}
             </small>
           </p>
           {dupEffects && chestEffects.length > 0 && (
-            <p style={{ color: "#b45309" }}><small>{t("dupEffectWarn")}</small></p>
+            <p style={{ color: "var(--warn)" }}><small>{t("dupEffectWarn")}</small></p>
           )}
           <label>
             {t("chestPrice")}{" "}
@@ -258,9 +258,9 @@ export default function GameSetup() {
                     onChange={(e) => editPotion(p.id, { in_chest: e.target.checked ? 1 : 0 })}
                   />
                 </label>
-                <button onClick={() => move(p.id, -1)} title="↑">↑</button>
-                <button onClick={() => move(p.id, 1)} title="↓">↓</button>
-                <button onClick={() => removePotion(p.id)} title={t("delete")}>✕</button>
+                <button onClick={() => move(p.id, -1)} title="↑" className="btn-icon">↑</button>
+                <button onClick={() => move(p.id, 1)} title="↓" className="btn-icon">↓</button>
+                <button onClick={() => removePotion(p.id)} title={t("delete")} className="btn-icon">✕</button>
               </div>
             ))}
           <button onClick={addPotion} style={{ marginTop: 8 }}>+ {t("addPotion")}</button>
@@ -291,13 +291,13 @@ export default function GameSetup() {
                 style={{ ...input, flex: 2 }}
               />
               <small style={{ flex: 3 }}>
-                <small style={{ color: "#888" }}>{t("bonusText")}</small>
+                <small>{t("bonusText")}</small>
                 <input
                   value={m.bonus_text}
                   onChange={(e) => editModule(m.id, { bonus_text: e.target.value })}
                   style={{ ...input, width: "100%", boxSizing: "border-box" }}
                 />
-                <small style={{ color: "#888" }}>{tplBonus(m, lang)}</small>
+                <small>{tplBonus(m, lang)}</small>
               </small>
               <label>
                 <small>{t("price")}</small>
@@ -321,18 +321,64 @@ export default function GameSetup() {
         <button onClick={discard} disabled={!dirty}>
           {t("discard")}
         </button>
-        {dirty && <small style={{ color: "#b45309" }}>{t("unsaved")}</small>}
+        {dirty && <small style={{ color: "var(--warn)", fontWeight: 700 }}>{t("unsaved")}</small>}
       </div>
     </section>
   );
 }
 
 const tabs = { display: "flex", gap: 6, flexWrap: "wrap" };
-const tabBtn = { padding: "8px 12px", borderRadius: 8, border: "1px solid #ccc", background: "#fff" };
-const tabActive = { ...tabBtn, background: "#eee", fontWeight: "bold", borderColor: "#333" };
-const card = { display: "flex", gap: 8, alignItems: "center", padding: 8, border: "1px solid #eee", borderRadius: 8, marginBottom: 6, flexWrap: "wrap" };
-const input = { padding: 8, borderRadius: 6, border: "1px solid #ccc", fontSize: 14 };
-const btn = { padding: "10px 18px", borderRadius: 8, border: "1px solid #ccc", background: "#f5f5f5" };
-const btnPrimary = { ...btn, background: "#333", color: "#fff", border: "none" };
+const tabBtn = {
+  padding: "9px 14px",
+  borderRadius: 999,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
+  fontWeight: 600,
+};
+const tabActive = {
+  ...tabBtn,
+  background: "var(--accent)",
+  borderColor: "var(--accent)",
+  color: "var(--on-accent)",
+  fontWeight: 700,
+  boxShadow: "0 6px 14px color-mix(in srgb, var(--accent) 26%, transparent)",
+};
+const card = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+  padding: "10px 12px",
+  border: "1px solid var(--border)",
+  borderRadius: 14,
+  marginBottom: 8,
+  flexWrap: "wrap",
+  background: "var(--surface)",
+  boxShadow: "0 4px 14px rgba(23, 34, 56, 0.05)",
+};
+const input = {
+  padding: "10px 12px",
+  borderRadius: 10,
+  border: "1.5px solid var(--border)",
+  fontSize: 14,
+  background: "var(--surface)",
+  color: "var(--text)",
+  minWidth: 0,
+};
+const btn = {
+  padding: "11px 18px",
+  borderRadius: 12,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
+  fontWeight: 600,
+};
+const btnPrimary = {
+  ...btn,
+  background: "var(--accent)",
+  color: "var(--on-accent)",
+  border: "1.5px solid transparent",
+  fontWeight: 700,
+  boxShadow: "0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent)",
+};
 const planPlus = { fontSize: 10, fontWeight: "bold", color: "#9c27b0" };
-const planFree = { fontSize: 10, fontWeight: "bold", color: "#2e7d32" };
+const planFree = { fontSize: 10, fontWeight: "bold", color: "var(--success)" };
+const planOnActive = { fontSize: 10, fontWeight: "bold", color: "var(--on-accent)", opacity: 0.8 };
