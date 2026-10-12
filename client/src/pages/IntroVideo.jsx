@@ -16,7 +16,7 @@ export default function IntroVideo({ videos, onDone }) {
           controls
           autoPlay
           playsInline
-          style={{ width: "100%", borderRadius: 8, maxHeight: "60vh" }}
+          style={{ width: "100%", borderRadius: 14, maxHeight: "60vh" }}
         />
         <button onClick={onDone} style={btn}>
           {t("continue")}
@@ -37,4 +37,14 @@ const overlay = {
   zIndex: 20,
 };
 const box = { maxWidth: 560, width: "100%", textAlign: "center" };
-const btn = { marginTop: 12, padding: "12px 24px", borderRadius: 8, border: "none", background: "#fff", fontSize: 16 };
+const btn = {
+  marginTop: 14,
+  padding: "13px 28px",
+  borderRadius: 12,
+  border: "none",
+  background: "#fff",
+  color: "#172238",
+  fontSize: 16,
+  fontWeight: 700,
+  boxShadow: "0 10px 24px rgba(0,0,0,.35)",
+};

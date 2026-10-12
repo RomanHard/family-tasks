@@ -92,22 +92,26 @@ const overlay = {
   zIndex: 100,
 };
 const card = {
-  background: "#fff",
-  borderRadius: 14,
-  padding: 22,
+  background: "var(--surface)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  borderRadius: 20,
+  padding: 24,
   maxWidth: 400,
   width: "100%",
-  boxShadow: "0 18px 44px rgba(0,0,0,.25)",
+  boxShadow: "0 24px 54px rgba(0,0,0,.30)",
 };
-const counter = { margin: "0 0 6px", fontSize: 13, color: "#607089" };
+const counter = { margin: "0 0 6px", fontSize: 13, color: "var(--dim)", fontWeight: 700, letterSpacing: 0.4 };
 const btnRow = { display: "flex", gap: 8, alignItems: "center" };
-const linkBtn = { background: "none", border: "none", color: "#607089", cursor: "pointer", padding: "8px 4px" };
+const linkBtn = { background: "none", border: "none", color: "var(--dim)", cursor: "pointer", padding: "8px 4px", fontWeight: 600 };
 const primaryBtn = {
-  padding: "10px 18px",
-  borderRadius: 8,
+  padding: "11px 20px",
+  borderRadius: 12,
   border: "none",
-  background: "#2457e6",
-  color: "#fff",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
   fontSize: 15,
+  fontWeight: 700,
   cursor: "pointer",
+  boxShadow: "0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent)",
 };

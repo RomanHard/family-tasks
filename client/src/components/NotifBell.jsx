@@ -55,7 +55,7 @@ export default function NotifBell() {
           <div style={box} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <h3 style={{ margin: 0 }}>{t("notifs")}</h3>
-              <button onClick={() => setOpen(false)}>✕</button>
+              <button onClick={() => setOpen(false)} className="btn-icon">✕</button>
             </div>
             <div style={{ maxHeight: 320, overflowY: "auto", marginTop: 8 }}>
               {items.length === 0 && (
@@ -71,7 +71,7 @@ export default function NotifBell() {
                   <div key={n.id} style={{ ...row, opacity: n.read ? 0.7 : 1 }}>
                     <div><b>{title}</b></div>
                     <div><small>{body}</small></div>
-                    <div><small style={{ color: "#888" }}>{timeAgo(n.created_at)}</small></div>
+                    <div><small>{timeAgo(n.created_at)}</small></div>
                   </div>
                 );
               })}
@@ -86,19 +86,21 @@ export default function NotifBell() {
 const bellBtn = {
   position: "relative",
   fontSize: 20,
-  padding: "6px 10px",
-  borderRadius: 8,
-  border: "1px solid #ccc",
-  background: "#fff",
+  padding: "8px 11px",
+  borderRadius: 999,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
   cursor: "pointer",
+  lineHeight: 1,
+  boxShadow: "0 4px 12px rgba(23, 34, 56, 0.07)",
 };
 const badge = {
   position: "absolute",
   top: -6,
   right: -6,
-  background: "#d32f2f",
+  background: "var(--danger)",
   color: "#fff",
-  borderRadius: 10,
+  borderRadius: 999,
   fontSize: 11,
   fontWeight: "bold",
   padding: "1px 6px",
@@ -116,5 +118,14 @@ const overlay = {
   paddingTop: 64,
   zIndex: 50,
 };
-const box = { background: "#fff", borderRadius: 12, padding: 16, maxWidth: 380, width: "100%" };
-const row = { padding: "8px 0", borderBottom: "1px solid #eee" };
+const box = {
+  background: "var(--surface)",
+  color: "var(--text)",
+  border: "1px solid var(--border)",
+  borderRadius: 18,
+  padding: 18,
+  maxWidth: 380,
+  width: "100%",
+  boxShadow: "var(--shadow)",
+};
+const row = { padding: "9px 0", borderBottom: "1px solid var(--border)" };

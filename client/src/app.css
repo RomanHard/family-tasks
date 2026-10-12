@@ -1,0 +1,219 @@
+/* Family Tasks — global design layer.
+   The canonical palette lives in theme.css as CSS variables on
+   [data-theme] / [data-world]. This file gives every bare element the
+   product's design language (soft surfaces, 12–18px radii, accent focus
+   rings, pill chips) so screens look finished even where a component
+   doesn't set its own inline styles. Component style objects reference
+   the same variables, so parent themes and kid world palettes always win. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Avenir Next", "Segoe UI", system-ui, -apple-system, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---- typography ---- */
+h1 {
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 12px;
+}
+
+h2 {
+  font-size: 21px;
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  margin: 24px 0 10px;
+}
+
+h3 {
+  font-size: 16.5px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+}
+
+h4 {
+  font-size: 14.5px;
+  font-weight: 700;
+  margin: 14px 0 6px;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+small {
+  color: var(--dim);
+}
+
+a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+ul {
+  margin: 0 0 10px;
+  padding-left: 22px;
+}
+
+li {
+  margin: 4px 0;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  opacity: 0.7;
+}
+
+/* ---- buttons: every bare <button> becomes a soft ghost button ---- */
+button {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease,
+    transform 0.05s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  outline-offset: 1px;
+}
+
+/* primary call-to-action (add className="btn-primary") */
+.btn-primary {
+  background: var(--accent);
+  border-color: transparent;
+  color: var(--on-accent, #fff);
+  font-weight: 700;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.btn-primary:hover {
+  border-color: transparent;
+  filter: brightness(1.06);
+}
+
+/* gold call-to-action (chest opening, celebrations) */
+.btn-gold {
+  background: var(--accent-2);
+  border-color: transparent;
+  color: #3a2a00;
+  font-weight: 800;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--accent-2) 35%, transparent);
+}
+
+.btn-gold:hover {
+  border-color: transparent;
+  filter: brightness(1.05);
+}
+
+.btn-sm {
+  padding: 8px 13px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+.btn-icon {
+  padding: 8px 10px;
+  line-height: 1;
+  font-size: 15px;
+  border-radius: 10px;
+}
+
+/* ---- form controls: every bare input/select/textarea ---- */
+input,
+select,
+textarea {
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 12px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+::placeholder {
+  color: var(--dim);
+  opacity: 0.85;
+}
+
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 6px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+label {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+
+/* ---- shared surfaces ---- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 24px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+}

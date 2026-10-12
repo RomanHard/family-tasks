@@ -60,15 +60,15 @@ export default function Login() {
   };
 
   return (
-    <main style={styles.page}>
+    <main className="auth-card" style={styles.page}>
       <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
-        <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t("language")}>
+        <select value={lang} onChange={(e) => setLang(e.target.value)} aria-label={t("language")} style={{ padding: "7px 10px", fontSize: 14 }}>
           {LANGS.map((l) => (
             <option key={l.id} value={l.id}>{l.label}</option>
           ))}
         </select>
       </div>
-      <h1>Family Tasks</h1>
+      <h1 style={{ textAlign: "center" }}>Family Tasks</h1>
       <div style={styles.tabs}>
         <button
           style={mode === "parent" ? styles.tabActive : styles.tab}
@@ -137,7 +137,7 @@ export default function Login() {
                 required
               />
               <p><small>{t("resetHint")}</small></p>
-              {resetMsg && <p style={{ color: "green" }}><small>{resetMsg}</small></p>}
+              {resetMsg && <p style={{ color: "var(--success)" }}><small>{resetMsg}</small></p>}
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={styles.button} type="submit">{t("send")}</button>
                 <button type="button" onClick={() => { setShowReset(false); setResetMsg(""); }}>
@@ -166,7 +166,7 @@ export default function Login() {
                 required
               />
               <p><small>{t("kidResetHint")}</small></p>
-              {kidResetMsg && <p style={{ color: "green" }}><small>{kidResetMsg}</small></p>}
+              {kidResetMsg && <p style={{ color: "var(--success)" }}><small>{kidResetMsg}</small></p>}
               <div style={{ display: "flex", gap: 8 }}>
                 <button style={styles.button} type="submit">{t("send")}</button>
                 <button type="button" onClick={() => { setShowKidReset(false); setKidResetMsg(""); }}>
@@ -182,13 +182,61 @@ export default function Login() {
 }
 
 const styles = {
-  page: { fontFamily: "system-ui", maxWidth: 360, margin: "40px auto", padding: 16 },
-  tabs: { display: "flex", gap: 8, marginBottom: 16 },
-  tab: { flex: 1, padding: 10, borderRadius: 8, border: "1px solid #ccc", background: "#fff" },
-  tabActive: { flex: 1, padding: 10, borderRadius: 8, border: "1px solid #333", background: "#eee", fontWeight: "bold" },
-  form: { display: "flex", flexDirection: "column", gap: 10 },
-  input: { padding: 10, borderRadius: 8, border: "1px solid #ccc", fontSize: 16 },
-  button: { padding: 12, borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 },
-  error: { color: "crimson" },
-  link: { background: "none", border: "none", padding: 0, color: "#1565c0", textDecoration: "underline", cursor: "pointer", fontSize: 14 },
+  page: { maxWidth: 400, width: "calc(100% - 24px)", margin: "44px auto", padding: "26px 24px" },
+  tabs: {
+    display: "flex",
+    gap: 5,
+    marginBottom: 18,
+    background: "var(--surface-2)",
+    padding: 5,
+    borderRadius: 999,
+  },
+  tab: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 999,
+    border: "1px solid transparent",
+    background: "transparent",
+    color: "var(--dim)",
+    fontWeight: 700,
+  },
+  tabActive: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 999,
+    border: "1px solid transparent",
+    background: "var(--surface)",
+    color: "var(--text)",
+    fontWeight: 800,
+    boxShadow: "0 4px 12px rgba(23, 34, 56, 0.12)",
+  },
+  form: { display: "flex", flexDirection: "column", gap: 11 },
+  input: {
+    padding: "12px 14px",
+    borderRadius: 12,
+    border: "1.5px solid var(--border)",
+    background: "var(--surface)",
+    fontSize: 16,
+    width: "100%",
+  },
+  button: {
+    padding: "13px 16px",
+    borderRadius: 12,
+    border: "none",
+    background: "var(--accent)",
+    color: "var(--on-accent)",
+    fontSize: 16,
+    fontWeight: 700,
+    boxShadow: "0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent)",
+  },
+  error: {
+    color: "var(--danger)",
+    background: "color-mix(in srgb, var(--danger) 10%, var(--surface))",
+    borderRadius: 10,
+    padding: "9px 12px",
+    margin: 0,
+    fontSize: 14,
+    fontWeight: 600,
+  },
+  link: { background: "none", border: "none", padding: 0, color: "var(--accent)", textDecoration: "underline", cursor: "pointer", fontSize: 14, fontWeight: 600 },
 };

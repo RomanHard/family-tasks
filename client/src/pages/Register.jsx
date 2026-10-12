@@ -23,8 +23,8 @@ export default function Register() {
   };
 
   return (
-    <main style={{ fontFamily: "system-ui", maxWidth: 360, margin: "40px auto", padding: 16 }}>
-      <h1>{t("registerTitle")}</h1>
+    <main className="auth-card" style={{ maxWidth: 400, width: "calc(100% - 24px)", margin: "44px auto", padding: "26px 24px" }}>
+      <h1 style={{ textAlign: "center" }}>{t("registerTitle")}</h1>
       <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <input
           style={input}
@@ -42,7 +42,7 @@ export default function Register() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        {error && <p style={{ color: "crimson" }}>{error}</p>}
+        {error && <p style={{ color: "var(--danger)", fontWeight: 600, margin: 0 }}>{error}</p>}
         <button style={button} type="submit">
           {t("createAccount")}
         </button>
@@ -54,5 +54,21 @@ export default function Register() {
   );
 }
 
-const input = { padding: 10, borderRadius: 8, border: "1px solid #ccc", fontSize: 16 };
-const button = { padding: 12, borderRadius: 8, border: "none", background: "#333", color: "#fff", fontSize: 16 };
+const input = {
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: "1.5px solid var(--border)",
+  background: "var(--surface)",
+  fontSize: 16,
+  width: "100%",
+};
+const button = {
+  padding: "13px 16px",
+  borderRadius: 12,
+  border: "none",
+  background: "var(--accent)",
+  color: "var(--on-accent)",
+  fontSize: 16,
+  fontWeight: 700,
+  boxShadow: "0 8px 18px color-mix(in srgb, var(--accent) 28%, transparent)",
+};
